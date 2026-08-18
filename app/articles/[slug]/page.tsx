@@ -9,15 +9,22 @@ import { SITE_URL } from "../../lib/seo";
 import { useLang } from "../../i18n";
 import { SEED_ARTICLES } from "../../lib/data";
 import type { Article } from "../../lib/data";
+import { getArticleContent } from "../../lib/store";
 
 export default function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const [article, setArticle] = useState<Article | null>(null);
   const [done, setDone] = useState(false);
   useEffect(() => {
     let list: Article[] = SEED_ARTICLES;
-    try { const v = localStorage.getItem("nf_articles"); if (v) list = JSON.parse(v); } catch {}
+    try {
+      const v = localStorage.getItem("nf_articles");
+      if (v) {
+        const parsed = JSON.parse(v) as Article[];
+        list = parsed.map((a) => ({ ...a, contentId: a.contentId ?? a.content, contentEn: a.contentEn ?? a.content, contentZh: a.contentZh ?? a.content }));
+      }
+    } catch {}
     setArticle(list.find((a) => a.slug === slug) ?? null);
     setDone(true);
   }, [slug]);
@@ -35,7 +42,7 @@ export default function ArticleDetailPage() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] px-3 py-1">{article.category}</span><span>{article.date}</span></div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-light leading-none text-[#2D4A22] break-words">{article.title}</h1>
           <p className="mt-3 text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{article.excerpt}</p>
-          <div className="prose prose-sm mt-6 max-w-none text-[13px] sm:text-[14px] leading-7 text-[#1a1a16]/70 break-words [&_img]:max-w-full [&_img]:rounded-xl" dangerouslySetInnerHTML={{ __html: article.content }} />
+          <div className="prose prose-sm mt-6 max-w-none text-[13px] sm:text-[14px] leading-7 text-[#1a1a16]/70 break-words [&_img]:max-w-full [&_img]:rounded-xl [&_a]:text-[#2D4A22] [&_a]:underline" dangerouslySetInnerHTML={{ __html: getArticleContent(article, locale) }} />
         </div>
       </div>
     </PageShell>

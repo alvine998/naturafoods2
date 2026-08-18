@@ -5,9 +5,12 @@ import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { Article, Edu, Innovation, Job, Product } from "../../lib/data";
+import dynamic from "next/dynamic";
 import AdminShell from "../AdminShell";
 import { Card, Field, FileUpload, Input, TextArea } from "../_components";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const QuillEditor = dynamic(() => import("@/components/ui/quill-editor"), { ssr: false });
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -157,10 +160,23 @@ function ProductsTab({ s, a, editIdx, setEditIdx }: any) {
 function ArticlesTab({ s, a, editIdx, setEditIdx }: any) {
   const [f, setF] = useState<Partial<Article>>({});
   const [q, setQ] = useState("");
+  const [localeTab, setLocaleTab] = useState<"id" | "en" | "zh">("en");
   const startEdit = (i: number) => { setF(s.articles[i]); setEditIdx(i); };
   const save = () => {
     if (!f.title || !f.slug) return;
-    const item: Article = { slug: String(f.slug), title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.content ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? "") };
+    // normalize: content* comes from Quill HTML; keep legacy content as fallback to EN
+    const item: Article = {
+      slug: String(f.slug),
+      title: String(f.title),
+      excerpt: String(f.excerpt ?? ""),
+      content: String(f.contentEn ?? f.content ?? ""),
+      contentId: String(f.contentId ?? ""),
+      contentEn: String(f.contentEn ?? f.content ?? ""),
+      contentZh: String(f.contentZh ?? ""),
+      date: String(f.date ?? new Date().toISOString().slice(0, 10)),
+      category: String(f.category ?? "General"),
+      img: String(f.img ?? ""),
+    };
     if (editIdx !== null) s.setArticles((prev: Article[]) => prev.map((x: Article, i: number) => i === editIdx ? item : x)); else s.setArticles((prev: Article[]) => [...prev, item]);
     setF({}); setEditIdx(null);
   };
@@ -170,7 +186,7 @@ function ArticlesTab({ s, a, editIdx, setEditIdx }: any) {
     return (s.articles as Article[]).filter((x: Article) => `${x.title} ${x.slug} ${x.category}`.toLowerCase().includes(n));
   }, [s.articles, q]);
   return (
-    <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
       <Card className="p-4 sm:p-5 h-fit lg:sticky lg:top-[72px]">
         <SectionTitle title={`${editIdx !== null ? a.edit : a.add} — ${a.tabs[1]}`} />
         <div className="mt-4 grid gap-3">
@@ -180,7 +196,23 @@ function ArticlesTab({ s, a, editIdx, setEditIdx }: any) {
           <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} placeholder="YYYY-MM-DD" /></Field>
           <Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" /></Field>
           <Field label="excerpt"><TextArea value={f.excerpt ?? ""} onChange={(e) => setF({ ...f, excerpt: e.target.value })} rows={2} placeholder="Short summary for listing" /></Field>
-          <Field label="content (HTML)"><TextArea value={f.content ?? ""} onChange={(e) => setF({ ...f, content: e.target.value })} rows={5} placeholder="<p>Article HTML content…</p>" /></Field>
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] tracking-[0.14em] text-[#8B6F47] uppercase">Content — WYSIWYG</span>
+              <span className="text-[11px] text-[#8B6F47]">Quill</span>
+            </div>
+            <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] p-1 w-fit">
+              {(["id", "en", "zh"] as const).map((loc) => (
+                <button key={loc} type="button" onClick={() => setLocaleTab(loc)} className={`rounded-full px-3 py-1.5 text-[11px] font-medium tracking-[0.08em] transition ${localeTab === loc ? "bg-[#2D4A22] text-white shadow" : "text-[#8B6F47] hover:text-[#2D4A22]"}`}>
+                  {loc === "id" ? "ID" : loc === "en" ? "EN" : "中文"}
+                </button>
+              ))}
+            </div>
+            {localeTab === "id" && <QuillEditor value={f.contentId ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentId: v }))} placeholder="Tulis konten (ID)…" />}
+            {localeTab === "en" && <QuillEditor value={f.contentEn ?? (f.content ?? "")} onChange={(v) => setF((prev) => ({ ...prev, contentEn: v, content: v }))} placeholder="Write content (EN)…" />}
+            {localeTab === "zh" && <QuillEditor value={f.contentZh ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentZh: v }))} placeholder="撰写内容（中文）…" />}
+            <p className="text-[11px] text-[#8B6F47]">Saved as HTML. Detail page shows content for active locale (ID/EN/ZH) — fallback to EN.</p>
+          </div>
           <div className="flex flex-wrap gap-2 pt-1"><button onClick={save} disabled={!f.title || !f.slug} className="rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.12em] text-white disabled:opacity-50">{a.save}</button>{editIdx !== null && <button onClick={() => { setF({}); setEditIdx(null); }} className="rounded-full border border-[#2D4A22]/15 px-5 py-2.5 text-[11px]">{a.cancel}</button>}</div>
         </div>
       </Card>

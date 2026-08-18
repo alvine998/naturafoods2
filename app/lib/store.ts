@@ -44,8 +44,25 @@ export function useStore() {
 
 // for non-hook access (articles list / detail fallback to seed)
 export function getSeedArticles(): Article[] {
-  try { const v = localStorage.getItem(KEYS.articles); if (v) return JSON.parse(v); } catch {}
+  try {
+    const v = localStorage.getItem(KEYS.articles);
+    if (v) {
+      const parsed = JSON.parse(v) as Article[];
+      // migrate old single-content articles → fill locale variants
+      return parsed.map((a) => ({
+        ...a,
+        contentId: a.contentId ?? a.content ?? "",
+        contentEn: a.contentEn ?? a.content ?? "",
+        contentZh: a.contentZh ?? a.content ?? "",
+      }));
+    }
+  } catch {}
   return SEED_ARTICLES;
+}
+export function getArticleContent(a: Article, locale: string): string {
+  if (locale === "id") return a.contentId ?? a.contentEn ?? a.content ?? "";
+  if (locale === "zh") return a.contentZh ?? a.contentEn ?? a.content ?? "";
+  return a.contentEn ?? a.content ?? "";
 }
 export function getSeedProducts(): Product[] {
   try { const v = localStorage.getItem(KEYS.products); if (v) return JSON.parse(v); } catch {}

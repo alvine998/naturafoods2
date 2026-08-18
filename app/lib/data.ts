@@ -1,5 +1,5 @@
 export type Product = { slug: string; cat: "choco" | "matcha"; title: string; note: string; tag: string; img: string; desc: string };
-export type Article = { slug: string; title: string; excerpt: string; content: string; date: string; category: string; img: string };
+export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string };
 export type Edu = { id: string; title: string; desc: string; duration: string; level: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string };
@@ -15,9 +15,42 @@ export const SEED_PRODUCTS: Product[] = [
 ];
 
 export const SEED_ARTICLES: Article[] = [
-  { slug: "tempering-guide", title: "The Tempering Guide for Cafés", excerpt: "Why 31–32°C matters and how to hold temper during service.", content: "<p>Temper is everything. In this guide we cover tabling vs seeding, holding at 31–32°C, and how to rescue bloomed batches without wasting callets. Includes a one-page SOP for service.</p><p>Key takeaway: hold your bain-marie at 45°C melt, seed to 27°C, reheat to 31.5°C — whisk, don't stir.</p>", date: "2026-02-10", category: "Choco", img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=900&q=80" },
-  { slug: "matcha-grades", title: "Ceremonial vs Culinary — What Shops Actually Need", excerpt: "Grade, colour and cost-per-serve breakdown for latte programs.", content: "<p>Not all matcha is equal. We break down Grade A vs B, colour (L*a*b*), and cost-per-serve so you can choose without overpaying.</p><p>Rule of thumb: ceremonial for usucha/koicha, Grade B for latte where milk dominates.</p>", date: "2026-01-18", category: "Matcha", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=900&q=80" },
-  { slug: "cold-chain-jakarta", title: "Cold-Chain in Jakarta: Why We Hold Stock", excerpt: "How temp-logged warehousing protects couverture & matcha.", content: "<p>Jakarta heat kills flavour. Our warehouse is temp-logged at 18–20°C for choco and 5°C for matcha, with batch traceability and COA on request.</p>", date: "2025-12-03", category: "Operations", img: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80" },
+  {
+    slug: "tempering-guide",
+    title: "The Tempering Guide for Cafés",
+    excerpt: "Why 31–32°C matters and how to hold temper during service.",
+    content: "<p>Temper is everything. In this guide we cover tabling vs seeding, holding at 31–32°C, and how to rescue bloomed batches without wasting callets. Includes a one-page SOP for service.</p><p>Key takeaway: hold your bain-marie at 45°C melt, seed to 27°C, reheat to 31.5°C — whisk, don't stir.</p>",
+    contentEn: "<p>Temper is everything. In this guide we cover tabling vs seeding, holding at 31–32°C, and how to rescue bloomed batches without wasting callets. Includes a one-page SOP for service.</p><p>Key takeaway: hold your bain-marie at 45°C melt, seed to 27°C, reheat to 31.5°C — whisk, don't stir.</p>",
+    contentId: "<p>Temper adalah segalanya. Panduan ini membahas tabling vs seeding, menjaga 31–32°C, dan cara menyelamatkan batch yang blooming tanpa membuang callets. Termasuk SOP satu halaman untuk service.</p><p>Poin kunci: lelehkan di bain-marie 45°C, seed ke 27°C, panaskan ulang ke 31,5°C — whisk, jangan diaduk.</p>",
+    contentZh: "<p>回温至关重要。本指南涵盖大理石降温与籽晶法、保持31–32°C以及如何在不浪费纽扣巧克力的情况下拯救起霜批次。包含一页服务SOP。</p><p>要点：隔水加热至45°C融化，籽晶降至27°C，再加热至31.5°C——用 whisk 搅拌，不要搅动。</p>",
+    date: "2026-02-10",
+    category: "Choco",
+    img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=900&q=80",
+  },
+  {
+    slug: "matcha-grades",
+    title: "Ceremonial vs Culinary — What Shops Actually Need",
+    excerpt: "Grade, colour and cost-per-serve breakdown for latte programs.",
+    content: "<p>Not all matcha is equal. We break down Grade A vs B, colour (L*a*b*), and cost-per-serve so you can choose without overpaying.</p><p>Rule of thumb: ceremonial for usucha/koicha, Grade B for latte where milk dominates.</p>",
+    contentEn: "<p>Not all matcha is equal. We break down Grade A vs B, colour (L*a*b*), and cost-per-serve so you can choose without overpaying.</p><p>Rule of thumb: ceremonial for usucha/koicha, Grade B for latte where milk dominates.</p>",
+    contentId: "<p>Tidak semua matcha sama. Kami membedah Grade A vs B, warna (L*a*b*), dan cost-per-serve agar Anda memilih tanpa overpay.</p><p>Aturan praktis: ceremonial untuk usucha/koicha, Grade B untuk latte di mana susu mendominasi.</p>",
+    contentZh: "<p>并非所有抹茶都一样。我们解析 A级与 B级、颜色（L*a*b*）以及每杯成本，帮你做出性价比之选。</p><p>经验法则：仪式级用于薄茶/浓茶，B级用于拿铁等奶味主导的饮品。</p>",
+    date: "2026-01-18",
+    category: "Matcha",
+    img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=900&q=80",
+  },
+  {
+    slug: "cold-chain-jakarta",
+    title: "Cold-Chain in Jakarta: Why We Hold Stock",
+    excerpt: "How temp-logged warehousing protects couverture & matcha.",
+    content: "<p>Jakarta heat kills flavour. Our warehouse is temp-logged at 18–20°C for choco and 5°C for matcha, with batch traceability and COA on request.</p>",
+    contentEn: "<p>Jakarta heat kills flavour. Our warehouse is temp-logged at 18–20°C for choco and 5°C for matcha, with batch traceability and COA on request.</p>",
+    contentId: "<p>Panas Jakarta merusak rasa. Gudang kami tercatat suhu 18–20°C untuk choco dan 5°C untuk matcha, dengan traceability batch dan COA on request.</p>",
+    contentZh: "<p>雅加达的高温会破坏风味。我们的仓库全程温控记录：巧克力 18–20°C、抹茶 5°C，批次可追溯、按需提供 COA。</p>",
+    date: "2025-12-03",
+    category: "Operations",
+    img: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80",
+  },
 ];
 
 export const SEED_EDU: Edu[] = [
