@@ -203,7 +203,7 @@ function EduTab({ s, a, editIdx, setEditIdx }: any) {
   const startEdit = (i: number) => { setF(s.edu[i]); setEditIdx(i); };
   const save = () => {
     if (!f.title) return;
-    const item: Edu = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), duration: String(f.duration ?? ""), level: String(f.level ?? ""), img: String(f.img ?? "") };
+    const item: Edu = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), duration: String(f.duration ?? ""), level: String(f.level ?? ""), img: String(f.img ?? ""), link: String(f.link ?? ""), cta: String(f.cta ?? ""), eyebrow: String(f.eyebrow ?? "") };
     if (editIdx !== null) s.setEdu((prev: Edu[]) => prev.map((x: Edu, i: number) => i === editIdx ? item : x)); else s.setEdu((prev: Edu[]) => [...prev, item]);
     setF({}); setEditIdx(null);
   };
@@ -218,6 +218,9 @@ function EduTab({ s, a, editIdx, setEditIdx }: any) {
           <Field label="duration"><Input value={f.duration ?? ""} onChange={(e) => setF({ ...f, duration: e.target.value })} placeholder="1 day · Jakarta" /></Field>
           <Field label="level"><Input value={f.level ?? ""} onChange={(e) => setF({ ...f, level: e.target.value })} placeholder="Beginner" /></Field>
           <Field label="img url"><Input value={f.img ?? ""} onChange={(e) => setF({ ...f, img: e.target.value })} /></Field>
+          <Field label="eyebrow"><Input value={f.eyebrow ?? ""} onChange={(e) => setF({ ...f, eyebrow: e.target.value })} placeholder="EDUCATION · WORKSHOP" /></Field>
+          <Field label="link (youtube / any url)"><Input value={f.link ?? ""} onChange={(e) => setF({ ...f, link: e.target.value })} placeholder="https://youtube.com/watch?v=..." /></Field>
+          <Field label="cta label"><Input value={f.cta ?? ""} onChange={(e) => setF({ ...f, cta: e.target.value })} placeholder="Watch on YouTube" /></Field>
           <div className="flex gap-2 pt-1"><button onClick={save} disabled={!f.title} className="rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.12em] text-white disabled:opacity-50">{a.save}</button>{editIdx !== null && <button onClick={() => { setF({}); setEditIdx(null); }} className="rounded-full border border-[#2D4A22]/15 px-5 py-2.5 text-[11px]">{a.cancel}</button>}</div>
         </div>
       </Card>
@@ -240,7 +243,7 @@ function InnovationTab({ s, a, editIdx, setEditIdx }: any) {
   const startEdit = (i: number) => { setF(s.innovation[i]); setEditIdx(i); };
   const save = () => {
     if (!f.title) return;
-    const item: Innovation = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? "") };
+    const item: Innovation = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? ""), link: String(f.link ?? ""), cta: String(f.cta ?? ""), eyebrow: String(f.eyebrow ?? "") };
     if (editIdx !== null) s.setInnovation((prev: Innovation[]) => prev.map((x: Innovation, i: number) => i === editIdx ? item : x)); else s.setInnovation((prev: Innovation[]) => [...prev, item]);
     setF({}); setEditIdx(null);
   };
@@ -254,6 +257,9 @@ function InnovationTab({ s, a, editIdx, setEditIdx }: any) {
           <Field label="desc"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={2} /></Field>
           <Field label="tag"><Input value={f.tag ?? ""} onChange={(e) => setF({ ...f, tag: e.target.value })} /></Field>
           <Field label="img url"><Input value={f.img ?? ""} onChange={(e) => setF({ ...f, img: e.target.value })} /></Field>
+          <Field label="eyebrow"><Input value={f.eyebrow ?? ""} onChange={(e) => setF({ ...f, eyebrow: e.target.value })} placeholder="INNOVATION · R&D" /></Field>
+          <Field label="link (youtube / any url)"><Input value={f.link ?? ""} onChange={(e) => setF({ ...f, link: e.target.value })} placeholder="https://youtube.com/watch?v=..." /></Field>
+          <Field label="cta label"><Input value={f.cta ?? ""} onChange={(e) => setF({ ...f, cta: e.target.value })} placeholder="Watch film" /></Field>
           <div className="flex gap-2 pt-1"><button onClick={save} disabled={!f.title} className="rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.12em] text-white disabled:opacity-50">{a.save}</button>{editIdx !== null && <button onClick={() => { setF({}); setEditIdx(null); }} className="rounded-full border border-[#2D4A22]/15 px-5 py-2.5 text-[11px]">{a.cancel}</button>}</div>
         </div>
       </Card>
