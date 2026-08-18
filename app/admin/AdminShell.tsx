@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Menu, X, ArrowLeft } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -13,7 +14,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const ICONS = ["◈", "◐", "⬡", "✦", "◎", "✉"];
+const ICONS = [Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail] as const;
 
 export default function AdminShell({ active, onTab, counts, labels, children }: Props) {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function AdminShell({ active, onTab, counts, labels, children }: 
   const a = t.admin;
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const nav = labels.map((l, i) => ({ label: l, icon: ICONS[i] ?? "•", count: counts[i] ?? 0, idx: i }));
+  const nav = labels.map((l, i) => ({ label: l, Icon: ICONS[i] ?? Package, count: counts[i] ?? 0, idx: i }));
 
   const Sidebar = ({ compact }: { compact?: boolean }) => (
     <nav className="grid gap-1">
@@ -31,7 +32,7 @@ export default function AdminShell({ active, onTab, counts, labels, children }: 
           onClick={() => { onTab(n.idx); setMobileOpen(false); }}
           className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-[12px] tracking-[0.02em] transition ${active === n.idx ? "bg-[#2D4A22] text-white shadow-[0_4px_16px_rgba(45,74,34,0.25)]" : "text-[#2D4A22]/70 hover:bg-[#2D4A22]/[0.06] hover:text-[#2D4A22]"}`}
         >
-          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[11px] ${active === n.idx ? "bg-white/15 text-white" : "bg-[#FFFCF2] border border-[#2D4A22]/10"}`}>{n.icon}</span>
+          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${active === n.idx ? "bg-white/15 text-white" : "bg-[#FFFCF2] border border-[#2D4A22]/10"}`}><n.Icon className="h-3.5 w-3.5" /></span>
           {!compact && <span className="flex-1 truncate font-medium">{n.label}</span>}
           {!compact && <span className={`rounded-full px-2 py-0.5 text-[10px] ${active === n.idx ? "bg-white/15 text-white" : "bg-[#2D4A22]/[0.06] text-[#2D4A22]/60"}`}>{n.count}</span>}
         </button>
@@ -45,7 +46,7 @@ export default function AdminShell({ active, onTab, counts, labels, children }: 
       <header className="sticky top-0 z-30 border-b border-[#2D4A22]/10 bg-[#FFFCF2]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle menu" className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D4A22]/15 bg-white text-[#2D4A22] lg:hidden">☰</button>
+            <button onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle menu" className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D4A22]/15 bg-white text-[#2D4A22] lg:hidden"><Menu className="h-4 w-4" /></button>
             <Link href="/" className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.png" alt="NaturaFoods" className="h-7 w-auto" />
@@ -55,7 +56,7 @@ export default function AdminShell({ active, onTab, counts, labels, children }: 
             <span className="hidden sm:inline text-[11px] tracking-[0.14em] text-[#8B6F47]">ADMIN</span>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/" className="hidden sm:inline-flex rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#FFFCF2]">← Home</Link>
+            <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#FFFCF2]"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
             <button onClick={() => { logout(); router.push("/admin/login"); }} className="rounded-full bg-[#2D4A22] px-4 sm:px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.logout}</button>
           </div>
         </div>
@@ -82,10 +83,10 @@ export default function AdminShell({ active, onTab, counts, labels, children }: 
             <div className="absolute inset-y-0 left-0 w-[84%] max-w-[320px] bg-[#FFFCF2] border-r border-[#2D4A22]/10 p-4 overflow-y-auto">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">MENU</span>
-                <button onClick={() => setMobileOpen(false)} className="h-8 w-8 rounded-full bg-[#2D4A22] text-white">✕</button>
+                <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white"><X className="h-4 w-4" /></button>
               </div>
               <div className="mt-4"><Sidebar /></div>
-              <Link href="/" onClick={() => setMobileOpen(false)} className="mt-4 flex justify-center rounded-full border border-[#2D4A22]/15 bg-white py-2.5 text-[11px] tracking-[0.12em] text-[#2D4A22]">← Home</Link>
+              <Link href="/" onClick={() => setMobileOpen(false)} className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white py-2.5 text-[11px] tracking-[0.12em] text-[#2D4A22]"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
             </div>
           </div>
         )}

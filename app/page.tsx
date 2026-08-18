@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, ArrowUpRight, Minus } from "lucide-react";
 import LenisProvider from "./components/LenisProvider";
 import Splash from "./components/Splash";
 import HeroSlider from "./components/HeroSlider";
@@ -54,7 +55,7 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.16}><p className="mt-4 sm:mt-6 max-w-[46ch] text-[14px] sm:text-[15px] leading-6 sm:leading-7 text-[#1a1a16]/60">{t.heroDesc}</p></Reveal>
               <Reveal delay={0.22} className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-                <Link href="/products" className="group inline-flex items-center gap-2 sm:gap-3 rounded-full bg-[#2D4A22] px-5 sm:px-7 py-3 sm:py-3.5 text-[11px] sm:text-[12px] tracking-[0.16em] text-white transition hover:bg-[#1e3317]">{t.viewCatalog}<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition group-hover:bg-white group-hover:text-[#2D4A22]">→</span></Link>
+                <Link href="/products" className="group inline-flex items-center gap-2 sm:gap-3 rounded-full bg-[#2D4A22] px-5 sm:px-7 py-3 sm:py-3.5 text-[11px] sm:text-[12px] tracking-[0.16em] text-white transition hover:bg-[#1e3317]">{t.viewCatalog}<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition group-hover:bg-white group-hover:text-[#2D4A22]"><ArrowRight className="h-3.5 w-3.5" /></span></Link>
                 <Link href="/about" className="text-[11px] tracking-[0.16em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-8 hover:decoration-[#2D4A22]">{t.companyProfile}</Link>
               </Reveal>
               <Reveal delay={0.28} className="mt-8 sm:mt-10 grid grid-cols-3 gap-4 sm:gap-6 border-t border-[#2D4A22]/10 pt-6 sm:pt-8">
@@ -78,7 +79,7 @@ export default function Home() {
                   <div className="text-[10px] sm:text-[11px] tracking-[0.14em] text-[#8B6F47]">{t.cardPriceEyebrow}</div>
                   <div className="mt-1 flex items-baseline gap-2"><span className="font-[var(--font-display)] text-[16px] sm:text-[20px] font-medium text-[#2D4A22]">{t.cardPriceTitle}</span></div>
                   <div className="text-[10px] sm:text-[11px] text-[#8B6F47]">{t.cardPriceSub}</div>
-                  <Link href="/contact" className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-2 text-[11px] tracking-[0.14em] text-white">{t.cardRequestPrice} <span>↗</span></Link>
+                  <Link href="/contact" className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-2 text-[11px] tracking-[0.14em] text-white">{t.cardRequestPrice} <ArrowUpRight className="h-3.5 w-3.5" /></Link>
                 </motion.div>
               </div>
               <Parallax offset={40} className="pointer-events-none absolute -right-4 -top-4 hidden md:block"><div className="h-24 w-24 rounded-full border border-[#2D4A22]/10" /></Parallax>
@@ -100,10 +101,10 @@ export default function Home() {
             <div className="order-1 md:order-2">
               <Reveal><p className="text-[10px] tracking-[0.2em] sm:text-[11px] sm:tracking-[0.24em] text-[#8B6F47]">{t.aboutEyebrow}</p></Reveal>
               <Reveal delay={0.08}><h2 className="mt-2 sm:mt-3 font-[var(--font-display)] text-[28px] sm:text-[34px] font-light leading-none tracking-tight text-[#2D4A22] md:text-[44px]">{t.aboutTitle1}<br /><span className="italic font-normal">{t.aboutTitle2}</span></h2></Reveal>
-              <Reveal delay={0.14}><p className="mt-4 sm:mt-5 max-w-[46ch] text-[14px] sm:text-[15px] leading-6 sm:leading-7 text-[#1a1a16]/65">{t.aboutDesc}</p><ul className="mt-4 sm:mt-5 grid gap-2 text-[13px] leading-6 text-[#1a1a16]/70">{t.aboutBullets.map((b) => <li key={b} className="flex gap-2"><span className="text-[#2D4A22]">—</span>{b}</li>)}</ul></Reveal>
+              <Reveal delay={0.14}><p className="mt-4 sm:mt-5 max-w-[46ch] text-[14px] sm:text-[15px] leading-6 sm:leading-7 text-[#1a1a16]/65">{t.aboutDesc}</p><ul className="mt-4 sm:mt-5 grid gap-2 text-[13px] leading-6 text-[#1a1a16]/70">{t.aboutBullets.map((b) => <li key={b} className="flex gap-2"><Minus className="mt-1 h-3 w-3 shrink-0 text-[#2D4A22]" />{b}</li>)}</ul></Reveal>
               <Reveal delay={0.2} className="mt-6 sm:mt-8 flex gap-4 sm:gap-6"><div className="hidden sm:block h-16 w-px shrink-0 bg-[#2D4A22]/15" /><blockquote className="max-w-[34ch] font-[var(--font-display)] text-[15px] sm:text-[17px] italic leading-6 sm:leading-7 text-[#2D4A22]">&ldquo;{t.aboutQuote}&rdquo;<span className="mt-2 block font-sans text-[11px] not-italic tracking-[0.14em] text-[#8B6F47]">{t.aboutQuoteAttr}</span></blockquote></Reveal>
               <Reveal delay={0.26} className="mt-6 sm:mt-8 flex flex-wrap gap-2 sm:gap-3">{t.aboutBadges.map((b) => <span key={b} className="rounded-full border border-[#2D4A22]/10 bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] tracking-[0.12em] text-[#2D4A22]">{b}</span>)}</Reveal>
-              <Reveal delay={0.3} className="mt-4 sm:mt-6"><Link href="/about" className="text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">View more →</Link></Reveal>
+              <Reveal delay={0.3} className="mt-4 sm:mt-6"><Link href="/about" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">View more <ArrowRight className="h-3 w-3" /></Link></Reveal>
             </div>
           </div>
         </section>
@@ -117,7 +118,7 @@ export default function Home() {
                 <div className="p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px]">{p.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{p.note}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-white">{p.tag}</span></div><Link href="/products?cat=choco" className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">{t.requestQuote}</Link></div>
               </motion.div>))}
             </div>
-            <div className="mt-6 text-center"><Link href="/products?cat=choco" className="text-[11px] tracking-[0.14em] text-[#2D4A22] underline">View all products →</Link></div>
+            <div className="mt-6 text-center"><Link href="/products?cat=choco" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline">View all products <ArrowRight className="h-3 w-3" /></Link></div>
           </div>
         </section>
 
@@ -151,7 +152,7 @@ export default function Home() {
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1280px] gap-8 sm:gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-start">
-            <div><h3 className="font-[var(--font-display)] text-[26px] sm:text-[30px] font-light leading-none text-white md:text-[36px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-white/65">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex rounded-full bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">Go to contact page →</Link></div></div>
+            <div><h3 className="font-[var(--font-display)] text-[26px] sm:text-[30px] font-light leading-none text-white md:text-[36px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-white/65">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex items-center gap-1 rounded-full bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">Go to contact page <ArrowRight className="h-3 w-3" /></Link></div></div>
             <div className="rounded-[20px] bg-white p-5 sm:p-6 md:p-7 text-center">
               <p className="text-[13px] leading-6 text-[#1a1a16]/60">Full inquiry form moved to</p>
               <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white">CONTACT US</Link>

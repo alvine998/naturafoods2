@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ArrowRight, ArrowUpRight, Menu, X, Plus } from "lucide-react";
 import { LanguageSwitcher, useLang } from "../i18n";
 
 const PRODUCT_SUB = [
@@ -68,7 +69,7 @@ export default function SiteNav() {
                     }`}
                   >
                     {n.label}
-                    <span className="text-[9px] opacity-60 transition group-hover:rotate-180">▾</span>
+                    <ChevronDown className="h-3 w-3 opacity-60 transition group-hover:rotate-180" />
                     {isActive(n.href) && <span className="pointer-events-none absolute inset-x-3 bottom-1 h-px bg-[#2D4A22]/20" />}
                   </Link>
                   <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
@@ -83,7 +84,7 @@ export default function SiteNav() {
                             <div className="text-[12px] font-medium tracking-[0.04em] text-[#2D4A22]">{s.label[locale]}</div>
                             <div className="text-[11px] tracking-[0.06em] text-[#8B6F47]">{s.desc[locale]}</div>
                           </div>
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#2D4A22]/10 text-[#2D4A22] transition group-hover/item:bg-[#2D4A22] group-hover/item:text-white">→</span>
+                           <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#2D4A22]/10 text-[#2D4A22] transition group-hover/item:bg-[#2D4A22] group-hover/item:text-white"><ArrowRight className="h-3.5 w-3.5" /></span>
                         </Link>
                       ))}
                     </div>
@@ -118,11 +119,7 @@ export default function SiteNav() {
               aria-label="Open menu"
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2D4A22]/15 bg-white text-[#2D4A22] shadow-sm transition hover:bg-[#FFFCF2] lg:hidden"
             >
-              <span className="space-y-1.5">
-                <span className="block h-px w-4 bg-current" />
-                <span className="block h-px w-4 bg-current" />
-                <span className="block h-px w-3 bg-current" />
-              </span>
+              <Menu className="h-4 w-4" />
             </button>
           </div>
         </nav>
@@ -158,7 +155,7 @@ export default function SiteNav() {
                   aria-label="Close menu"
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2D4A22] text-white"
                 >
-                  ✕
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
@@ -176,7 +173,7 @@ export default function SiteNav() {
                             onClick={() => setProdOpen((v) => !v)}
                             className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2D4A22]/10 bg-white text-[#2D4A22]"
                           >
-                            <span className={`text-xs transition ${prodOpen ? "rotate-45" : ""}`}>+</span>
+                            <Plus className={`h-3.5 w-3.5 transition ${prodOpen ? "rotate-45" : ""}`} />
                           </button>
                         </div>
                         <AnimatePresence initial={false}>
@@ -191,12 +188,12 @@ export default function SiteNav() {
                               <div className="pb-3 pl-3">
                                 <div className="grid gap-1 border-l border-[#2D4A22]/10 pl-3">
                                   {n.dropdown.map((s) => (
-                                    <Link key={s.href} href={s.href} onClick={() => setOpen(false)} className="flex items-center justify-between rounded-xl bg-[#FFFCF2] px-3 py-2.5">
+                                     <Link key={s.href} href={s.href} onClick={() => setOpen(false)} className="flex items-center justify-between rounded-xl bg-[#FFFCF2] px-3 py-2.5">
                                       <div>
                                         <div className="text-[12px] font-medium text-[#2D4A22]">{s.label[locale]}</div>
                                         <div className="text-[11px] text-[#8B6F47]">{s.desc[locale]}</div>
                                       </div>
-                                      <span className="text-[#2D4A22]">→</span>
+                                      <ArrowRight className="h-3.5 w-3.5 text-[#2D4A22]" />
                                     </Link>
                                   ))}
                                 </div>
@@ -213,7 +210,7 @@ export default function SiteNav() {
                         className={`flex items-center justify-between rounded-2xl px-1 py-3.5 text-[13px] tracking-[0.14em] transition ${isActive(n.href) ? "text-[#2D4A22]" : "text-[#2D4A22]/80"}`}
                       >
                         {n.label}
-                        <span className="text-[#C4B5A0]">→</span>
+                        <ArrowRight className="h-3.5 w-3.5 text-[#C4B5A0]" />
                       </Link>
                     )
                   )}
@@ -225,7 +222,7 @@ export default function SiteNav() {
                     <LanguageSwitcher />
                   </div>
                   <Link href="/contact" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.16em] text-white">
-                    {t.nav.becomePartner} <span>↗</span>
+                    {t.nav.becomePartner} <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
                   <Link href="/admin/login" onClick={() => setOpen(false)} className="text-center text-[11px] tracking-[0.14em] text-[#8B6F47] hover:text-[#2D4A22]">
                     ADMIN LOGIN

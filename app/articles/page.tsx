@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import { useLang } from "../i18n";
 import { SEED_ARTICLES } from "../lib/data";
@@ -24,7 +25,7 @@ export default function ArticlesPage() {
                 <div className="flex flex-wrap items-center gap-2 text-[11px] tracking-[0.12em] text-[#8B6F47]"><span className="rounded-full bg-[#FFFCF2] border border-[#2D4A22]/10 px-2.5 py-1">{a.category}</span><span>{a.date}</span></div>
                 <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] break-words">{a.title}</h3>
                 <p className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60 line-clamp-2">{a.excerpt}</p>
-                <span className="mt-4 inline-flex text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">{p.readMore} →</span>
+                <span className="mt-4 inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">{p.readMore} <ArrowRight className="h-3 w-3" /></span>
               </div>
             </Link>
           ))}

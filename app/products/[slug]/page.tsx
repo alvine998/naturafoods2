@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import SalesContactCard from "../../components/SalesContactCard";
+import { ArrowLeft } from "lucide-react";
 import { SEED_PRODUCTS } from "../../lib/data";
 import type { Product } from "../../lib/data";
 import { useLang } from "../../i18n";
@@ -24,7 +25,7 @@ export default function ProductDetailPage() {
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: product.title }]} />
-      <Link href="/products" className="inline-flex text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline">← {t.productsPage.title}</Link>
+      <Link href="/products" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.productsPage.title}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
         <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]"><img src={product.img} alt={product.title} className="h-full w-full object-cover" /></div>
         <div className="p-4 sm:p-6 md:p-8">

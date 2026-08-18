@@ -1,4 +1,5 @@
 "use client";
+import { ArrowUpRight } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import { Breadcrumbs } from "../components/PageShell";
 import SiteFooter from "../components/SiteFooter";
@@ -35,7 +36,7 @@ export default function CareersPage() {
             rel="noopener noreferrer"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-[11px] tracking-[0.16em] text-[#2D4A22] shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition hover:bg-[#FFFCF2] sm:mt-10 sm:px-10 sm:py-4 sm:text-[12px]"
           >
-            {p.apply} <span>↗</span>
+            {p.apply} <ArrowUpRight className="h-4 w-4" />
           </a>
           <p className="mt-4 text-[11px] tracking-[0.12em] text-white/50">via Glints</p>
         </div>

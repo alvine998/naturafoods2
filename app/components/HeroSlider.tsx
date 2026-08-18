@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 type Slide = {
   type: "image" | "video";
@@ -120,7 +121,7 @@ export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => 
                     onClick={handleCta}
                     className="mt-4 sm:mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-[#FFFCF2]"
                   >
-                    {s.cta} <span>→</span>
+                    {s.cta} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -132,16 +133,16 @@ export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => 
         <button
           aria-label="Previous slide"
           onClick={() => go(-1)}
-          className="absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white text-sm sm:text-base"
+          className="absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white"
         >
-          ‹
+          <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
         <button
           aria-label="Next slide"
           onClick={() => go(1)}
-          className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white text-sm sm:text-base"
+          className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white"
         >
-          ›
+          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
 
         {/* dots */}

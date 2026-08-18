@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
 export type BannerSlide = {
   id: string;
@@ -79,7 +80,7 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
                       rel="noopener noreferrer"
                       className="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 sm:px-7 py-3 sm:py-3.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-[#FFFCF2]"
                     >
-                      {ctaLabel} <span>↗</span>
+                      {ctaLabel} <ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
                   ) : (
                     <span className="mt-6 sm:mt-8 inline-flex rounded-full bg-white/15 border border-white/20 px-6 py-3 text-[11px] tracking-[0.14em] text-white backdrop-blur">
@@ -100,14 +101,14 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
               onClick={() => go(-1)}
               className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white"
             >
-              ‹
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               aria-label="Next"
               onClick={() => go(1)}
               className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 text-[#2D4A22] backdrop-blur shadow hover:bg-white"
             >
-              ›
+              <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}

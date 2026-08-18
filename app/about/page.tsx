@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
@@ -205,7 +206,7 @@ export default function AboutPage() {
               </Reveal>
               <Reveal delay={0.12}><p className="mt-5 max-w-[58ch] text-[14px] leading-7 text-[#1a1a16]/60 sm:text-[15px]">{L.lead}</p></Reveal>
               <Reveal delay={0.18} className="mt-6 flex flex-wrap gap-3">
-                <button onClick={() => scrollTo("story")} className="rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">EXPLORE STORY →</button>
+                <button onClick={() => scrollTo("story")} className="inline-flex items-center gap-1.5 rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">EXPLORE STORY <ArrowRight className="h-3.5 w-3.5" /></button>
                 <Link href="/contact" className="rounded-full border border-[#2D4A22]/15 bg-white px-6 py-3 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:bg-[#FFF7E8]">{L.ctaBtn}</Link>
               </Reveal>
               <Reveal delay={0.22} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -223,7 +224,7 @@ export default function AboutPage() {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-white/95 px-4 py-3 backdrop-blur">
                   <div><div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">JAKARTA WAREHOUSE</div><div className="text-[12px] font-medium text-[#2D4A22]">Temp-logged · HACCP</div></div>
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white">↗</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white"><ArrowUpRight className="h-4 w-4" /></span>
                 </div>
               </div>
               <div className="pointer-events-none absolute -right-6 -top-6 hidden h-28 w-28 rounded-full border border-[#2D4A22]/10 md:block" />
@@ -341,7 +342,7 @@ export default function AboutPage() {
             <div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">WHY TWO STEPS MATTERS</div>
             <div className="mt-2 font-[var(--font-display)] text-[20px] leading-tight text-[#2D4A22]">Short chain = stable flavour, stable cost.</div>
             <p className="mt-3 text-[13px] leading-6 text-[#1a1a16]/60">No consolidator margin, no repack expiry risk, no months of ocean + customs. You order this week, you serve this week.</p>
-            <Link href="/products" className="mt-5 inline-flex w-fit rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.14em] text-white">VIEW PRODUCTS →</Link>
+            <Link href="/products" className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.14em] text-white">VIEW PRODUCTS <ArrowRight className="h-3.5 w-3.5" /></Link>
           </div>
         </Reveal>
       </section>
@@ -353,7 +354,7 @@ export default function AboutPage() {
           <div className="mt-8 grid gap-4 sm:gap-6 md:grid-cols-3">
             {L.values.map((v, i) => (
               <Reveal key={v.t} delay={i * 0.08} className="rounded-[24px] bg-white p-6 sm:p-7 border border-[#2D4A22]/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFCF2] border border-[#2D4A22]/10 text-[#2D4A22]">✓</div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFCF2] border border-[#2D4A22]/10 text-[#2D4A22]"><Check className="h-4 w-4" /></div>
                 <h3 className="mt-4 font-[var(--font-display)] text-[16px] font-medium text-[#2D4A22]">{v.t}</h3>
                 <p className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60">{v.d}</p>
               </Reveal>
@@ -415,7 +416,7 @@ export default function AboutPage() {
           <Reveal delay={0.1} className="rounded-[24px] bg-white p-6 sm:p-8">
             <div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">PARTNER INQUIRY</div>
             <div className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60">Response within 24h · samples & barista kit available. Net-14 & consignment for volume.</div>
-            <Link href="/contact" className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">{L.ctaBtn} <span>↗</span></Link>
+            <Link href="/contact" className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">{L.ctaBtn} <ArrowUpRight className="h-3.5 w-3.5" /></Link>
             <div className="mt-4 flex flex-wrap justify-center gap-4 text-[12px]"><a href="mailto:hello@naturafoods.id" className="underline decoration-[#2D4A22]/20 underline-offset-4 text-[#2D4A22]">hello@naturafoods.id</a><a href="https://wa.me/6281234567890" className="underline decoration-[#2D4A22]/20 underline-offset-4 text-[#2D4A22]">WhatsApp</a></div>
           </Reveal>
         </div>

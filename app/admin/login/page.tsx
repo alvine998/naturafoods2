@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { useLang } from "../../i18n";
 import { DEMO_CRED_HINT, login } from "../../lib/auth";
 
@@ -30,7 +31,7 @@ export default function AdminLoginPage() {
       {/* right — form */}
       <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-10 bg-[#FFFCF2]">
         <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target as HTMLFormElement); const u = String(fd.get("user") ?? ""); const p = String(fd.get("pass") ?? ""); if (login(u, p)) router.push("/admin/dashboard"); else setErr(a.invalid); }} className="w-full max-w-[420px] rounded-[24px] bg-white border border-[#2D4A22]/10 p-6 sm:p-8 shadow-[0_16px_48px_rgba(26,26,22,0.08)]">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.14em] text-[#8B6F47] hover:text-[#2D4A22]">← Home</Link>
+           <Link href="/" className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.14em] text-[#8B6F47] hover:text-[#2D4A22]"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
           <div className="mt-4 flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.png" alt="" className="h-7 w-auto lg:hidden" />

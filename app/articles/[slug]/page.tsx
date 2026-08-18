@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "../../components/JsonLd";
 import { SITE_URL } from "../../lib/seo";
@@ -27,7 +28,7 @@ export default function ArticleDetailPage() {
       <Breadcrumbs items={[{ label: "Articles", href: "/articles" }, { label: article.title }]} />
       <BreadcrumbJsonLd items={[{ name: "Home", url: SITE_URL }, { name: "Articles", url: `${SITE_URL}/articles` }, { name: article.title, url: `${SITE_URL}/articles/${article.slug}` }]} />
       <ArticleJsonLd title={article.title} description={article.excerpt} datePublished={article.date} image={article.img} url={`${SITE_URL}/articles/${article.slug}`} category={article.category} />
-      <Link href="/articles" className="inline-flex text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline">← {t.articleDetail.back}</Link>
+      <Link href="/articles" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.articleDetail.back}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
         <img src={article.img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />
         <div className="p-4 sm:p-6 md:p-8">

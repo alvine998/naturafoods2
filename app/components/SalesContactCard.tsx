@@ -1,4 +1,5 @@
 "use client";
+import { MessageCircle, Mail, Phone } from "lucide-react";
 import { useLang } from "../i18n";
 
 type Contact = { name: string; role: string; phone: string; email: string; avatar: string };
@@ -40,11 +41,11 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-medium text-[#2D4A22]">{c.name}</p>
                 <p className="text-[11px] tracking-[0.06em] text-[#8B6F47]">{c.role}</p>
-                <a href={`tel:${digits}`} className="mt-2 block text-[12px] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">{c.phone}</a>
-                <a href={`mailto:${c.email}`} className="block truncate text-[12px] text-[#2D4A22]/70 underline decoration-[#2D4A22]/15 underline-offset-4">{c.email}</a>
+                <a href={`tel:${digits}`} className="mt-2 inline-flex items-center gap-1.5 text-[12px] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"><Phone className="h-3 w-3" />{c.phone}</a>
+                <a href={`mailto:${c.email}`} className="mt-1 inline-flex items-center gap-1.5 truncate text-[12px] text-[#2D4A22]/70 underline decoration-[#2D4A22]/15 underline-offset-4"><Mail className="h-3 w-3" />{c.email}</a>
                 <div className="mt-3 flex gap-2">
-                  <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center rounded-full bg-[#2D4A22] px-4 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{t.chat}</a>
-                  <a href={`mailto:${c.email}?subject=${encodeURIComponent(productTitle ? `Inquiry: ${productTitle}` : `Price list request`)}`} className="inline-flex items-center justify-center rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#FFFCF2]">{t.email}</a>
+                  <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] px-4 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]"><MessageCircle className="h-3.5 w-3.5" />{t.chat}</a>
+                  <a href={`mailto:${c.email}?subject=${encodeURIComponent(productTitle ? `Inquiry: ${productTitle}` : `Price list request`)}`} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#FFFCF2]"><Mail className="h-3.5 w-3.5" />{t.email}</a>
                 </div>
               </div>
             </div>
