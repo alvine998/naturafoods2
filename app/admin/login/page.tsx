@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useLang } from "../../i18n";
 import { DEMO_CRED_HINT, login } from "../../lib/auth";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function AdminLoginPage() {
   const { t } = useLang();
@@ -40,12 +42,8 @@ export default function AdminLoginPage() {
           <h1 className="mt-3 font-[var(--font-display)] text-[26px] sm:text-[28px] font-light text-[#2D4A22]">{a.loginTitle}</h1>
           <p className="mt-2 rounded-xl bg-[#FFFCF2] border border-[#2D4A22]/10 px-3 py-2 text-[11px] leading-5 text-[#8B6F47]">{a.hint} · <span className="font-medium text-[#2D4A22]">{DEMO_CRED_HINT}</span></p>
           <div className="mt-6 grid gap-4">
-            <label className="grid gap-1.5 text-[10px] tracking-[0.14em] text-[#8B6F47]">USERNAME
-              <input name="user" required placeholder={a.user} autoComplete="username" className="rounded-xl border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/30 focus:outline-none focus:border-[#2D4A22]/30 focus:bg-white" />
-            </label>
-            <label className="grid gap-1.5 text-[10px] tracking-[0.14em] text-[#8B6F47]">PASSWORD
-              <input name="pass" required type="password" placeholder={a.pass} autoComplete="current-password" className="rounded-xl border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/30 focus:outline-none focus:border-[#2D4A22]/30 focus:bg-white" />
-            </label>
+            <div className="grid gap-1.5"><Label htmlFor="login-user">USERNAME</Label><Input id="login-user" name="user" required placeholder={a.user} autoComplete="username" className="bg-[#FFFCF2] focus:bg-white" /></div>
+            <div className="grid gap-1.5"><Label htmlFor="login-pass">PASSWORD</Label><Input id="login-pass" name="pass" required type="password" placeholder={a.pass} autoComplete="current-password" className="bg-[#FFFCF2] focus:bg-white" /></div>
             {err && <p role="alert" className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-[12px] text-red-700">{err}</p>}
             <button className="rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.16em] text-white hover:bg-[#1e3317] shadow-[0_4px_16px_rgba(45,74,34,0.25)]">{a.signIn}</button>
             <p className="text-center text-[11px] text-[#8B6F47]">Local demo auth · no backend required.</p>

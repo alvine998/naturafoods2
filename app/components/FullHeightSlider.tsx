@@ -54,8 +54,13 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={s.img} alt={s.title} className="h-full w-full object-cover" />
+            {s.img?.startsWith("data:video") || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(s.img ?? "") ? (
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video src={s.img} autoPlay muted loop playsInline className="h-full w-full object-cover" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s.img} alt={s.title} className="h-full w-full object-cover" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
             <div className="absolute inset-0 bg-[#2D4A22]/10 mix-blend-multiply" />
 

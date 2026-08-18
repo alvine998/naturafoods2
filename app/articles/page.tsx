@@ -20,7 +20,7 @@ export default function ArticlesPage() {
         <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((a) => (
             <Link key={a.slug} href={`/articles/${a.slug}`} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white hover:shadow-lg transition">
-              <div className="aspect-[16/10] overflow-hidden bg-[#F5EFE0]"><img src={a.img} alt={a.title} className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-500" /></div>
+              <div className="aspect-[16/10] overflow-hidden bg-[#F5EFE0]">{a.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(a.img ?? "") ? <video src={a.img} muted className="h-full w-full object-cover" /> : <img src={a.img} alt={a.title} className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-500" />}</div>
               <div className="p-4 sm:p-5">
                 <div className="flex flex-wrap items-center gap-2 text-[11px] tracking-[0.12em] text-[#8B6F47]"><span className="rounded-full bg-[#FFFCF2] border border-[#2D4A22]/10 px-2.5 py-1">{a.category}</span><span>{a.date}</span></div>
                 <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] break-words">{a.title}</h3>

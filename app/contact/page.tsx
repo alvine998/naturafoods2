@@ -2,6 +2,9 @@
 import { useState } from "react";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import { useLang } from "../i18n";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ContactPage() {
   const { t } = useLang();
@@ -25,14 +28,17 @@ export default function ContactPage() {
         <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target as HTMLFormElement); const entry = { id: Date.now().toString(), name: String(fd.get("name") ?? ""), city: String(fd.get("city") ?? ""), whatsapp: String(fd.get("whatsapp") ?? ""), interest: String(fd.get("interest") ?? ""), date: new Date().toISOString() }; try { const cur = JSON.parse(localStorage.getItem("nf_inquiries") ?? "[]"); cur.push(entry); localStorage.setItem("nf_inquiries", JSON.stringify(cur)); } catch {} setOk(true); (e.target as HTMLFormElement).reset(); setTimeout(() => setOk(false), 3000); }} className="rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10 p-5 sm:p-6 md:p-7">
           <h3 className="font-medium text-[#2D4A22]">{p.formTitle}</h3>
           <div className="mt-4 grid gap-4">
-            <input name="name" required placeholder={t.formOutlet} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none focus:border-[#2D4A22]/40" />
+            <Input name="name" required placeholder={t.formOutlet} className="rounded-full bg-[#FFFCF2] h-auto py-3" />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <input name="city" placeholder={t.formCity} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none focus:border-[#2D4A22]/40" />
-              <select name="interest" defaultValue="" className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] text-[#1a1a16]/70 focus:outline-none focus:border-[#2D4A22]/40"><option value="" disabled>{t.formInterest}</option>{t.formInterests.map((o) => <option key={o}>{o}</option>)}</select>
+              <Input name="city" placeholder={t.formCity} className="rounded-full bg-[#FFFCF2] h-auto py-3" />
+              <Select name="interest" defaultValue="">
+                <SelectTrigger><SelectValue placeholder={t.formInterest} /></SelectTrigger>
+                <SelectContent>{t.formInterests.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
-            <input name="whatsapp" required placeholder={t.formWhatsapp} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none focus:border-[#2D4A22]/40" />
-            <input name="email" type="email" placeholder={t.formEmail} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none focus:border-[#2D4A22]/40" />
-            <textarea name="message" rows={3} placeholder="Message" className="rounded-2xl border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none focus:border-[#2D4A22]/40" />
+            <Input name="whatsapp" required placeholder={t.formWhatsapp} className="rounded-full bg-[#FFFCF2] h-auto py-3" />
+            <Input name="email" type="email" placeholder={t.formEmail} className="rounded-full bg-[#FFFCF2] h-auto py-3" />
+            <Textarea name="message" rows={3} placeholder="Message" className="rounded-2xl bg-[#FFFCF2]" />
             <button className="rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.16em] text-white hover:bg-[#1e3317]">{t.formSubmit}</button>
             {ok && <p className="text-center text-[12px] text-[#2D4A22]">{t.formThanks} — {t.formThanksSuffix}</p>}
             <p className="text-center text-[11px] text-[#8B6F47]">{t.formFoot}</p>

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, MessageCircle, Send, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useLang } from "../i18n";
+import { Input } from "@/components/ui/input";
 
 type Msg = { role: "user" | "bot"; text: string };
 
@@ -183,7 +184,7 @@ export default function ChatAssistant() {
                 <Link href="/contact" onClick={() => setOpen(false)} className="flex-1 rounded-full border border-[#2D4A22]/15 bg-white py-2 text-center text-[11px] tracking-[0.08em] text-[#2D4A22] hover:bg-[#FFFCF2]">{copy.contact}</Link>
               </div>
               <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="mt-3 flex items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-2 py-1.5 focus-within:border-[#2D4A22]/30 focus-within:bg-white">
-                <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={copy.placeholder} className="flex-1 bg-transparent px-2 text-[13px] placeholder:text-[#1a1a16]/40 focus:outline-none" />
+                <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={copy.placeholder} className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2 h-auto py-1" />
                 <button type="submit" disabled={!input.trim()} className="inline-flex items-center gap-1 rounded-full bg-[#2D4A22] px-4 py-2 text-[11px] tracking-[0.08em] text-white disabled:opacity-40 hover:bg-[#1e3317]"><Send className="h-3 w-3" /> {copy.send}</button>
               </form>
               <p className="mt-2 text-center text-[10px] leading-4 text-[#8B6F47]">AI helper — for accurate quote, our team replies within 24h.</p>

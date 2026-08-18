@@ -30,7 +30,7 @@ export default function ArticleDetailPage() {
       <ArticleJsonLd title={article.title} description={article.excerpt} datePublished={article.date} image={article.img} url={`${SITE_URL}/articles/${article.slug}`} category={article.category} />
       <Link href="/articles" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.articleDetail.back}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
-        <img src={article.img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />
+        {article.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(article.img ?? "") ? <video src={article.img} controls className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" /> : <img src={article.img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />}
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] px-3 py-1">{article.category}</span><span>{article.date}</span></div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-light leading-none text-[#2D4A22] break-words">{article.title}</h1>
