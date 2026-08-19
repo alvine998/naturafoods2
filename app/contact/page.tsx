@@ -23,7 +23,17 @@ export default function ContactPage() {
             <a href={`https://wa.me/${p.phone.replace(/[^0-9]/g, "")}`} className="underline decoration-white/30 underline-offset-4">WhatsApp {p.phone}</a>
             <div className="pt-4 border-t border-white/15"><div className="text-white/60 text-[11px] tracking-[0.14em]">{p.hours}</div><div className="text-white">{p.hoursVal}</div></div>
           </div>
-          <div className="mt-6 sm:mt-8 rounded-2xl bg-white/10 p-4 text-[12px] leading-6 text-white/70">Maps placeholder — replace with embedded Google Maps iframe when ready.</div>
+          <div className="mt-6 sm:mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+            <iframe
+              title="PT Natura Inti Sukses — Location"
+              src="https://maps.google.com/maps?q=Jakarta%20Indonesia&t=&z=13&ie=UTF8&iwloc=&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              className="h-[260px] w-full border-0 sm:h-[300px]"
+            />
+          </div>
+          <a href="https://www.google.com/maps/search/?api=1&query=Jakarta+Indonesia" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[11px] tracking-[0.12em] text-white/60 underline decoration-white/20 underline-offset-4 hover:text-white">Open in Google Maps →</a>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target as HTMLFormElement); const entry = { id: Date.now().toString(), name: String(fd.get("name") ?? ""), city: String(fd.get("city") ?? ""), whatsapp: String(fd.get("whatsapp") ?? ""), interest: String(fd.get("interest") ?? ""), date: new Date().toISOString() }; try { const cur = JSON.parse(localStorage.getItem("nf_inquiries") ?? "[]"); cur.push(entry); localStorage.setItem("nf_inquiries", JSON.stringify(cur)); } catch {} setOk(true); (e.target as HTMLFormElement).reset(); setTimeout(() => setOk(false), 3000); }} className="rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10 p-5 sm:p-6 md:p-7">
           <h3 className="font-medium text-[#2D4A22]">{p.formTitle}</h3>
