@@ -5,97 +5,35 @@ import { Sparkles, X, MessageCircle, Send, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useLang } from "../i18n";
 import { Input } from "@/components/ui/input";
+import { DEFAULT_ASSISTANT, loadAssistantConfig, getCopy, resolveReply, type AssistantConfig } from "../lib/assistant";
 
 type Msg = { role: "user" | "bot"; text: string };
 
-const COPY: Record<string, { title: string; sub: string; placeholder: string; send: string; quick: string[]; greet: string; fallback: string; wa: string; contact: string }> = {
-  en: {
-    title: "Natura Assistant",
-    sub: "Virtual assistant · replies instantly",
-    placeholder: "Ask about products, price, delivery...",
-    send: "Send",
-    quick: ["Products", "Price list", "Delivery", "Training"],
-    greet: "Hi! I'm Natura Assistant — your virtual helper for choco & matcha. Ask me about products, MOQ, cold-chain delivery, or training. How can I help?",
-    fallback: "I can help with products, pricing (MOQ 6kg), 48h Jabodetabek delivery, cold-chain, and barista training. Try a quick question or contact our team.",
-    wa: "Chat on WhatsApp",
-    contact: "Contact form",
-  },
-  id: {
-    title: "Asisten Natura",
-    sub: "Asisten virtual · balas instan",
-    placeholder: "Tanya produk, harga, pengiriman...",
-    send: "Kirim",
-    quick: ["Produk", "Daftar harga", "Pengiriman", "Pelatihan"],
-    greet: "Hai! Saya Asisten Natura — helper virtual untuk choco & matcha. Tanya soal produk, MOQ, pengiriman cold-chain, atau pelatihan. Ada yang bisa dibantu?",
-    fallback: "Saya bisa bantu soal produk, harga (MOQ 6kg), pengiriman 48 jam Jabodetabek, cold-chain, dan pelatihan barista. Coba pertanyaan cepat atau hubungi tim kami.",
-    wa: "Chat WhatsApp",
-    contact: "Form kontak",
-  },
-  zh: {
-    title: "Natura 智能助手",
-    sub: "虚拟助手 · 即时回复",
-    placeholder: "咨询产品、价格、配送...",
-    send: "发送",
-    quick: ["产品", "报价单", "配送", "培训"],
-    greet: "你好！我是 Natura 智能助手，帮你了解巧克力与抹茶。可咨询产品、MOQ、冷链配送或培训。需要什么帮助？",
-    fallback: "我可以解答产品、价格（MOQ 6kg）、雅加达都市圈48小时配送、冷链与咖啡师培训。试试快捷问题或联系人工。",
-    wa: "WhatsApp 咨询",
-    contact: "联系表单",
-  },
-};
-
-function getReply(q: string, locale: string): string {
-  const s = q.toLowerCase();
-  const is = (k: string[]) => k.some((x) => s.includes(x));
-  if (is(["price", "pricing", "catalog", "moq", "wholesale", "harga", "katalog", "报价", "价格", "批发"])) {
-    if (locale === "id") return "MOQ grosir mulai 6kg, reorder fleksibel, konsinyasi untuk mitra volume tinggi (Net-14). Minta daftar harga + sampel di /contact atau chat Sales via WhatsApp. Mau saya carikan produk choco atau matcha?";
-    if (locale === "zh") return "批发 MOQ 6kg 起，灵活补货，高销量可寄售（Net-14）。可在 /contact 索取报价单与样品，或转人工 WhatsApp。需要巧克力还是抹茶？";
-    return "Wholesale MOQ from 6kg, flexible reorder, consignment for high-volume (Net-14). Get price list + samples at /contact or chat Sales via WhatsApp. Looking for choco or matcha?";
-  }
-  if (is(["delivery", "shipping", "cold chain", "cold-chain", "logistics", "warehouse", "stock", "pengiriman", "logistik", "gudang", "stok", "配送", "物流", "冷链", "仓储"])) {
-    if (locale === "id") return "Gudang di Jakarta suhu tercatat (choco 18–20°C, matcha 5°C), traceability batch + COA on request. Pengiriman Jabodetabek 48 jam, nasional via cold-chain. Penggantian jika meleleh/rusak.";
-    if (locale === "zh") return "雅加达温控仓储（巧克力 18–20°C，抹茶 5°C），批次可追溯、按需提供 COA。雅加达都市圈48小时达，全国冷链。融化/破损包换。";
-    return "Temp-logged Jakarta warehouse (choco 18–20°C, matcha 5°C), batch traceability + COA on request. 48h Jabodetabek, nationwide cold-chain. Replacements for melt/damage.";
-  }
-  if (is(["matcha", "uji", "yame", "ceremonial", "culinary", "hojicha", "nishio", "抹茶", "宇治", "焙茶"])) {
-    if (locale === "id") return "Matcha giling batu Uji & Yame, segel nitrogen: Ceremonial Grade A (30g/500g) untuk usucha, Grade B 1kg untuk latte/bakery, dan Hojicha low-caffeine. Stok Jakarta, siap 48 jam. Lihat di /products?cat=matcha";
-    if (locale === "zh") return "宇治·八女石磨、氮气密封：仪式级 A级（30g/500g）用于薄茶/浓茶，料理级 B级 1kg 用于拿铁/烘焙，另有低咖啡因焙茶。雅加达现货，48小时达。查看 /products?cat=matcha";
-    return "Stone-milled Uji & Yame, nitrogen-sealed: Ceremonial Grade A (30g/500g) for usucha, Culinary Grade B 1kg for latte/bakery, plus Hojicha low-caffeine. Jakarta stock, 48h ready. See /products?cat=matcha";
-  }
-  if (is(["choco", "chocolate", "couverture", "cokelat", "coklat", "temper", "ganache", "callets", "巧克力"])) {
-    if (locale === "id") return "Couverture Belgia & Ekuador bentuk callets: Dark 72% single-origin, Milk 33% creamy, White 28% — stabil temper untuk minuman, pastry & cetakan. Lihat di /products?cat=choco. Butuh panduan tempering? Cek /articles";
-    if (locale === "zh") return "比利时与厄瓜多尔纽扣调温巧克力：72% 黑巧单一产地、33% 牛奶、28% 白巧 — 回温稳定，适用于饮品/甜点/模具。查看 /products?cat=choco，调温指南见 /articles";
-    return "Belgian & Ecuadorian callets: Dark 72% single-origin, Milk 33% creamy, White 28% — stable temper for drinks, pastry & moulding. See /products?cat=choco. Need tempering guide? Check /articles";
-  }
-  if (is(["training", "education", "workshop", "barista", "pastry", "costing", "edukasi", "pelatihan", "kelas", "培训", "教育", "课程"])) {
-    if (locale === "id") return "Edukasi: Barista Matcha Essentials (1 hari Jakarta), Choco Pastry Lab (2 hari Surabaya), dan Menu Costing (half-day online). Gratis untuk mitra. Daftar di /education atau /contact";
-    if (locale === "zh") return "培训：抹茶咖啡师基础（1天 雅加达）、巧克力甜点实验室（2天 泗水）、菜单成本（半天 线上）。合作伙伴免费。报名见 /education 或 /contact";
-    return "Education: Barista Matcha Essentials (1 day Jakarta), Choco Pastry Lab (2 days Surabaya), Menu Costing (half-day online). Free for partners. Join at /education or /contact";
-  }
-  if (is(["innovation", "r&d", "nusantara", "low sugar", "packaging", "inovasi", "研发", "创新"])) {
-    if (locale === "id") return "Inovasi: Nusantara Single-Origin (Sulawesi), Low-Sugar Couverture (30% less sugar), dan kemasan retail nitrogen-seal 500g. Lihat slide penuh di /innovation — tiap slide bisa link ke YouTube.";
-    if (locale === "zh") return "创新：Nusantara 单一产地（苏拉威西）、低糖调温巧克力（少糖30%）、500g 氮封零售包。全屏轮播见 /innovation，支持 YouTube 外链。";
-    return "Innovation: Nusantara Single-Origin (Sulawesi), Low-Sugar Couverture (30% less sugar), Nitrogen-sealed 500g retail packs. See full-height slider at /innovation — each slide links to YouTube.";
-  }
-  if (is(["contact", "whatsapp", "email", "phone", "hubungi", "alamat", "kontak", "联系", "电话", "邮箱"])) {
-    if (locale === "id") return "Hubungi: hello@naturafoods.id · +62 812-3456-7890 (WA) · PT NaturaFoods Jakarta·Surabaya·Bali. Jam 09:00–18:00 WIB. Form di /contact";
-    if (locale === "zh") return "联系：hello@naturafoods.id · +62 812-3456-7890 (WhatsApp) · 雅加达·泗水·巴厘岛。时间 09:00–18:00 WIB。表单见 /contact";
-    return "Contact: hello@naturafoods.id · +62 812-3456-7890 (WA) · Jakarta·Surabaya·Bali. Hours 09:00–18:00 WIB. Form at /contact";
-  }
-  if (is(["hello", "hi", "hey", "halo", "hai", "help", "bantu", "你好", "您好"])) {
-    return COPY[locale]?.greet ?? COPY.en.greet;
-  }
-  return COPY[locale]?.fallback ?? COPY.en.fallback;
-}
-
 export default function ChatAssistant() {
   const { locale } = useLang();
-  const copy = COPY[locale] ?? COPY.en;
+  const [cfg, setCfg] = useState<AssistantConfig>(DEFAULT_ASSISTANT);
+  const copy = getCopy(cfg, locale);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: "bot", text: copy.greet }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ role: "bot", text: getCopy(DEFAULT_ASSISTANT, locale).greet }]);
   const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCfg(loadAssistantConfig());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "nf_assistant_config") setCfg(loadAssistantConfig());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // live reload when admin saves in same tab: poll localStorage via custom event
+  useEffect(() => {
+    const tick = () => setCfg(loadAssistantConfig());
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => { setMsgs([{ role: "bot", text: copy.greet }]); }, [copy.greet]);
   useEffect(() => { listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }); }, [msgs, typing, open]);
@@ -108,7 +46,7 @@ export default function ChatAssistant() {
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { role: "bot", text: getReply(q, locale) }]);
+      setMsgs((m) => [...m, { role: "bot", text: resolveReply(cfg, q, locale) }]);
     }, 500 + Math.random() * 300);
   };
 
@@ -173,14 +111,14 @@ export default function ChatAssistant() {
             {/* quick chips + human handoff */}
             <div className="border-t border-[#2D4A22]/10 bg-white px-3 py-3">
               <div className="flex flex-wrap gap-1.5">
-                {copy.quick.map((q) => (
+                {copy.quick.map((q: string) => (
                   <button key={q} onClick={() => send(q)} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-3 py-1.5 text-[11px] tracking-[0.04em] text-[#2D4A22] hover:bg-[#2D4A22] hover:text-white transition">
                     {q}
                   </button>
                 ))}
               </div>
               <div className="mt-2 flex gap-2">
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] py-2 text-center text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]">{copy.wa} <ArrowUpRight className="h-3 w-3" /></a>
+                <a href={cfg.waLink} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] py-2 text-center text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]">{copy.wa} <ArrowUpRight className="h-3 w-3" /></a>
                 <Link href="/contact" onClick={() => setOpen(false)} className="flex-1 rounded-full border border-[#2D4A22]/15 bg-white py-2 text-center text-[11px] tracking-[0.08em] text-[#2D4A22] hover:bg-[#FFFCF2]">{copy.contact}</Link>
               </div>
               <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="mt-3 flex items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-2 py-1.5 focus-within:border-[#2D4A22]/30 focus-within:bg-white">

@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [gate, setGate] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0];
+  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0];
   const links = [
     { href: "/admin/products", label: a.tabs[0], c: counts[0], sub: "catalog" },
     { href: "/admin/articles", label: a.tabs[1], c: counts[1], sub: "published" },
@@ -25,6 +25,7 @@ export default function DashboardPage() {
     { href: "/admin/careers", label: a.tabs[4], c: counts[4], sub: "open roles" },
     { href: "/admin/inquiries", label: a.tabs[5], c: counts[5], sub: "leads" },
     { href: "/admin/users", label: a.tabs[6], c: counts[6], sub: "users" },
+    { href: "/admin/assistant", label: a.tabs[7], c: counts[7], sub: "fine-tuning" },
   ];
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>

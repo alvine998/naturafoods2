@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Menu, X, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Menu, X, ArrowLeft } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -21,9 +21,10 @@ const ROUTES = [
   "/admin/careers",
   "/admin/inquiries",
   "/admin/users",
+  "/admin/assistant",
 ] as const;
 
-const ICONS = [LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users] as const;
+const ICONS = [LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot] as const;
 
 export default function AdminShell({ counts, labels, children }: Props) {
   const router = useRouter();

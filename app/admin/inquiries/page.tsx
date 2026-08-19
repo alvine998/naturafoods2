@@ -16,7 +16,7 @@ export default function InquiriesPage() {
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0];
+  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return s.inquiries as any[];

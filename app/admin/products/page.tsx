@@ -21,7 +21,7 @@ export default function ProductsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0];
+  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0];
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return s.products as Product[];
