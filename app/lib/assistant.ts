@@ -19,9 +19,16 @@ export type KnowledgeEntry = {
   reply: Record<string, string>; // locale -> reply
 };
 
+export type AssistantTuning = {
+  tone: "friendly" | "professional" | "concise";
+  length: "short" | "medium" | "detailed";
+  strict: boolean; // if true, never fall back to generic; use fallback copy only
+};
+
 export type AssistantConfig = {
   waLink: string; // e.g. https://wa.me/6281234567890
   persona: string; // system prompt / fine-tune instruction, used as context
+  tuning: AssistantTuning;
   copy: Record<string, LocaleCopy>;
   knowledge: KnowledgeEntry[];
 };
@@ -130,9 +137,12 @@ export const DEFAULT_KNOWLEDGE: KnowledgeEntry[] = [
   },
 ];
 
+export const DEFAULT_TUNING: AssistantTuning = { tone: "friendly", length: "medium", strict: false };
+
 export const DEFAULT_ASSISTANT: AssistantConfig = {
   waLink: "https://wa.me/6281234567890",
   persona: "You are Natura Assistant for PT Natura Inti Sukses — helpful, concise, B2B, focused on choco & matcha, MOQ 6kg, cold-chain, training. Reply in user's language.",
+  tuning: DEFAULT_TUNING,
   copy: DEFAULT_COPY,
   knowledge: DEFAULT_KNOWLEDGE,
 };
@@ -146,6 +156,7 @@ export function loadAssistantConfig(): AssistantConfig {
     return {
       waLink: parsed.waLink || DEFAULT_ASSISTANT.waLink,
       persona: parsed.persona ?? DEFAULT_ASSISTANT.persona,
+      tuning: { ...DEFAULT_TUNING, ...(parsed.tuning as any) },
       copy: {
         en: { ...DEFAULT_COPY.en, ...(parsed.copy as any)?.en },
         id: { ...DEFAULT_COPY.id, ...(parsed.copy as any)?.id },
@@ -168,17 +179,32 @@ export function getCopy(cfg: AssistantConfig, locale: string): LocaleCopy {
   return cfg.copy[locale] ?? cfg.copy.en ?? DEFAULT_COPY.en;
 }
 
+function applyTuning(text: string, tuning: AssistantTuning): string {
+  let out = text.trim();
+  if (tuning.tone === "concise") out = out.replace(/\s+/g, " ").trim();
+  if (tuning.tone === "professional") out = out.replace(/!+/g, ".");
+  if (tuning.length === "short") {
+    const first = out.split(/(?<=[.!?])\s+/)[0];
+    if (first && first.length < out.length) out = first;
+  } else if (tuning.length === "detailed") {
+    // keep as-is; persona already guides detail; hook for LLM expansion later
+  }
+  return out;
+}
+
 export function resolveReply(cfg: AssistantConfig, q: string, locale: string): string {
+  const tuning = cfg.tuning ?? DEFAULT_TUNING;
   const s = q.toLowerCase();
   for (const entry of cfg.knowledge) {
     if (entry.keywords.some((k) => s.includes(k.toLowerCase()))) {
-      return entry.reply[locale] ?? entry.reply.en ?? entry.reply.id ?? Object.values(entry.reply)[0] ?? getCopy(cfg, locale).fallback;
+      const raw = entry.reply[locale] ?? entry.reply.en ?? entry.reply.id ?? Object.values(entry.reply)[0] ?? getCopy(cfg, locale).fallback;
+      return applyTuning(raw, tuning);
     }
   }
   if (["hello", "hi", "hey", "halo", "hai", "help", "bantu", "你好", "您好"].some((k) => s.includes(k))) {
-    return getCopy(cfg, locale).greet;
+    return applyTuning(getCopy(cfg, locale).greet, tuning);
   }
-  return getCopy(cfg, locale).fallback;
+  return applyTuning(getCopy(cfg, locale).fallback, tuning);
 }
 
 export function useAssistantConfig() {
