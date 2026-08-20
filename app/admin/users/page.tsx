@@ -25,7 +25,7 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const refresh = () => setUsers(getUsers());
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else { setGate(true); refresh(); } }, [router]);
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0];
+  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return users;

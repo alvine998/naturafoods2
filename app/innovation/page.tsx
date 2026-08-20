@@ -34,7 +34,7 @@ export default function InnovationPage() {
         {slides.length === 0 ? (
           <p className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 py-16 text-center text-[13px] text-[#8B6F47]">{t.admin.noData}</p>
         ) : (
-          <FullHeightSlider items={slides} fallbackCta="Learn more" />
+          <FullHeightSlider items={slides} fallbackCta={t.homeCommon.viewMore} />
         )}
       </div>
       <SiteFooter />

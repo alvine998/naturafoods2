@@ -39,7 +39,7 @@ export default function AssistantPage() {
     else setGate(true);
   }, [router]);
 
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0];
+  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
   const tuning: AssistantTuning = cfg.tuning ?? DEFAULT_TUNING;
 
   const testReply = useMemo(() => {
