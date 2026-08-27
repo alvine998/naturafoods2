@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, ArrowUpRight, Check, Pencil } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
+import { isAuthed } from "../lib/auth";
+import AboutHeroEditModal from "../components/AboutHeroEditModal";
 
 function Reveal({ children, delay = 0, y = 18, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
   return <motion.div initial={{ opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>{children}</motion.div>;
@@ -19,6 +21,32 @@ export default function AboutPage() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 180]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
 
+  const aboutVideoSrc = L.aboutHeroVideoSrc || "https://cdn.alvineitsolutions.com/naturafoods/Video%20About%20Website.mp4";
+  const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
+  const aboutVideoRef = useRef<HTMLVideoElement>(null);
+  const [aboutVideoReady, setAboutVideoReady] = useState(false);
+  const [authed, setAuthed] = useState<boolean>(() => (typeof window !== "undefined" ? isAuthed() : false));
+  const [aboutEditOpen, setAboutEditOpen] = useState(false);
+
+  useEffect(() => {
+    const el = aboutVideoRef.current;
+    if (!el) return;
+    const onPlay = () => setAboutVideoReady(true);
+    el.addEventListener("playing", onPlay);
+    el.play().catch(() => {});
+    return () => el.removeEventListener("playing", onPlay);
+  }, []);
+
+  useEffect(() => {
+    const onChange = () => setAuthed(isAuthed());
+    window.addEventListener("storage", onChange);
+    window.addEventListener("nf_auth_changed" as never, onChange as never);
+    return () => {
+      window.removeEventListener("storage", onChange);
+      window.removeEventListener("nf_auth_changed" as never, onChange as never);
+    };
+  }, []);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -27,6 +55,75 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
+
+      {/* ABOUT HERO VIDEO */}
+      <section aria-label="About" className="w-full">
+        <div className="relative overflow-hidden bg-[#1a1a16] min-h-[70vh]">
+          <div className="relative h-[70vh] min-h-[520px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={aboutVideoPoster}
+              alt=""
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${aboutVideoReady ? "opacity-0" : "opacity-100"}`}
+            />
+            <video
+              key={aboutVideoSrc}
+              ref={aboutVideoRef}
+              src={aboutVideoSrc}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+            <div className="absolute inset-0 bg-[#2D4A22]/15 mix-blend-multiply" />
+
+            <div className="absolute inset-0 flex items-end p-4 sm:p-12 md:p-16 lg:p-20">
+              <div className="max-w-[640px]">
+                <motion.p
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-flex rounded-full bg-white/15 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.18em] text-white backdrop-blur"
+                >
+                  {L.aboutHeroEyebrow}
+                </motion.p>
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-3 sm:mt-4 font-[var(--font-display)] text-[28px] sm:text-[34px] md:text-[46px] lg:text-[52px] font-light leading-[0.95] text-white"
+                >
+                  {L.aboutHeroTitle}
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-3 sm:mt-4 max-w-[52ch] text-[13px] sm:text-[14px] leading-6 text-white/80"
+                >
+                  {L.aboutHeroDesc}
+                </motion.p>
+              </div>
+            </div>
+
+            {authed && (
+              <button
+                type="button"
+                onClick={() => setAboutEditOpen(true)}
+                aria-label="Edit About Hero"
+                className="group absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[10px] tracking-[0.16em] text-[#2D4A22] shadow-md backdrop-blur transition hover:bg-white sm:right-5 sm:top-5"
+              >
+                <Pencil className="h-3 w-3" />
+                <span>EDIT</span>
+              </button>
+            )}
+          </div>
+        </div>
+        <AboutHeroEditModal open={aboutEditOpen} onClose={() => setAboutEditOpen(false)} />
+      </section>
 
       {/* HERO */}
       <section ref={heroRef} className="relative overflow-hidden">
