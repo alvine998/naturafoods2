@@ -44,7 +44,7 @@ export default function UsersPage() {
     const v = pwd[editUser]?.trim(); if (!v) return;
     updatePassword(editUser, v); setPwd((p) => ({ ...p, [editUser]: "" })); setEditUser(null); refresh();
   };
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {u.title}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{u.title}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">Signed in: <b className="text-[#2D4A22]">{me}</b></span></div>
@@ -67,10 +67,10 @@ export default function UsersPage() {
         {filtered.length === 0 ? <Empty msg={a.noData} /> : (
           <TableWrap>
             <table className="w-full min-w-[520px] text-[12px]">
-              <thead className="bg-[#FFFCF2] text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Username</th><th className="px-3 py-3 text-left font-medium">Status</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+              <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Username</th><th className="px-3 py-3 text-left font-medium">Status</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
               <tbody className="divide-y divide-[#2D4A22]/10">
                 {paged.map((usr) => (
-                  <tr key={usr.username} className="hover:bg-[#FFFCF2]/60">
+                  <tr key={usr.username} className="hover:bg-white/60">
                     <td className="px-3 py-2 font-medium text-[#2D4A22]">{usr.username} {usr.username === me && <span className="ml-1 rounded-full bg-[#2D4A22] px-2 py-0.5 text-[10px] text-white">{u.you}</span>}</td>
                     <td className="px-3 py-2 text-[#8B6F47]">{usr.username === me ? "current" : "active"}</td>
                     <td className="px-3 py-2 text-right"><div className="inline-flex gap-1.5"><button onClick={() => setEditUser(usr.username)} className="rounded-full border bg-white px-3 py-1 text-[11px]">{u.changePass}</button><button onClick={() => { const ok = removeUser(usr.username); if (!ok) { const meSelf = usr.username === me; setErr(meSelf ? u.selfDelete : u.lastUser); setTimeout(() => setErr(""), 2000); return; } refresh(); }} className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] text-red-700">{u.remove}</button></div></td>

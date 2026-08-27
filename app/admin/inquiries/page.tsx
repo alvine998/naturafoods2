@@ -25,7 +25,7 @@ export default function InquiriesPage() {
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[5]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[5]}</h1></div><span className="rounded-full bg-[#2D4A22] px-3 py-1 text-[11px] text-white">{filtered.length}</span></div>
@@ -35,12 +35,12 @@ export default function InquiriesPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">
-                <thead className="bg-[#FFFCF2] text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="text-left px-4 py-3 font-medium">Name</th><th className="text-left px-4 py-3 font-medium">City</th><th className="text-left px-4 py-3 font-medium">WhatsApp</th><th className="text-left px-4 py-3 font-medium">Interest</th><th className="text-left px-4 py-3 font-medium">Date</th><th className="px-4 py-3"></th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="text-left px-4 py-3 font-medium">Name</th><th className="text-left px-4 py-3 font-medium">City</th><th className="text-left px-4 py-3 font-medium">WhatsApp</th><th className="text-left px-4 py-3 font-medium">Interest</th><th className="text-left px-4 py-3 font-medium">Date</th><th className="px-4 py-3"></th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((inq: any, i: number) => {
                     const realIdx = (s.inquiries as any[]).indexOf(inq);
                     return (
-                      <tr key={inq.id + i} className="hover:bg-[#FFFCF2]/60"><td className="px-4 py-3 font-medium text-[#2D4A22]">{inq.name}</td><td className="px-4 py-3 text-[#1a1a16]/70">{inq.city}</td><td className="px-4 py-3">{inq.whatsapp}</td><td className="px-4 py-3"><span className="rounded-full bg-[#2D4A22]/10 px-2.5 py-1 text-[11px] text-[#2D4A22]">{inq.interest}</span></td><td className="px-4 py-3 text-[#8B6F47]">{new Date(inq.date).toLocaleDateString()}</td><td className="px-4 py-3 text-right"><button onClick={() => s.setInquiries((prev: any[]) => prev.filter((_: any, idx: number) => idx !== realIdx))} className="rounded-full bg-red-50 border border-red-200 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></td></tr>
+                      <tr key={inq.id + i} className="hover:bg-white/60"><td className="px-4 py-3 font-medium text-[#2D4A22]">{inq.name}</td><td className="px-4 py-3 text-[#1a1a16]/70">{inq.city}</td><td className="px-4 py-3">{inq.whatsapp}</td><td className="px-4 py-3"><span className="rounded-full bg-[#2D4A22]/10 px-2.5 py-1 text-[11px] text-[#2D4A22]">{inq.interest}</span></td><td className="px-4 py-3 text-[#8B6F47]">{new Date(inq.date).toLocaleDateString()}</td><td className="px-4 py-3 text-right"><button onClick={() => s.setInquiries((prev: any[]) => prev.filter((_: any, idx: number) => idx !== realIdx))} className="rounded-full bg-red-50 border border-red-200 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></td></tr>
                     );
                   })}
                 </tbody>

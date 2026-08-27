@@ -500,7 +500,7 @@ export default function ContentPage() {
   const baseForEdit = useMemo(() => dict[editLocale] as unknown as Record<string, unknown>, [editLocale]);
   const localeData = (draft[editLocale] ?? {}) as Record<string, unknown>;
 
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
 
   const paths = GROUP_PATHS[group];
   const filteredPaths = paths.filter((p) => {
@@ -536,7 +536,7 @@ export default function ContentPage() {
               <button key={l} onClick={() => setEditLocale(l)} className={`rounded-full px-3 py-1.5 text-[11px] tracking-[0.12em] ${editLocale === l ? "bg-[#2D4A22] text-white" : "text-[#2D4A22]/60 hover:text-[#2D4A22]"}`}>{l.toUpperCase()}</button>
             ))}
           </div>
-          <button onClick={reset} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#FFFCF2]">{a.contentReset}</button>
+          <button onClick={reset} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white">{a.contentReset}</button>
           <button onClick={save} className="rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.save}</button>
         </div>
       </div>
@@ -547,10 +547,10 @@ export default function ContentPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-1.5">
             {GROUP_ORDER.map((k) => (
-              <button key={k} onClick={() => setGroup(k)} className={`rounded-full px-3.5 py-1.5 text-[11px] tracking-[0.08em] border ${group === k ? "bg-[#2D4A22] text-white border-[#2D4A22]" : "bg-white text-[#2D4A22] border-[#2D4A22]/15 hover:bg-[#FFFCF2]"}`}>{a.contentGroups[k]}</button>
+              <button key={k} onClick={() => setGroup(k)} className={`rounded-full px-3.5 py-1.5 text-[11px] tracking-[0.08em] border ${group === k ? "bg-[#2D4A22] text-white border-[#2D4A22]" : "bg-white text-[#2D4A22] border-[#2D4A22]/15 hover:bg-white"}`}>{a.contentGroups[k]}</button>
             ))}
           </div>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={a.contentSearchPlaceholder} className="w-full sm:w-64 rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-2 text-[12px] outline-none placeholder:text-[#8B6F47]/60 focus:border-[#2D4A22]/30" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={a.contentSearchPlaceholder} className="w-full sm:w-64 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[12px] outline-none placeholder:text-[#8B6F47]/60 focus:border-[#2D4A22]/30" />
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -582,7 +582,7 @@ export default function ContentPage() {
                 )}
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                   <span className="text-[#8B6F47] line-clamp-1">{a.contentDefaultLabel}: {typeof baseVal === "string" ? baseVal.slice(0, 90) : Array.isArray(baseVal) ? `[${baseVal.length} items]` : String(baseVal ?? "")}</span>
-                  {isOverridden && <button onClick={() => { setDraft((prev) => { const cur = { ...(prev[editLocale] as Record<string, unknown> ?? {}) }; const del = (obj: Record<string, unknown>, p: string[]): Record<string, unknown> => { if (p.length === 0) return obj; const c = { ...obj }; let cur2: Record<string, unknown> = c; for (let i = 0; i < p.length - 1; i++) { const k = p[i]; const nxt = cur2[k] as Record<string, unknown>; if (!nxt || typeof nxt !== "object") return c; const copy = { ...nxt }; cur2[k] = copy; cur2 = copy; } delete cur2[p[p.length - 1]]; return c; }; return { ...prev, [editLocale]: del(cur as Record<string, unknown>, path) }; }); }} className="rounded-full border border-[#2D4A22]/15 bg-white px-3 py-1 text-[#2D4A22] hover:bg-[#FFFCF2]">{a.contentClearOverride}</button>}
+                  {isOverridden && <button onClick={() => { setDraft((prev) => { const cur = { ...(prev[editLocale] as Record<string, unknown> ?? {}) }; const del = (obj: Record<string, unknown>, p: string[]): Record<string, unknown> => { if (p.length === 0) return obj; const c = { ...obj }; let cur2: Record<string, unknown> = c; for (let i = 0; i < p.length - 1; i++) { const k = p[i]; const nxt = cur2[k] as Record<string, unknown>; if (!nxt || typeof nxt !== "object") return c; const copy = { ...nxt }; cur2[k] = copy; cur2 = copy; } delete cur2[p[p.length - 1]]; return c; }; return { ...prev, [editLocale]: del(cur as Record<string, unknown>, path) }; }); }} className="rounded-full border border-[#2D4A22]/15 bg-white px-3 py-1 text-[#2D4A22] hover:bg-white">{a.contentClearOverride}</button>}
                 </div>
               </div>
             );

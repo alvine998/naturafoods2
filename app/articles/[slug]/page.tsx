@@ -39,7 +39,7 @@ export default function ArticleDetailPage() {
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
         {article.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(article.img ?? "") ? <video src={article.img} controls className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" /> : <img src={article.img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />}
         <div className="p-4 sm:p-6 md:p-8">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] px-3 py-1">{article.category}</span><span>{article.date}</span></div>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-white px-3 py-1">{article.category}</span><span>{article.date}</span></div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-light leading-none text-[#2D4A22] break-words">{article.title}</h1>
           <p className="mt-3 text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{article.excerpt}</p>
           <div className="prose prose-sm mt-6 max-w-none text-[13px] sm:text-[14px] leading-7 text-[#1a1a16]/70 break-words [&_img]:max-w-full [&_img]:rounded-xl [&_a]:text-[#2D4A22] [&_a]:underline" dangerouslySetInnerHTML={{ __html: getArticleContent(article, locale) }} />

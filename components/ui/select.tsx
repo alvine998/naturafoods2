@@ -12,7 +12,7 @@ export function SelectTrigger({ className, children, ...props }: React.Component
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-10 w-full items-center justify-between rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-3 text-[13px] text-[#1a1a16]/70 placeholder:text-muted-foreground focus:outline-none focus:border-[#2D4A22]/40 data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex h-10 w-full items-center justify-between rounded-full border border-[#2D4A22]/15 bg-white px-4 py-3 text-[13px] text-[#1a1a16]/70 placeholder:text-muted-foreground focus:outline-none focus:border-[#2D4A22]/40 data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

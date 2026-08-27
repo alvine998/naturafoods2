@@ -82,7 +82,7 @@ export default function AssistantPage() {
     reader.readAsText(file);
   };
 
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
 
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
@@ -96,11 +96,11 @@ export default function AssistantPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-[#FFFCF2]">
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-white">
             <Upload className="h-3.5 w-3.5" /> Import<input type="file" accept="application/json" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importJson(f); e.currentTarget.value = ""; }} />
           </label>
-          <button onClick={exportJson} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-[#FFFCF2]"><Download className="h-3.5 w-3.5" /> Export</button>
-          <button onClick={() => { if (confirm("Reset assistant to defaults?")) reset(); }} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-[#FFFCF2]"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
+          <button onClick={exportJson} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-white"><Download className="h-3.5 w-3.5" /> Export</button>
+          <button onClick={() => { if (confirm("Reset assistant to defaults?")) reset(); }} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-white"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
           <button onClick={onSave} className="inline-flex items-center gap-1.5 rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]"><Save className="h-3.5 w-3.5" /> {saved ? "Saved ✓" : "Save"}</button>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function AssistantPage() {
           <button
             key={tb.id}
             onClick={() => setTab(tb.id)}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] tracking-[0.08em] transition ${tab === tb.id ? "bg-[#2D4A22] text-white shadow" : "text-[#2D4A22]/60 hover:bg-[#FFFCF2] hover:text-[#2D4A22]"}`}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] tracking-[0.08em] transition ${tab === tb.id ? "bg-[#2D4A22] text-white shadow" : "text-[#2D4A22]/60 hover:bg-white hover:text-[#2D4A22]"}`}
           >
             <tb.Icon className="h-3.5 w-3.5" /> {tb.label}
             {tb.id === "knowledge" && <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] leading-none ${tab === tb.id ? "bg-white/15 text-white" : "bg-[#2D4A22]/10 text-[#2D4A22]"}`}>{cfg.knowledge.length}</span>}
@@ -134,7 +134,7 @@ export default function AssistantPage() {
         <Card className="mt-4 p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">COPY PER LOCALE</h3>
-            <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] p-1">
+            <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1">
               {LOCALES.map((l) => (
                 <button key={l} onClick={() => setCopyLoc(l)} className={`rounded-full px-3.5 py-1.5 text-[11px] tracking-[0.08em] ${copyLoc === l ? "bg-[#2D4A22] text-white" : "text-[#2D4A22]/60 hover:text-[#2D4A22]"}`}>{l.toUpperCase()}</button>
               ))}
@@ -194,13 +194,13 @@ export default function AssistantPage() {
                 </div>
                 <div className="grid gap-1.5">
                   <Label>Strict</Label>
-                  <label className="flex h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-4 text-[12px] text-[#2D4A22]">
+                  <label className="flex h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-white px-4 text-[12px] text-[#2D4A22]">
                     <input type="checkbox" checked={tuning.strict} onChange={(e) => setTuning({ strict: e.target.checked })} className="accent-[#2D4A22]" />
                     Knowledge-only (no generic fallback)
                   </label>
                 </div>
               </div>
-              <p className="text-[11px] text-[#8B6F47]">Persona + tone/length/strict are read by <code className="rounded bg-[#FFFCF2] px-1 py-0.5">resolveReply</code> and will be the <code className="rounded bg-[#FFFCF2] px-1 py-0.5">system prompt</code> when you wire a real LLM.</p>
+              <p className="text-[11px] text-[#8B6F47]">Persona + tone/length/strict are read by <code className="rounded bg-white px-1 py-0.5">resolveReply</code> and will be the <code className="rounded bg-white px-1 py-0.5">system prompt</code> when you wire a real LLM.</p>
             </div>
           </Card>
 
@@ -214,7 +214,7 @@ export default function AssistantPage() {
             </div>
             <div className="mt-4 grid gap-3">
               {cfg.knowledge.map((entry, idx) => (
-                <div key={entry.id} className="rounded-2xl border border-[#2D4A22]/10 bg-[#FFFCF2] p-4">
+                <div key={entry.id} className="rounded-2xl border border-[#2D4A22]/10 bg-white p-4">
                   <div className="flex items-start gap-2">
                     <div className="flex flex-col gap-1 pt-6">
                       <button onClick={() => moveEntry(idx, -1)} disabled={idx === 0} className="rounded-full border border-[#2D4A22]/10 bg-white p-1.5 disabled:opacity-30"><ChevronUp className="h-3 w-3" /></button>
@@ -249,7 +249,7 @@ export default function AssistantPage() {
           <h3 className="flex items-center gap-2 text-[11px] tracking-[0.14em] text-[#2D4A22]"><TestTube className="h-3.5 w-3.5" /> PLAYGROUND — test reply</h3>
           <p className="mt-1 text-[11px] text-[#8B6F47]">Persona + tuning from Knowledge tab applied here. Edit there, test here.</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] p-1 w-fit">
+            <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1 w-fit">
               {LOCALES.map((l) => (
                 <button key={l} onClick={() => setTestLocale(l)} className={`rounded-full px-3 py-1.5 text-[11px] tracking-[0.08em] ${testLocale === l ? "bg-[#2D4A22] text-white" : "text-[#2D4A22]/60 hover:text-[#2D4A22]"}`}>{l.toUpperCase()}</button>
               ))}
@@ -257,7 +257,7 @@ export default function AssistantPage() {
             <Input value={testQ} onChange={(e) => setTestQ(e.target.value)} placeholder="Try: price, delivery, matcha..." className="flex-1" />
           </div>
           {testQ.trim() ? (
-            <div className="mt-4 rounded-2xl border border-[#2D4A22]/10 bg-[#FFFCF2] p-4">
+            <div className="mt-4 rounded-2xl border border-[#2D4A22]/10 bg-white p-4">
               <p className="flex items-center gap-1.5 text-[10px] tracking-[0.12em] text-[#8B6F47]"><MessageCircle className="h-3 w-3" /> BOT REPLY · {testLocale.toUpperCase()}</p>
               <p className="mt-2 text-[13px] leading-6 text-[#2D4A22]">{testReply}</p>
               <p className="mt-2 text-[10px] tracking-[0.08em] text-[#8B6F47]">persona: {tuning.tone} · {tuning.length}{tuning.strict ? " · strict" : ""}</p>

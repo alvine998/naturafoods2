@@ -40,7 +40,7 @@ export default function ProductsPage() {
     else s.setProducts((prev: Product[]) => [...prev, item]);
     closeForm();
   };
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex items-center justify-between gap-3">
@@ -68,13 +68,13 @@ export default function ProductsPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[720px] text-[12px]">
-                <thead className="bg-[#FFFCF2] text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Tag</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Tag</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((p: Product) => {
                     const realIdx = (s.products as Product[]).indexOf(p);
                     const isVideo = p.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(p.img ?? "");
                     return (
-                      <tr key={p.slug + realIdx} className="hover:bg-[#FFFCF2]/60">
+                      <tr key={p.slug + realIdx} className="hover:bg-white/60">
                         <td className="px-3 py-2">{isVideo ? <video src={p.img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={p.img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{p.title}<div className="text-[11px] font-normal text-[#8B6F47] line-clamp-1">{p.note}</div></td>
                         <td className="px-3 py-2 text-[#8B6F47]">{p.slug}</td>

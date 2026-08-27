@@ -16,7 +16,7 @@ export const viewport: Viewport = { themeColor: "#2D4A22", width: "device-width"
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#FFFCF2] text-[#1a1a16]">
+      <body className="min-h-full bg-white text-[#1a1a16]">
         <OrgJsonLd />
         <LanguageProvider>{children}<ChatAssistant /></LanguageProvider>
       </body>

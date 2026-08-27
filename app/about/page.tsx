@@ -25,7 +25,7 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFCF2] overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
 
       {/* HERO */}
@@ -68,7 +68,7 @@ export default function AboutPage() {
         </div>
 
         {/* sticky TOC */}
-        <div className="sticky top-[64px] z-20 border-y border-[#2D4A22]/10 bg-[#FFFCF2]/90 backdrop-blur-xl">
+        <div className="sticky top-[64px] z-20 border-y border-[#2D4A22]/10 bg-white/90 backdrop-blur-xl">
           <div className="mx-auto flex max-w-[1280px] items-center gap-2 overflow-x-auto px-4 py-3 sm:px-6 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <span className="hidden shrink-0 text-[10px] tracking-[0.18em] text-[#8B6F47] sm:block">JUMP TO</span>
             {L.toc.map((label, i) => {
@@ -189,7 +189,7 @@ export default function AboutPage() {
           <div className="mt-8 grid gap-4 sm:gap-6 md:grid-cols-3">
             {L.values.map((v, i) => (
               <Reveal key={v.t} delay={i * 0.08} className="rounded-[24px] bg-white p-6 sm:p-7 border border-[#2D4A22]/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFCF2] border border-[#2D4A22]/10 text-[#2D4A22]"><Check className="h-4 w-4" /></div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-[#2D4A22]/10 text-[#2D4A22]"><Check className="h-4 w-4" /></div>
                 <h3 className="mt-4 font-[var(--font-display)] text-[16px] font-medium text-[#2D4A22]">{v.t}</h3>
                 <p className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60">{v.d}</p>
               </Reveal>
@@ -231,11 +231,11 @@ export default function AboutPage() {
               <Reveal><p className="text-[11px] tracking-[0.24em] text-[#8B6F47]">{L.whEyebrow}</p><h2 className="mt-3 font-[var(--font-display)] text-[30px] sm:text-[36px] font-light leading-none text-[#2D4A22] md:text-[44px]">{L.whTitle}<br /><span className="italic font-normal">{L.whTitleIt}</span></h2></Reveal>
               <Reveal delay={0.08} className="mt-6 grid gap-3">
                 {L.whBullets.map((b) => (
-                  <div key={b} className="flex gap-3 rounded-2xl border border-[#2D4A22]/10 bg-[#FFFCF2] px-4 py-3 text-[13px] leading-6 text-[#1a1a16]/70"><span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D4A22]" />{b}</div>
+                  <div key={b} className="flex gap-3 rounded-2xl border border-[#2D4A22]/10 bg-white px-4 py-3 text-[13px] leading-6 text-[#1a1a16]/70"><span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D4A22]" />{b}</div>
                 ))}
               </Reveal>
               <Reveal delay={0.14} className="mt-6 flex flex-wrap gap-2">
-                {t.aboutBadges.map((b) => <span key={b} className="rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22]">{b}</span>)}
+                {t.aboutBadges.map((b) => <span key={b} className="rounded-full border border-[#2D4A22]/10 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22]">{b}</span>)}
               </Reveal>
             </div>
           </div>

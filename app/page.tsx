@@ -8,6 +8,7 @@ import Splash from "./components/Splash";
 import HeroSlider from "./components/HeroSlider";
 import SiteNav from "./components/SiteNav";
 import SiteFooter from "./components/SiteFooter";
+import OfficialPartnersSection from "./components/OfficialPartnersSection";
 import { useLang } from "./i18n";
 
 function Reveal({ children, delay = 0, y = 24, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
@@ -23,11 +24,6 @@ function Parallax({ children, offset = 80, className = "" }: { children: React.R
 export default function Home() {
   const [entered, setEntered] = useState(false);
   const { t } = useLang();
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 220]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,11 +36,11 @@ export default function Home() {
     <>
       <LenisProvider enabled={entered} />
       <Splash onDone={() => setEntered(true)} sub={t.splashSub} foot={t.splashFoot} />
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: entered ? 1 : 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="bg-[#FFFCF2] overflow-x-hidden">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: entered ? 1 : 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="bg-white overflow-x-hidden">
         <SiteNav />
-        <HeroSlider onCta={scrollTo} slides={t.heroSlides} />
+        <HeroSlider onCta={scrollTo} slides={t.heroSlides} welcome={{ title: t.welcomeTitle, sub: t.welcomeSub }} />
 
-        <section ref={heroRef} className="relative overflow-hidden">
+        {/* <section ref={heroRef} className="relative overflow-hidden">
           <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-8 sm:px-6 sm:py-10 md:grid-cols-[1.08fr_0.92fr] md:px-8 md:py-16 lg:py-20">
             <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 flex flex-col justify-center">
               <Reveal><p className="mb-3 sm:mb-4 inline-flex items-center gap-2 rounded-full border border-[#2D4A22]/10 bg-white px-3 py-1 text-[10px] tracking-[0.2em] text-[#8B6F47]"><span className="h-1.5 w-1.5 rounded-full bg-[#2D4A22] animate-pulse" />{t.heroBadge}</p></Reveal>
@@ -93,9 +89,9 @@ export default function Home() {
               <span key={i} className="flex items-center gap-6 sm:gap-8">{t.marquee.map((s, idx) => <span key={s} className="flex items-center gap-6 sm:gap-8"><span>{s}</span>{idx < t.marquee.length - 1 && <span className="h-1 w-1 rounded-full bg-[#C4B5A0]" />}</span>)}<span className="h-1 w-1 rounded-full bg-[#C4B5A0]" /></span>
             ))}
           </motion.div>
-        </div>
+        </div> */}
 
-        <section id="about" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-24">
+        {/* <section id="about" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-24">
           <div className="grid items-center gap-8 sm:gap-10 md:grid-cols-2 md:gap-16">
             <Parallax offset={60} className="order-2 md:order-1"><div className="relative aspect-[4/3.1] overflow-hidden rounded-[20px] sm:rounded-[24px] bg-[#FFF7E8]"><img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80" alt="Warehouse" className="h-full w-full object-cover" /></div></Parallax>
             <div className="order-1 md:order-2">
@@ -115,7 +111,7 @@ export default function Home() {
             <div className="mt-8 sm:mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">{t.chocoProducts.map((p, i) => {
               const slugs = ["belgian-dark-72", "milk-couverture-33", "white-chocolate-28"];
               return (
-              <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-[#FFFCF2]">
+              <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white">
                 <Link href={`/products/${slugs[i]}`} className="block aspect-[4/3] overflow-hidden bg-[#F5EFE0]"><motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} src={p.img} alt={p.title} className="h-full w-full object-cover" /></Link>
                 <div className="p-4 sm:p-5"><Link href={`/products/${slugs[i]}`} className="flex items-start justify-between gap-3 group/link"><div className="min-w-0"><h3 className="font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{p.note}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-white">{p.tag}</span></Link><Link href={`/products/${slugs[i]}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">{t.homeCommon.viewDetail}</Link></div>
               </motion.div>);})}
@@ -146,13 +142,9 @@ export default function Home() {
             <Reveal delay={0.08}><h2 className="mt-3 sm:mt-4 max-w-[18ch] font-[var(--font-display)] text-[28px] sm:text-[34px] font-light leading-[0.9] text-white md:text-[52px]">{t.bannerTitle1} <span className="italic">{t.bannerTitleItalic}</span> {t.bannerTitle3}</h2></Reveal>
             <Reveal delay={0.16}><p className="mt-3 sm:mt-4 max-w-[52ch] text-[13px] sm:text-[14px] leading-6 text-white/80">{t.bannerDesc}</p></Reveal>
           </div>
-        </section>
+        </section> */}
 
-        <section id="partners" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
-          <Reveal><p className="text-[10px] tracking-[0.2em] sm:text-[11px] sm:tracking-[0.24em] text-[#8B6F47]">{t.partnersEyebrow}</p><h2 className="mt-2 sm:mt-3 font-[var(--font-display)] text-[26px] sm:text-[34px] font-light leading-none text-[#2D4A22] md:text-[42px]">{t.partnersTitle1} <span className="italic font-normal">{t.partnersTitle2}</span></h2></Reveal>
-          <div className="mt-8 sm:mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">{t.partnersCards.map((c, i) => (<Reveal key={c.n} delay={i * 0.08} className="rounded-2xl border border-[#2D4A22]/10 bg-white p-5 sm:p-6"><div className="text-[11px] tracking-[0.2em] text-[#C4B5A0]">{c.n}</div><h3 className="mt-2 font-[var(--font-display)] text-[17px] sm:text-[19px] font-medium text-[#2D4A22]">{c.t}</h3><p className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60">{c.d}</p></Reveal>))}</div>
-          <Reveal delay={0.2} className="mt-8 sm:mt-10 flex flex-col gap-3 border-t border-[#2D4A22]/10 pt-6 sm:pt-8 sm:flex-row sm:flex-wrap sm:items-center"><span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">{t.trustedBy}</span><div className="flex flex-wrap gap-2">{["% Arabica", "Common Grounds", "Tanamera", "Anomali", "Giyanti", "One Fifteenth"].map((b) => (<span key={b} className="rounded-full bg-white border border-[#2D4A22]/10 px-3 sm:px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.1em] text-[#2D4A22]/70">{b}</span>))}<span className="px-2 sm:px-3 py-1.5 text-[11px] text-[#8B6F47]">{t.morePartners}</span></div></Reveal>
-        </section>
+        <OfficialPartnersSection />
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1280px] gap-8 sm:gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-start">

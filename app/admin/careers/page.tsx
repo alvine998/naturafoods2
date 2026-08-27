@@ -38,7 +38,7 @@ export default function CareersPage() {
     if (editIdx !== null) s.setJobs((prev: Job[]) => prev.map((x, i) => i === editIdx ? item : x)); else s.setJobs((prev: Job[]) => [...prev, item]);
     closeForm();
   };
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[4]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[4]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.jobs.length}</span></div>
@@ -61,16 +61,16 @@ export default function CareersPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">
-                <thead className="bg-[#FFFCF2] text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Dept</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Type</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Dept</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Type</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((j: Job) => {
                     const realIdx = (s.jobs as Job[]).indexOf(j);
                     return (
-                      <tr key={j.id + realIdx} className="hover:bg-[#FFFCF2]/60">
+                      <tr key={j.id + realIdx} className="hover:bg-white/60">
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{j.title}</td>
                         <td className="px-3 py-2">{j.dept}</td>
                         <td className="px-3 py-2">{j.loc}</td>
-                        <td className="px-3 py-2"><span className="rounded-full bg-[#FFFCF2] border px-2 py-0.5 text-[11px]">{j.type}</span></td>
+                        <td className="px-3 py-2"><span className="rounded-full bg-white border px-2 py-0.5 text-[11px]">{j.type}</span></td>
                         <td className="px-3 py-2 text-right"><div className="inline-flex gap-1.5"><button onClick={() => openEdit(realIdx)} className="rounded-full border px-3 py-1 text-[11px]">{a.edit}</button><button onClick={() => s.setJobs((prev: Job[]) => prev.filter((_: Job, idx: number) => idx !== realIdx))} className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></div></td>
                       </tr>
                     );

@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const s = useStore();
   const [gate, setGate] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
   const links = [
     { href: "/admin/products", label: a.tabs[0], c: counts[0], sub: "catalog" },
@@ -40,7 +40,7 @@ export default function DashboardPage() {
       </div>
       <Card className="mt-6 grid grid-cols-2 gap-3 p-3 sm:grid-cols-4 sm:p-4">
         {links.slice(0, 6).map((x) => (
-          <Link key={x.href} href={x.href} className="rounded-2xl border border-[#2D4A22]/10 bg-[#FFFCF2] p-4 hover:bg-white">
+          <Link key={x.href} href={x.href} className="rounded-2xl border border-[#2D4A22]/10 bg-white p-4 hover:bg-white">
             <p className="text-[10px] tracking-[0.14em] text-[#8B6F47]">{x.label.toUpperCase()}</p>
             <p className="mt-1 font-[var(--font-display)] text-[22px] font-light text-[#2D4A22]">{x.c}</p>
             <p className="text-[11px] text-[#8B6F47]">{x.sub}</p>

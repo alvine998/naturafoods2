@@ -28,7 +28,7 @@ function ProductsInner() {
       <PageHeader eyebrow={p.eyebrow} title={p.title} desc={p.desc} />
       <div className="mb-6 -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:px-0 sm:overflow-visible">
         {([["all", p.all], ["choco", p.choco], ["matcha", p.matcha]] as const).map(([k, label]) => (
-          <button key={k} onClick={() => setCat(k)} className={`shrink-0 rounded-full px-4 sm:px-5 py-2 text-[11px] tracking-[0.14em] border ${cat === k ? "bg-[#2D4A22] text-white border-[#2D4A22]" : "bg-white text-[#2D4A22] border-[#2D4A22]/15 hover:bg-[#FFFCF2]"}`}>{label}</button>
+          <button key={k} onClick={() => setCat(k)} className={`shrink-0 rounded-full px-4 sm:px-5 py-2 text-[11px] tracking-[0.14em] border ${cat === k ? "bg-[#2D4A22] text-white border-[#2D4A22]" : "bg-white text-[#2D4A22] border-[#2D4A22]/15 hover:bg-white"}`}>{label}</button>
         ))}
       </div>
       <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -47,5 +47,5 @@ function ProductsInner() {
   );
 }
 export default function ProductsPage() {
-  return <Suspense fallback={<div className="min-h-screen bg-[#FFFCF2] p-12 text-center text-[#8B6F47]">…</div>}><ProductsInner /></Suspense>;
+  return <Suspense fallback={<div className="min-h-screen bg-white p-12 text-center text-[#8B6F47]">…</div>}><ProductsInner /></Suspense>;
 }

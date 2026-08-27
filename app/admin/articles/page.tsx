@@ -41,7 +41,7 @@ export default function ArticlesPage() {
     if (editIdx !== null) s.setArticles((prev: Article[]) => prev.map((x, i) => i === editIdx ? item : x)); else s.setArticles((prev: Article[]) => [...prev, item]);
     closeForm();
   };
-  if (!gate) return <div className="min-h-screen bg-[#FFFCF2] grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
+  if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[1]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[1]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.articles.length}</span></div>
@@ -57,7 +57,7 @@ export default function ArticlesPage() {
             <div className="sm:col-span-2"><Field label="excerpt"><TextArea value={f.excerpt ?? ""} onChange={(e) => setF({ ...f, excerpt: e.target.value })} rows={2} placeholder="Short summary" /></Field></div>
             <div className="sm:col-span-2 grid gap-2">
               <div className="flex items-center justify-between"><span className="text-[10px] tracking-[0.14em] text-[#8B6F47]">Content — WYSIWYG</span><span className="text-[11px] text-[#8B6F47]">Quill</span></div>
-              <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] p-1 w-fit">
+              <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1 w-fit">
                 {(["id", "en", "zh"] as const).map((loc) => (
                   <button key={loc} type="button" onClick={() => setLocaleTab(loc)} className={`rounded-full px-3 py-1.5 text-[11px] font-medium ${localeTab === loc ? "bg-[#2D4A22] text-white" : "text-[#8B6F47]"}`}>{loc === "id" ? "ID" : loc === "en" ? "EN" : "中文"}</button>
                 ))}
@@ -75,13 +75,13 @@ export default function ArticlesPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[720px] text-[12px]">
-                <thead className="bg-[#FFFCF2] text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Date</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Date</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((ar: Article) => {
                     const realIdx = (s.articles as Article[]).indexOf(ar);
                     const isVideo = ar.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(ar.img ?? "");
                     return (
-                      <tr key={ar.slug + realIdx} className="hover:bg-[#FFFCF2]/60">
+                      <tr key={ar.slug + realIdx} className="hover:bg-white/60">
                         <td className="px-3 py-2">{isVideo ? <video src={ar.img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={ar.img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1">{ar.title}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.slug}</td>

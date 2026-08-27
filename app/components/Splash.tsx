@@ -21,7 +21,7 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FFFCF2] overflow-hidden"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white overflow-hidden"
         >
           {/* <div
             className="pointer-events-none absolute inset-0 opacity-[0.035]"

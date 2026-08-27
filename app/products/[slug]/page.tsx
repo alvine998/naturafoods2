@@ -31,14 +31,14 @@ export default function ProductDetailPage() {
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[#2D4A22] px-3 py-1 text-[10px] tracking-[0.14em] text-white uppercase">{product.cat}</span>
-            <span className="rounded-full border border-[#2D4A22]/10 bg-[#FFFCF2] px-3 py-1 text-[11px] tracking-[0.08em] text-[#8B6F47]">{product.tag}</span>
+            <span className="rounded-full border border-[#2D4A22]/10 bg-white px-3 py-1 text-[11px] tracking-[0.08em] text-[#8B6F47]">{product.tag}</span>
           </div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] font-light leading-none text-[#2D4A22] break-words">{product.title}</h1>
           <p className="mt-2 text-[12px] tracking-[0.06em] text-[#8B6F47]">{product.note}</p>
           <p className="mt-3 max-w-[65ch] text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{product.desc}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/contact" className="inline-flex rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">{t.productDetail.requestPrice}</Link>
-            <Link href="/products" className="inline-flex rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">{t.productDetail.viewAll}</Link>
+            <Link href="/products" className="inline-flex rounded-full border border-[#2D4A22]/15 bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">{t.productDetail.viewAll}</Link>
           </div>
         </div>
       </div>

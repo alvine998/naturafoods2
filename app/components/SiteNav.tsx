@@ -37,6 +37,7 @@ export default function SiteNav() {
     { label: locale === "id" ? "ARTIKEL" : locale === "zh" ? "文章" : "ARTICLES", href: "/articles" },
     { label: locale === "id" ? "EDUKASI" : locale === "zh" ? "教育中心" : "EDUCATION", href: "/education" },
     { label: locale === "id" ? "INOVASI" : locale === "zh" ? "创新中心" : "INNOVATION", href: "/innovation" },
+    { label: locale === "id" ? "SOSIAL MEDIA" : locale === "zh" ? "社交媒体" : "SOCIAL MEDIA", href: "/social-media" },
     { label: locale === "id" ? "KONTAK" : locale === "zh" ? "联系" : "CONTACT", href: "/contact" },
     { label: locale === "id" ? "KARIR" : locale === "zh" ? "招聘" : "CAREERS", href: "/careers" },
   ];
@@ -47,7 +48,7 @@ export default function SiteNav() {
     <>
       <header
         className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-all ${
-          scrolled ? "border-[#2D4A22]/10 bg-[#FFFCF2]/90 shadow-[0_4px_24px_rgba(45,74,34,0.06)]" : "border-[#2D4A22]/[0.06] bg-[#FFFCF2]/75"
+          scrolled ? "border-[#2D4A22]/10 bg-white/90 shadow-[0_4px_24px_rgba(45,74,34,0.06)]" : "border-[#2D4A22]/[0.06] bg-white/75"
         }`}
       >
         <nav className="mx-auto flex h-[64px] max-w-[1440px] items-center justify-between gap-4 px-6 md:px-8">
@@ -78,7 +79,7 @@ export default function SiteNav() {
                         <Link
                           key={s.href}
                           href={s.href}
-                          className="flex items-center justify-between rounded-2xl px-4 py-3 hover:bg-[#FFFCF2] group/item"
+                          className="flex items-center justify-between rounded-2xl px-4 py-3 hover:bg-white group/item"
                         >
                           <div>
                             <div className="text-[12px] font-medium tracking-[0.04em] text-[#2D4A22]">{s.label[locale]}</div>
@@ -108,16 +109,10 @@ export default function SiteNav() {
           {/* right */}
           <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <LanguageSwitcher className="hidden sm:flex" />
-            <Link
-              href="/contact"
-              className="hidden items-center justify-center rounded-full bg-[#2D4A22] px-5 py-2.5 text-[11px] tracking-[0.14em] text-white shadow-[0_4px_16px_rgba(45,74,34,0.2)] transition hover:bg-[#1e3317] hover:shadow-[0_6px_20px_rgba(45,74,34,0.25)] md:inline-flex"
-            >
-              {t.nav.becomePartner}
-            </Link>
             <button
               onClick={() => setOpen(true)}
               aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2D4A22]/15 bg-white text-[#2D4A22] shadow-sm transition hover:bg-[#FFFCF2] lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2D4A22]/15 bg-white text-[#2D4A22] shadow-sm transition hover:bg-white lg:hidden"
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -142,7 +137,7 @@ export default function SiteNav() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-y-0 right-0 z-50 flex w-[88%] max-w-[380px] flex-col bg-[#FFFCF2] shadow-2xl lg:hidden"
+              className="fixed inset-y-0 right-0 z-50 flex w-[88%] max-w-[380px] flex-col bg-white shadow-2xl lg:hidden"
             >
               <div className="flex h-[64px] items-center justify-between border-b border-[#2D4A22]/10 px-6">
                 <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
@@ -188,7 +183,7 @@ export default function SiteNav() {
                               <div className="pb-3 pl-3">
                                 <div className="grid gap-1 border-l border-[#2D4A22]/10 pl-3">
                                   {n.dropdown.map((s) => (
-                                     <Link key={s.href} href={s.href} onClick={() => setOpen(false)} className="flex items-center justify-between rounded-xl bg-[#FFFCF2] px-3 py-2.5">
+                                     <Link key={s.href} href={s.href} onClick={() => setOpen(false)} className="flex items-center justify-between rounded-xl bg-white px-3 py-2.5">
                                       <div>
                                         <div className="text-[12px] font-medium text-[#2D4A22]">{s.label[locale]}</div>
                                         <div className="text-[11px] text-[#8B6F47]">{s.desc[locale]}</div>
@@ -221,9 +216,6 @@ export default function SiteNav() {
                     <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">LANGUAGE</span>
                     <LanguageSwitcher />
                   </div>
-                  <Link href="/contact" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.16em] text-white">
-                    {t.nav.becomePartner} <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
                   <Link href="/admin/login" onClick={() => setOpen(false)} className="text-center text-[11px] tracking-[0.14em] text-[#8B6F47] hover:text-[#2D4A22]">
                     ADMIN LOGIN
                   </Link>

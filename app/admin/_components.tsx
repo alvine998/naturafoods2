@@ -57,7 +57,7 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
       <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#2D4A22]/10 bg-white p-5 shadow-xl sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{title}</h3>
-          <button onClick={onClose} className="rounded-full border border-[#2D4A22]/15 px-3 py-1 text-[11px] text-[#2D4A22] hover:bg-[#FFFCF2]">✕</button>
+          <button onClick={onClose} className="rounded-full border border-[#2D4A22]/15 px-3 py-1 text-[11px] text-[#2D4A22] hover:bg-white">✕</button>
         </div>
         <div className="mt-4">{children}</div>
       </div>
@@ -86,14 +86,14 @@ export function FileUpload({ value, onChange, accept = "image/*" }: { value?: st
           )}
         </div>
       ) : (
-        <div className="grid place-items-center rounded-xl border border-dashed border-[#2D4A22]/15 bg-[#FFFCF2] px-4 py-6 text-center text-[11px] text-[#8B6F47]">No file selected</div>
+        <div className="grid place-items-center rounded-xl border border-dashed border-[#2D4A22]/15 bg-white px-4 py-6 text-center text-[11px] text-[#8B6F47]">No file selected</div>
       )}
       <div className="flex flex-wrap gap-2">
         <label className="cursor-pointer rounded-full bg-[#2D4A22] px-4 py-1.5 text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]">
           {value ? "Replace file" : "Upload file"}
           <input type="file" accept={accept} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
         </label>
-        {value && <button type="button" onClick={() => onChange("")} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-[#FFFCF2]">Remove</button>}
+        {value && <button type="button" onClick={() => onChange("")} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white">Remove</button>}
       </div>
     </div>
   );

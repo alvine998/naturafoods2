@@ -47,7 +47,7 @@ const SLIDES: Slide[] = [
   },
 ];
 
-export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => void; slides?: Slide[] }) {
+export default function HeroSlider({ onCta, slides, welcome }: { onCta?: (id: string) => void; slides?: Slide[]; welcome?: { title: string; sub: string } }) {
   const SLIDES_ACTIVE = slides ?? SLIDES;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -72,13 +72,13 @@ export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => 
   return (
     <section
       aria-label="Highlights"
-      className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8"
+      className="w-full"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative overflow-hidden rounded-[20px] sm:rounded-[24px] md:rounded-[28px] bg-[#1a1a16]">
+      <div className="relative overflow-hidden bg-[#1a1a16] min-h-[90vh]">
         {/* slides */}
-        <div className="relative h-[380px] sm:h-[420px] md:h-[480px] lg:h-[520px]">
+        <div className="relative h-[90vh] min-h-[640px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={i}
@@ -107,8 +107,19 @@ export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => 
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
               <div className="absolute inset-0 bg-[#2D4A22]/10 mix-blend-multiply" />
 
+              {/* welcome */}
+              {welcome && (
+                <div className="absolute left-1/2 top-6 sm:top-8 md:top-10 -translate-x-1/2 z-10 max-w-[92%] text-center">
+                  <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.28em] text-white backdrop-blur">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#F5EFE0]" />
+                    {welcome.title}
+                  </p>
+                  <p className="mt-2 hidden sm:block text-[11px] sm:text-[12px] leading-5 text-white/80">{welcome.sub}</p>
+                </div>
+              )}
+
               {/* content */}
-              <div className="absolute inset-0 flex items-end sm:items-center p-4 sm:p-6 md:p-10 lg:p-14">
+              <div className="absolute inset-0 flex items-end sm:items-center p-4 sm:p-16 md:p-16 lg:p-20">
                 <div className="max-w-[560px]">
                   <p className="inline-flex rounded-full bg-white/15 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.18em] text-white backdrop-blur">
                     {s.eyebrow}
@@ -119,7 +130,7 @@ export default function HeroSlider({ onCta, slides }: { onCta?: (id: string) => 
                   <p className="mt-2 sm:mt-3 max-w-[42ch] text-[13px] sm:text-[14px] leading-6 text-white/80">{s.desc}</p>
                   <button
                     onClick={handleCta}
-                    className="mt-4 sm:mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-[#FFFCF2]"
+                    className="mt-4 sm:mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-white"
                   >
                     {s.cta} <ArrowRight className="h-3.5 w-3.5" />
                   </button>

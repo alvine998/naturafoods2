@@ -4,7 +4,7 @@ import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
 export default function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#FFFCF2] overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
       <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12">{children}</main>
       <SiteFooter />

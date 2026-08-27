@@ -91,7 +91,7 @@ export default function ChatAssistant() {
             </div>
 
             {/* messages */}
-            <div ref={listRef} className="flex-1 overflow-y-auto bg-[#FFFCF2] px-3 py-4 sm:px-4 space-y-3">
+            <div ref={listRef} className="flex-1 overflow-y-auto bg-white px-3 py-4 sm:px-4 space-y-3">
               {msgs.map((m, idx) => (
                 <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[78%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-5 ${m.role === "user" ? "bg-[#2D4A22] text-white rounded-br-md" : "bg-white border border-[#2D4A22]/10 text-[#2D4A22] rounded-bl-md shadow-[0_2px_8px_rgba(26,26,22,0.04)]"}`}>
@@ -112,16 +112,16 @@ export default function ChatAssistant() {
             <div className="border-t border-[#2D4A22]/10 bg-white px-3 py-3">
               <div className="flex flex-wrap gap-1.5">
                 {copy.quick.map((q: string) => (
-                  <button key={q} onClick={() => send(q)} className="rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-3 py-1.5 text-[11px] tracking-[0.04em] text-[#2D4A22] hover:bg-[#2D4A22] hover:text-white transition">
+                  <button key={q} onClick={() => send(q)} className="rounded-full border border-[#2D4A22]/15 bg-white px-3 py-1.5 text-[11px] tracking-[0.04em] text-[#2D4A22] hover:bg-[#2D4A22] hover:text-white transition">
                     {q}
                   </button>
                 ))}
               </div>
               <div className="mt-2 flex gap-2">
                 <a href={cfg.waLink} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] py-2 text-center text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]">{copy.wa} <ArrowUpRight className="h-3 w-3" /></a>
-                <Link href="/contact" onClick={() => setOpen(false)} className="flex-1 rounded-full border border-[#2D4A22]/15 bg-white py-2 text-center text-[11px] tracking-[0.08em] text-[#2D4A22] hover:bg-[#FFFCF2]">{copy.contact}</Link>
+                <Link href="/contact" onClick={() => setOpen(false)} className="flex-1 rounded-full border border-[#2D4A22]/15 bg-white py-2 text-center text-[11px] tracking-[0.08em] text-[#2D4A22] hover:bg-white">{copy.contact}</Link>
               </div>
-              <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="mt-3 flex items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-[#FFFCF2] px-2 py-1.5 focus-within:border-[#2D4A22]/30 focus-within:bg-white">
+              <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="mt-3 flex items-center gap-2 rounded-full border border-[#2D4A22]/15 bg-white px-2 py-1.5 focus-within:border-[#2D4A22]/30 focus-within:bg-white">
                 <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={copy.placeholder} className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2 h-auto py-1" />
                 <button type="submit" disabled={!input.trim()} className="inline-flex items-center gap-1 rounded-full bg-[#2D4A22] px-4 py-2 text-[11px] tracking-[0.08em] text-white disabled:opacity-40 hover:bg-[#1e3317]"><Send className="h-3 w-3" /> {copy.send}</button>
               </form>

@@ -23,14 +23,9 @@ export default function InnovationPage() {
     cta: it.cta,
   }));
   return (
-    <div className="min-h-screen bg-[#FFFCF2] overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 pt-6 sm:pt-8">
-        <p className="text-[10px] tracking-[0.2em] sm:text-[11px] sm:tracking-[0.24em] text-[#8B6F47]">{p.eyebrow}</p>
-        <h1 className="mt-2 font-[var(--font-display)] text-[26px] sm:text-[32px] md:text-[40px] font-light leading-none text-[#2D4A22]">{p.title}</h1>
-        <p className="mt-3 max-w-[60ch] text-[13px] leading-6 text-[#1a1a16]/60">{p.desc}</p>
-      </div>
-      <div className="mt-6 sm:mt-8">
+      <div>
         {slides.length === 0 ? (
           <p className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 py-16 text-center text-[13px] text-[#8B6F47]">{t.admin.noData}</p>
         ) : (

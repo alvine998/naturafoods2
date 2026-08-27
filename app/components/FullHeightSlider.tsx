@@ -83,7 +83,7 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
                       href={s.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 sm:px-7 py-3 sm:py-3.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-[#FFFCF2]"
+                      className="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 sm:px-7 py-3 sm:py-3.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-white"
                     >
                       {ctaLabel} <ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
