@@ -13,6 +13,7 @@ type Product = { title: string; note: string; tag: string; img: string };
 export type Dict = {
   nav: { about: string; choco: string; matcha: string; partners: string; contact: string; becomePartner: string };
   heroBadge: string;
+  heroVideoSrc: string; heroVideoPoster: string; heroBannerCta: string;
   heroTitle1: string; heroTitleItalic: string; heroTitleAfterItalic: string; heroTitleLine3: string; heroTitleLine4: string; heroDesc: string;
   viewCatalog: string; companyProfile: string;
   stat1k: string; stat1v: string; stat2k: string; stat2v: string; stat3k: string; stat3v: string;
@@ -44,6 +45,9 @@ export const dict: Record<Locale, Dict> = {
   en: {
     nav: { about: "ABOUT", choco: "CHOCO", matcha: "MATCHA", partners: "PARTNERS", contact: "CONTACT", becomePartner: "BECOME A PARTNER" },
     heroBadge: "PT NATURA INTI SUKSES · IMPORTER & DISTRIBUTOR",
+    heroVideoSrc: "https://cdn.alvineitsolutions.com/naturafoods/Video%20Home%20Website%20(1).mp4",
+    heroVideoPoster: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80",
+    heroBannerCta: "BECOME A PARTNER",
     heroTitle1: "Baking", heroTitleItalic: "ingredients", heroTitleAfterItalic: "for", heroTitleLine3: "food & beverage", heroTitleLine4: "professionals.",
     heroDesc: "PT Natura Inti Sukses is an importer & distributor of food & beverage ingredients in Indonesia — focused on baking ingredients. Built on import experience from 2010–2016, strong principal partnerships & a nationwide marketing network.",
     viewCatalog: "VIEW CATALOG", companyProfile: "COMPANY PROFILE",
@@ -106,6 +110,9 @@ export const dict: Record<Locale, Dict> = {
   id: {
     nav: { about: "TENTANG", choco: "COKELAT", matcha: "MATCHA", partners: "MITRA", contact: "KONTAK", becomePartner: "JADI MITRA" },
     heroBadge: "PT NATURA INTI SUKSES · IMPORTIR & DISTRIBUTOR",
+    heroVideoSrc: "https://cdn.alvineitsolutions.com/naturafoods/Video%20Home%20Website%20(1).mp4",
+    heroVideoPoster: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80",
+    heroBannerCta: "JADI MITRA",
     heroTitle1: "Bahan baku", heroTitleItalic: "kue premium", heroTitleAfterItalic: "untuk", heroTitleLine3: "industri makanan", heroTitleLine4: "& minuman.",
     heroDesc: "PT Natura Inti Sukses adalah importir & distributor bahan baku makanan dan minuman di Indonesia — fokus pada baking ingredients. Berbekal pengalaman impor tim sejak 2010–2016, kemitraan principal yang kuat & jaringan pemasaran nasional.",
     viewCatalog: "LIHAT KATALOG", companyProfile: "PROFIL PERUSAHAAN",
@@ -168,6 +175,9 @@ export const dict: Record<Locale, Dict> = {
   zh: {
     nav: { about: "关于", choco: "巧克力", matcha: "抹茶", partners: "合作伙伴", contact: "联系我们", becomePartner: "成为伙伴" },
     heroBadge: "PT NATURA INTI SUKSES · 进口商与分销商",
+    heroVideoSrc: "https://cdn.alvineitsolutions.com/naturafoods/Video%20Home%20Website%20(1).mp4",
+    heroVideoPoster: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80",
+    heroBannerCta: "成为伙伴",
     heroTitle1: "为食品饮料", heroTitleItalic: "行业", heroTitleAfterItalic: "提供", heroTitleLine3: "优质烘焙原料", heroTitleLine4: "与添加剂。",
     heroDesc: "PT Natura Inti Sukses 是印度尼西亚食品饮料原料的进口商与分销商 — 专注烘焙原料。团队自2010–2016年积累进口经验，依托稳固的品牌合作与全国营销网络。",
     viewCatalog: "查看目录", companyProfile: "公司简介",

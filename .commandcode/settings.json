@@ -3,7 +3,17 @@
     "allow": [
       "Shell(npx tsc --noEmit -p tsconfig.json 2 >& 1)",
       "Shell(npx eslint app/components/HeroSlider.tsx app/page.tsx app/i18n.tsx 2 >& 1)",
-      "Shell(npx tsc --noEmit 2 >& 1)"
+      "Shell(npx tsc --noEmit 2 >& 1)",
+      "Shell(npx tsc --noEmit)",
+      "Shell(npx eslint app/components/HeroSlider.tsx app/i18n.tsx app/admin/content/page.tsx 2 >& 1)",
+      "Shell(xxd:*)",
+      "Shell(npx eslint app/components/HeroSlider.tsx 2 >& 1)",
+      "Shell(npx eslint app/components/HeroSlider.tsx)",
+      "Shell(git:*)",
+      "Shell(npx eslint app/i18n.tsx app/admin/content/page.tsx 2 >& 1)",
+      "Shell(npx eslint app/components/HeroSlider.tsx app/components/HeroSliderEditModal.tsx app/lib/siteContent.ts 2>&1; echo \"exit=$?\")",
+      "Shell(npx eslint . --ext .ts,.tsx 2 >& 1)",
+      "Shell(npx next build 2 >& 1)"
     ],
     "deny": [],
     "defaultMode": "default"

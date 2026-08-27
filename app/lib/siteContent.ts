@@ -29,6 +29,16 @@ export function clearOverrides() {
   } catch {}
 }
 
+export function getLocaleOverrides(locale: string): Record<string, unknown> {
+  const raw = loadRaw() as Record<string, unknown>;
+  return (raw?.[locale] as Record<string, unknown>) ?? {};
+}
+export function setLocaleOverrides(locale: string, overrides: Record<string, unknown>) {
+  const raw = loadRaw() as Record<string, unknown>;
+  const next = { ...raw, [locale]: overrides };
+  saveRaw(next);
+}
+
 // deep merge: source overwrites target; arrays are replaced
 export function deepMerge<T>(target: T, source: unknown): T {
   if (source === undefined) return target;
