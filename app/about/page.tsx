@@ -25,7 +25,7 @@ export default function AboutPage() {
   const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
   const aboutVideoRef = useRef<HTMLVideoElement>(null);
   const [aboutVideoReady, setAboutVideoReady] = useState(false);
-  const [authed, setAuthed] = useState<boolean>(() => (typeof window !== "undefined" ? isAuthed() : false));
+  const [authed, setAuthed] = useState<boolean>(false);
   const [aboutEditOpen, setAboutEditOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export default function AboutPage() {
   }, []);
 
   useEffect(() => {
+    setAuthed(isAuthed());
     const onChange = () => setAuthed(isAuthed());
     window.addEventListener("storage", onChange);
     window.addEventListener("nf_auth_changed" as never, onChange as never);

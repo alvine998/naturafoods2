@@ -18,7 +18,7 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
   const title = `${t.bannerTitle1} ${t.bannerTitleItalic} ${t.bannerTitle3}`;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
-  const [authed, setAuthed] = useState<boolean>(() => (typeof window !== "undefined" ? isAuthed() : false));
+  const [authed, setAuthed] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
   }, []);
 
   useEffect(() => {
+    setAuthed(isAuthed());
     const onChange = () => setAuthed(isAuthed());
     window.addEventListener("storage", onChange);
     window.addEventListener("nf_auth_changed" as never, onChange as never);
