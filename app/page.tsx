@@ -38,7 +38,7 @@ export default function Home() {
       <Splash onDone={() => setEntered(true)} sub={t.splashSub} foot={t.splashFoot} />
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: entered ? 1 : 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="bg-white overflow-x-hidden">
         <SiteNav />
-        <HeroSlider onCta={scrollTo} slides={t.heroSlides} welcome={{ title: t.welcomeTitle, sub: t.welcomeSub }} />
+        <HeroSlider onCta={scrollTo} welcome={{ title: t.welcomeTitle, sub: t.welcomeSub }} />
 
         {/* <section ref={heroRef} className="relative overflow-hidden">
           <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-8 sm:px-6 sm:py-10 md:grid-cols-[1.08fr_0.92fr] md:px-8 md:py-16 lg:py-20">

@@ -38,9 +38,17 @@ export default function CareersPage() {
       <SiteNav />
 
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-0 px-4 py-6 sm:px-6 sm:py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-6 md:px-8 md:py-10">
-          {/* Left: green panel */}
-          <div className="relative overflow-hidden rounded-[20px] bg-[#2D4A22] p-6 text-white shadow-[0_18px_50px_rgba(45,74,34,0.18)] sm:p-8 md:p-10">
+        {/* Full-bleed background image */}
+        <img
+          src="https://images.unsplash.com/photo-1521737604893-d14cc237f19d?w=1600&q=80"
+          alt="NaturaFoods careers"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#1a1a16]/35" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a16]/45 via-[#1a1a16]/20 to-transparent" />
+
+        <div className="relative mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
+          <div className="relative max-w-[560px] overflow-hidden rounded-[20px] bg-[#2D4A22] p-6 text-white shadow-[0_18px_50px_rgba(45,74,34,0.25)] sm:p-8 md:p-10">
             <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/5" />
             <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/[0.04]" />
 
@@ -56,7 +64,7 @@ export default function CareersPage() {
                 <span className="font-semibold text-[#F2A65A]">{copy.titleB}</span>
               </h1>
 
-              <p className="mt-5 max-w-[44ch] text-[13px] leading-6 text-white/80 sm:text-[14px] sm:leading-7">
+              <p className="mt-5 max-w-[44ch] text-[13px] leading-6 text-white/85 sm:text-[14px] sm:leading-7">
                 {copy.desc}
               </p>
 
@@ -70,19 +78,9 @@ export default function CareersPage() {
                   {copy.cta}
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
-                <span className="text-[11px] tracking-[0.16em] text-white/55">{copy.via}</span>
+                <span className="text-[11px] tracking-[0.16em] text-white/65">{copy.via}</span>
               </div>
             </div>
-          </div>
-
-          {/* Right: image */}
-          <div className="relative hidden min-h-[360px] overflow-hidden rounded-[20px] md:block">
-            <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f19d?w=1600&q=80"
-              alt="NaturaFoods careers"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#2D4A22]/15" />
           </div>
         </div>
       </section>
