@@ -43,8 +43,8 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* full viewport minus sticky nav (~64px) */}
-      <div className="relative h-[calc(100vh-64px)] min-h-[520px] sm:min-h-[560px]">
+      {/* full viewport minus sticky nav (~64px) — use dvh/svh for mobile browser chrome */}
+      <div className="relative min-h-[520px] h-[calc(100svh-64px)] supports-[height:100dvh]:h-[calc(100dvh-64px)] sm:h-[calc(100vh-64px)] sm:min-h-[560px] max-h-[760px] sm:max-h-[860px] [@media(max-height:500px)]:min-h-[420px] [@media(max-height:500px)]:h-[calc(100dvh-56px)]">
         <AnimatePresence mode="wait">
           <motion.div
             key={s.id}
@@ -56,17 +56,17 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
           >
             {s.img?.startsWith("data:video") || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(s.img ?? "") ? (
               // eslint-disable-next-line jsx-a11y/media-has-caption
-              <video src={s.img} autoPlay muted loop playsInline className="h-full w-full object-cover" />
+              <video src={s.img} autoPlay muted loop playsInline preload="metadata" className="h-full w-full object-cover object-center" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={s.img} alt={s.title} className="h-full w-full object-cover" />
+              <img src={s.img} alt={s.title} className="h-full w-full object-cover object-center" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 sm:from-black/75 sm:via-black/25" />
             <div className="absolute inset-0 bg-[#2D4A22]/10 mix-blend-multiply" />
 
-            {/* content — centered vertically, roomy */}
+            {/* content — bottom on mobile (thumb reach), centered on sm+ */}
             <div className="absolute inset-0 flex items-end sm:items-center">
-              <div className="w-full mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 py-10 sm:py-0 pb-16 sm:pb-0">
+              <div className="w-full mx-auto max-w-[1280px] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-10 sm:px-6 md:px-8 sm:py-0 sm:pb-0">
                 <div className="max-w-[640px]">
                   {(s.eyebrow || s.tag) && (
                     <p className="inline-flex rounded-full bg-white/15 px-3 py-1 text-[10px] tracking-[0.18em] text-white backdrop-blur border border-white/15">
@@ -74,21 +74,21 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
                     </p>
                   )}
                   {s.meta && <p className="mt-3 text-[11px] tracking-[0.12em] text-white/70">{s.meta}</p>}
-                  <h2 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[28px] sm:text-[40px] md:text-[52px] font-light leading-[0.9] text-white break-words">
+                  <h2 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[28px] font-light leading-[0.94] tracking-[-0.02em] text-white break-words [text-wrap:balance] min-[375px]:text-[30px] sm:text-[40px] md:text-[52px]">
                     {s.title}
                   </h2>
-                  <p className="mt-3 sm:mt-4 max-w-[50ch] text-[13px] sm:text-[15px] leading-6 sm:leading-7 text-white/80">{s.desc}</p>
+                  <p className="mt-3 sm:mt-4 max-w-[50ch] text-[14px] leading-6 text-white/85 [text-wrap:pretty] sm:text-[15px] sm:leading-7">{s.desc}</p>
                   {s.link ? (
                     <a
                       href={s.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 sm:px-7 py-3 sm:py-3.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition hover:bg-white"
+                      className="mt-5 sm:mt-8 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[11px] font-medium tracking-[0.14em] text-[#2D4A22] shadow-lg transition hover:bg-white active:scale-[0.98] sm:w-auto sm:justify-start sm:px-7 sm:py-3.5 sm:shadow-none"
                     >
-                      {ctaLabel} <ArrowUpRight className="h-3.5 w-3.5" />
+                      {ctaLabel} <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
                     </a>
                   ) : (
-                    <span className="mt-6 sm:mt-8 inline-flex rounded-full bg-white/15 border border-white/20 px-6 py-3 text-[11px] tracking-[0.14em] text-white backdrop-blur">
+                    <span className="mt-5 sm:mt-8 inline-flex min-h-11 items-center rounded-full bg-white/15 border border-white/20 px-6 py-3 text-[11px] tracking-[0.14em] text-white backdrop-blur">
                       {ctaLabel}
                     </span>
                   )}
@@ -118,9 +118,9 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
           </>
         )}
 
-        {/* dots + counter */}
+        {/* dots + counter — lift for safe-area on mobile + above CTA */}
         {len > 1 && (
-          <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
+          <div className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] sm:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
             <div className="flex items-center gap-2">
               {items.map((_, idx) => (
                 <button
