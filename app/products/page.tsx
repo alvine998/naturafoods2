@@ -7,6 +7,7 @@ import SalesContactCard from "../components/SalesContactCard";
 import { useLang } from "../i18n";
 import { SEED_PRODUCTS } from "../lib/data";
 import type { Product } from "../lib/data";
+import { apiFetch, buildQuery } from "../lib/api";
 
 function loadProducts(): Product[] {
   try { const v = localStorage.getItem("nf_products"); if (v) return JSON.parse(v); } catch {}
@@ -20,8 +21,39 @@ function ProductsInner() {
   const initial = (sp.get("cat") as "choco" | "matcha" | null) ?? null;
   const [cat, setCat] = useState<"all" | "choco" | "matcha">((initial as any) ?? "all");
   const [items, setItems] = useState<Product[]>(SEED_PRODUCTS);
+  const [apiItems, setApiItems] = useState<Product[] | null>(null);
+  const [loading, setLoading] = useState(false);
   useEffect(() => { setItems(loadProducts()); if (initial) setCat(initial); }, [initial]);
-  const filtered = cat === "all" ? items : items.filter((x) => x.cat === cat);
+
+  // API fetch — FRONTEND_API_GUIDE.md:3 GET /products with filters
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, limit: 50, sort: "createdAt:desc" });
+    apiFetch<Product[]>(`/products${q}`)
+      .then((json) => {
+        if (!cancelled && json.success && Array.isArray(json.data)) {
+          const norm = (json.data as unknown as Record<string, unknown>[]).map((raw) => ({
+            slug: String(raw.slug ?? raw.id ?? ""),
+            cat: (raw.cat as Product["cat"]) ?? "choco",
+            title: String(raw.title ?? ""),
+            note: String(raw.note ?? ""),
+            tag: String(raw.tag ?? ""),
+            img: String(raw.img ?? raw.image ?? ""),
+            desc: String(raw.desc ?? raw.description ?? ""),
+            type: (raw.type as Product["type"]) ?? "general",
+            isHighlight: Boolean(raw.isHighlight ?? false),
+          })) as Product[];
+          setApiItems(norm.filter((x) => x.slug));
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [cat]);
+
+  const source = apiItems ?? items;
+  const filtered = cat === "all" ? source : source.filter((x) => x.cat === cat);
   const cats = [
     ["all", p.all],
     ["choco", p.choco],
@@ -31,6 +63,7 @@ function ProductsInner() {
     <PageShell>
       <Breadcrumbs items={[{ label: "Products" }]} />
       <PageHeader eyebrow={p.eyebrow} title={p.title} desc={p.desc} />
+      {loading && <p className="mb-3 text-[11px] text-[#8B6F47]">Loading from <code className="rounded bg-[#F5EFE0] px-1 py-0.5">GET /products{buildQuery({ cat: cat !== "all" ? cat : undefined })}</code>…</p>}
       {/* Mobile filter — horizontal scroll with snap, edge-to-edge bleed handling */}
       <div className="mb-6 -mx-4 flex gap-2 overflow-x-auto overscroll-x-contain px-4 pb-2 snap-x snap-mandatory scrollbar-none sm:mx-0 sm:px-0 sm:overflow-visible sm:snap-none lg:hidden">
         {cats.map(([k, label]) => (
@@ -63,7 +96,7 @@ function ProductsInner() {
               ))}
             </div>
             <div className="mx-3 mt-3 border-t border-[#2D4A22]/10 pt-3">
-              <p className="text-[11px] leading-5 text-[#8B6F47]">{filtered.length} {filtered.length === 1 ? "product" : "products"}</p>
+              <p className="text-[11px] leading-5 text-[#8B6F47]">{filtered.length} {filtered.length === 1 ? "product" : "products"} {apiItems ? "· API" : "· local"}</p>
             </div>
           </div>
         </aside>

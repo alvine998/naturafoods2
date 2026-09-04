@@ -9,7 +9,7 @@ import AdminShell from "../AdminShell";
 import { Card, Field, Input, TextArea } from "../_components";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAssistantConfig, DEFAULT_ASSISTANT, DEFAULT_TUNING, type KnowledgeEntry, type LocaleCopy, type AssistantTuning } from "../../lib/assistant";
+import { useAssistantConfig, DEFAULT_ASSISTANT, DEFAULT_TUNING, type KnowledgeEntry, type LocaleCopy, type AssistantTuning, saveAssistantConfigApi } from "../../lib/assistant";
 import { resolveReply, getCopy } from "../../lib/assistant";
 
 const LOCALES = ["en", "id", "zh"] as const;
@@ -39,7 +39,7 @@ export default function AssistantPage() {
     else setGate(true);
   }, [router]);
 
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
   const tuning: AssistantTuning = cfg.tuning ?? DEFAULT_TUNING;
 
   const testReply = useMemo(() => {
@@ -47,7 +47,15 @@ export default function AssistantPage() {
     return resolveReply(cfg, testQ, testLocale);
   }, [cfg, testQ, testLocale]);
 
-  const onSave = () => { setSaved(true); setTimeout(() => setSaved(false), 1400); };
+  const onSave = async () => {
+    setSaved(true);
+    try {
+      await saveAssistantConfigApi(cfg);
+    } catch (e) {
+      // already saved locally, ignore network errors for offline
+    }
+    setTimeout(() => setSaved(false), 1400);
+  };
   const addEntry = () => {
     const id = `kb_${Date.now().toString(36)}`;
     const entry: KnowledgeEntry = { id, keywords: [], reply: { en: "", id: "", zh: "" } };
@@ -101,7 +109,7 @@ export default function AssistantPage() {
           </label>
           <button onClick={exportJson} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-white"><Download className="h-3.5 w-3.5" /> Export</button>
           <button onClick={() => { if (confirm("Reset assistant to defaults?")) reset(); }} className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] text-[#2D4A22] hover:bg-white"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
-          <button onClick={onSave} className="inline-flex items-center gap-1.5 rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]"><Save className="h-3.5 w-3.5" /> {saved ? "Saved ✓" : "Save"}</button>
+          <button onClick={onSave} className="inline-flex items-center gap-1.5 rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.08em] text-white hover:bg-[#1e3317]"><Save className="h-3.5 w-3.5" /> {saved ? "Saved ✓ · PUT /admin/assistant/config" : "Save"}</button>
         </div>
       </div>
 

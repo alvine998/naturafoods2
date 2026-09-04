@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Menu, X, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Menu, X, ArrowLeft } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -15,6 +15,7 @@ type Props = {
 const ROUTES = [
   "/admin/dashboard",
   "/admin/products",
+  "/admin/official-partners",
   "/admin/articles",
   "/admin/education",
   "/admin/innovation",
@@ -25,7 +26,7 @@ const ROUTES = [
   "/admin/content",
 ] as const;
 
-const ICONS = [LayoutDashboard, Package, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type] as const;
+const ICONS = [LayoutDashboard, Package, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type] as const;
 
 export default function AdminShell({ counts, labels, children }: Props) {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function AdminShell({ counts, labels, children }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
-            <button onClick={() => { logout(); router.push("/admin/login"); }} className="rounded-full bg-[#2D4A22] px-4 sm:px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.logout}</button>
+            <button onClick={async () => { await logout(); router.push("/admin/login"); }} className="rounded-full bg-[#2D4A22] px-4 sm:px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.logout}</button>
           </div>
         </div>
       </header>
@@ -88,10 +89,10 @@ export default function AdminShell({ counts, labels, children }: Props) {
             <div className="mt-3"><Sidebar /></div>
             <div className="mt-4 rounded-xl bg-white border border-[#2D4A22]/10 p-3">
               <p className="text-[11px] font-medium text-[#2D4A22]">{a.dashTitle}</p>
-              <p className="mt-1 text-[11px] leading-5 text-[#8B6F47]">Manage products, articles & inquiries. Changes save to localStorage.</p>
+              <p className="mt-1 text-[11px] leading-5 text-[#8B6F47]">API-first: data persists via <code className="rounded bg-[#F5EFE0] px-1 py-0.5">/api/v1</code> with localStorage fallback.</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">Tip: exports are local-only. Connect a backend to persist across devices.</div>
+          <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">Env: <code className="rounded bg-white px-1 py-0.5">NEXT_PUBLIC_API_URL</code> — defaults to <code className="rounded bg-white px-1 py-0.5">http://localhost:4000/api/v1</code></div>
         </aside>
 
         {mobileOpen && (

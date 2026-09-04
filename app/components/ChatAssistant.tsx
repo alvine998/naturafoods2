@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { useLang } from "../i18n";
-import { DEFAULT_ASSISTANT, loadAssistantConfig, getCopy } from "../lib/assistant";
+import { DEFAULT_ASSISTANT, loadAssistantConfig, getCopy, fetchAssistantConfig } from "../lib/assistant";
 
 // WhatsApp-only floating button — replaces previous AI chat panel.
 // Keeps admin-configurable waLink (localStorage `nf_assistant_config`) and i18n label.
@@ -12,17 +12,24 @@ export default function ChatAssistant() {
   const [label, setLabel] = useState(DEFAULT_ASSISTANT.copy.en.wa);
 
   useEffect(() => {
-    const sync = () => {
+    const syncLocal = () => {
       const cfg = loadAssistantConfig();
       setWaLink(cfg.waLink || DEFAULT_ASSISTANT.waLink);
       setLabel(getCopy(cfg, locale).wa || DEFAULT_ASSISTANT.copy.en.wa);
     };
-    sync();
+    syncLocal();
+    // Hydrate from API (public GET /assistant/config, cached 5min per guide)
+    fetchAssistantConfig()
+      .then((cfg) => {
+        setWaLink(cfg.waLink || DEFAULT_ASSISTANT.waLink);
+        setLabel(getCopy(cfg, locale).wa || DEFAULT_ASSISTANT.copy.en.wa);
+      })
+      .catch(() => {});
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "nf_assistant_config") sync();
+      if (e.key === "nf_assistant_config") syncLocal();
     };
     window.addEventListener("storage", onStorage);
-    const id = setInterval(sync, 1000);
+    const id = setInterval(syncLocal, 1000);
     return () => {
       window.removeEventListener("storage", onStorage);
       clearInterval(id);

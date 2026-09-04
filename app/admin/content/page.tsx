@@ -6,7 +6,7 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import AdminShell from "../AdminShell";
 import { Card } from "../_components";
-import { loadRaw, saveRaw, clearOverrides, deepSet } from "../../lib/siteContent";
+import { loadRaw, saveRaw, clearOverrides, deepSet, fetchSiteContent, saveLocaleContent, deleteAllOverrides } from "../../lib/siteContent";
 
 type GroupKey = "home" | "nav" | "about" | "aboutDetail" | "products" | "articles" | "education" | "innovation" | "contact" | "careers";
 
@@ -491,10 +491,16 @@ export default function ContentPage() {
   const [q, setQ] = useState("");
 
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  useEffect(() => { setDraft(loadRaw() as Record<string, unknown>); }, []);
+  useEffect(() => {
+    setDraft(loadRaw() as Record<string, unknown>);
+    // Hydrate from API (FRONTEND_API_GUIDE.md:8)
+    fetchSiteContent().then((data) => {
+      if (data && Object.keys(data).length) setDraft(data as unknown as Record<string, unknown>);
+    }).catch(() => {});
+  }, []);
   useEffect(() => { setEditLocale(locale); }, [locale]);
 
-  const counts = [s.products.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
 
   // show base values for the language being edited, not the UI language
   const baseForEdit = useMemo(() => dict[editLocale] as unknown as Record<string, unknown>, [editLocale]);
@@ -519,14 +525,34 @@ export default function ContentPage() {
     });
   };
 
-  const save = () => { saveRaw(draft); setSaved(true); setTimeout(() => setSaved(false), 2000); };
-  const reset = () => { if (!confirm(a.contentResetConfirm)) return; clearOverrides(); setDraft({}); };
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const save = async () => {
+    setErr(null); setSaving(true);
+    try {
+      const localeData = draft[editLocale] as Record<string, unknown> ?? {};
+      await saveLocaleContent(editLocale, localeData);
+      saveRaw(draft); // keep local synced
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Save failed";
+      setErr(msg);
+      // fallback still keep local
+      saveRaw(draft);
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } finally { setSaving(false); }
+  };
+  const reset = async () => {
+    if (!confirm(a.contentResetConfirm)) return;
+    try { await deleteAllOverrides(); } catch {}
+    clearOverrides(); setDraft({});
+  };
 
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[8] ?? "Content"}</p>
+          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[9] ?? "Content"}</p>
           <h1 className="mt-1 font-[var(--font-display)] text-[22px] font-light leading-none text-[#2D4A22] sm:text-[26px]">{a.contentTitle}</h1>
           <p className="mt-2 max-w-[60ch] text-[12px] leading-5 text-[#1a1a16]/60">{a.contentDesc}</p>
         </div>
@@ -537,11 +563,12 @@ export default function ContentPage() {
             ))}
           </div>
           <button onClick={reset} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white">{a.contentReset}</button>
-          <button onClick={save} className="rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.save}</button>
+          <button onClick={save} disabled={saving} className="rounded-full bg-[#2D4A22] px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317] disabled:opacity-60">{saving ? "Saving…" : a.save}</button>
         </div>
       </div>
 
-      {saved && <div className="mt-3 rounded-xl bg-[#2D4A22] px-4 py-2 text-[12px] text-white">{a.contentSaved}</div>}
+      {saved && <div className="mt-3 rounded-xl bg-[#2D4A22] px-4 py-2 text-[12px] text-white">{a.contentSaved} · via <code className="rounded bg-white/10 px-1 py-0.5">PUT /admin/site-content/:locale</code></div>}
+      {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
 
       <Card className="mt-4 p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

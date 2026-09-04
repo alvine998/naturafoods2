@@ -1,7 +1,10 @@
 "use client";
+import { apiFetch } from "./api";
+
 const KEY = "nf_content";
 
-// ponytail: localStorage only; replace with backend when multi-device persistence needed
+// ponytail: now API-first with localStorage fallback (FRONTEND_API_GUIDE.md:8)
+
 export function loadRaw(): Record<string, unknown> {
   try {
     const v = localStorage.getItem(KEY);
@@ -37,6 +40,70 @@ export function setLocaleOverrides(locale: string, overrides: Record<string, unk
   const raw = loadRaw() as Record<string, unknown>;
   const next = { ...raw, [locale]: overrides };
   saveRaw(next);
+}
+
+// ---------------------------------------------------------------------------
+// API — FRONTEND_API_GUIDE.md:8
+// GET /site-content (all), GET /site-content/:locale, PUT /admin/site-content/:locale, DELETE
+// ---------------------------------------------------------------------------
+
+export async function fetchSiteContent(): Promise<Record<string, Record<string, unknown>>> {
+  try {
+    const json = await apiFetch<Record<string, Record<string, unknown>>>("/site-content");
+    if (json.success && json.data) {
+      // cache to localStorage for offline
+      saveRaw(json.data as unknown as Record<string, unknown>);
+      return json.data;
+    }
+  } catch {}
+  return getOverrides();
+}
+
+export async function fetchLocaleContent(locale: string): Promise<Record<string, unknown>> {
+  try {
+    const json = await apiFetch<Record<string, unknown>>(`/site-content/${encodeURIComponent(locale)}`);
+    if (json.success && json.data) {
+      setLocaleOverrides(locale, json.data);
+      return json.data;
+    }
+  } catch {}
+  return getLocaleOverrides(locale);
+}
+
+export async function saveLocaleContent(locale: string, overrides: Record<string, unknown>): Promise<void> {
+  // optimistic local save
+  setLocaleOverrides(locale, overrides);
+  try {
+    await apiFetch(`/admin/site-content/${encodeURIComponent(locale)}`, {
+      method: "PUT",
+      body: JSON.stringify(overrides),
+    });
+  } catch (e) {
+    // if network error, keep local — will sync next time
+    // if validation error, rethrow
+    const status = (e as { status?: number })?.status;
+    if (status && status >= 400 && status < 500) throw e;
+  }
+}
+
+export async function deleteAllOverrides(): Promise<void> {
+  clearOverrides();
+  try {
+    await apiFetch("/admin/site-content", { method: "DELETE" });
+  } catch {}
+}
+
+export async function deleteLocaleOverrides(locale: string): Promise<void> {
+  try {
+    const raw = loadRaw() as Record<string, unknown>;
+    if (raw[locale]) {
+      delete raw[locale];
+      saveRaw(raw);
+    }
+  } catch {}
+  try {
+    await apiFetch(`/admin/site-content/${encodeURIComponent(locale)}`, { method: "DELETE" });
+  } catch {}
 }
 
 // deep merge: source overwrites target; arrays are replaced

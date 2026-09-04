@@ -9,6 +9,7 @@ import HeroSlider from "./components/HeroSlider";
 import SiteNav from "./components/SiteNav";
 import SiteFooter from "./components/SiteFooter";
 import OfficialPartnersSection from "./components/OfficialPartnersSection";
+import HighlightedProductsSection from "./components/HighlightedProductsSection";
 import { useLang } from "./i18n";
 
 function Reveal({ children, delay = 0, y = 24, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
@@ -144,6 +145,7 @@ export default function Home() {
           </div>
         </section> */}
 
+        <HighlightedProductsSection />
         <OfficialPartnersSection />
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">

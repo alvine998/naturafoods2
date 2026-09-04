@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { apiFetch } from "./api";
 
 export type LocaleCopy = {
   title: string;
@@ -147,23 +148,28 @@ export const DEFAULT_ASSISTANT: AssistantConfig = {
   knowledge: DEFAULT_KNOWLEDGE,
 };
 
+export function normalizeAssistantConfig(raw: unknown): AssistantConfig {
+  if (!raw || typeof raw !== "object") return structuredClone(DEFAULT_ASSISTANT) as AssistantConfig;
+  const parsed = raw as Partial<AssistantConfig>;
+  return {
+    waLink: (parsed.waLink as string) || DEFAULT_ASSISTANT.waLink,
+    persona: (parsed.persona as string) ?? DEFAULT_ASSISTANT.persona,
+    tuning: { ...DEFAULT_TUNING, ...((parsed.tuning as AssistantTuning) ?? {}) },
+    copy: {
+      en: { ...DEFAULT_COPY.en, ...((parsed.copy as Record<string, LocaleCopy>)?.en ?? {}) },
+      id: { ...DEFAULT_COPY.id, ...((parsed.copy as Record<string, LocaleCopy>)?.id ?? {}) },
+      zh: { ...DEFAULT_COPY.zh, ...((parsed.copy as Record<string, LocaleCopy>)?.zh ?? {}) },
+    } as Record<string, LocaleCopy>,
+    knowledge: Array.isArray(parsed.knowledge) && parsed.knowledge.length ? (parsed.knowledge as KnowledgeEntry[]) : DEFAULT_KNOWLEDGE,
+  };
+}
+
 export function loadAssistantConfig(): AssistantConfig {
   try {
     const raw = localStorage.getItem(ASSISTANT_KEY);
     if (!raw) return structuredClone(DEFAULT_ASSISTANT) as AssistantConfig;
     const parsed = JSON.parse(raw) as Partial<AssistantConfig>;
-    // shallow merge with defaults for missing locales/fields
-    return {
-      waLink: parsed.waLink || DEFAULT_ASSISTANT.waLink,
-      persona: parsed.persona ?? DEFAULT_ASSISTANT.persona,
-      tuning: { ...DEFAULT_TUNING, ...(parsed.tuning as any) },
-      copy: {
-        en: { ...DEFAULT_COPY.en, ...(parsed.copy as any)?.en },
-        id: { ...DEFAULT_COPY.id, ...(parsed.copy as any)?.id },
-        zh: { ...DEFAULT_COPY.zh, ...(parsed.copy as any)?.zh },
-      } as Record<string, LocaleCopy>,
-      knowledge: Array.isArray(parsed.knowledge) && parsed.knowledge.length ? (parsed.knowledge as KnowledgeEntry[]) : DEFAULT_KNOWLEDGE,
-    };
+    return normalizeAssistantConfig(parsed);
   } catch {
     return structuredClone(DEFAULT_ASSISTANT) as AssistantConfig;
   }
@@ -173,6 +179,62 @@ export function saveAssistantConfig(cfg: AssistantConfig) {
   try {
     localStorage.setItem(ASSISTANT_KEY, JSON.stringify(cfg));
   } catch {}
+}
+
+// ---------------------------------------------------------------------------
+// API — FRONTEND_API_GUIDE.md:9
+// GET /assistant/config (public), PUT /admin/assistant/config, POST /admin/assistant/config/reset, POST /assistant/chat
+// ---------------------------------------------------------------------------
+export async function fetchAssistantConfig(): Promise<AssistantConfig> {
+  try {
+    const json = await apiFetch<AssistantConfig>("/assistant/config");
+    if (json.success && json.data) {
+      const cfg = normalizeAssistantConfig(json.data);
+      // cache for offline
+      saveAssistantConfig(cfg);
+      return cfg;
+    }
+  } catch {}
+  return loadAssistantConfig();
+}
+
+export async function saveAssistantConfigApi(cfg: AssistantConfig): Promise<void> {
+  // optimistic local save
+  saveAssistantConfig(cfg);
+  try {
+    await apiFetch("/admin/assistant/config", { method: "PUT", body: JSON.stringify(cfg) });
+  } catch (e) {
+    const status = (e as { status?: number })?.status;
+    if (status && status >= 400 && status < 500) throw e;
+    // network error — keep local
+  }
+}
+
+export async function resetAssistantConfigApi(): Promise<AssistantConfig> {
+  try {
+    const json = await apiFetch<AssistantConfig>("/admin/assistant/config/reset", { method: "POST" });
+    if (json.success && json.data) {
+      const cfg = normalizeAssistantConfig(json.data);
+      saveAssistantConfig(cfg);
+      return cfg;
+    }
+  } catch {}
+  // fallback: local reset
+  const d = structuredClone(DEFAULT_ASSISTANT) as AssistantConfig;
+  saveAssistantConfig(d);
+  try { localStorage.removeItem(ASSISTANT_KEY); } catch {}
+  // ensure we return default after clearing
+  return structuredClone(DEFAULT_ASSISTANT) as AssistantConfig;
+}
+
+export async function fetchAssistantChat(message: string, locale: string): Promise<string> {
+  try {
+    const json = await apiFetch<{ reply: string }>("/assistant/chat", { method: "POST", body: JSON.stringify({ message, locale }) });
+    if (json.success && json.data?.reply) return json.data.reply;
+  } catch {}
+  // fallback to client-side resolveReply
+  const cfg = loadAssistantConfig();
+  return resolveReply(cfg, message, locale);
 }
 
 export function getCopy(cfg: AssistantConfig, locale: string): LocaleCopy {
@@ -211,8 +273,23 @@ export function useAssistantConfig() {
   const [cfg, setCfg] = useState<AssistantConfig>(DEFAULT_ASSISTANT);
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    let cancelled = false;
+    // Load local instantly
     setCfg(loadAssistantConfig());
-    setReady(true);
+    // Then hydrate from API
+    fetchAssistantConfig()
+      .then((apiCfg) => {
+        if (!cancelled) setCfg(apiCfg);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setReady(true);
+      });
+    if (!cancelled && !ready) {
+      // ensure ready even if fetch hangs
+      const t = setTimeout(() => { if (!cancelled) setReady(true); }, 2500);
+      return () => clearTimeout(t);
+    }
   }, []);
   useEffect(() => {
     if (ready) saveAssistantConfig(cfg);
@@ -223,6 +300,19 @@ export function useAssistantConfig() {
     try {
       localStorage.removeItem(ASSISTANT_KEY);
     } catch {}
+    // also try API reset (fire-and-forget)
+    resetAssistantConfigApi()
+      .then((apiCfg) => setCfg(apiCfg))
+      .catch(() => {});
   };
-  return { cfg, setCfg, ready, reset };
+  // wrapped setter that also syncs to API when possible
+  const setCfgApi: React.Dispatch<React.SetStateAction<AssistantConfig>> = (action) => {
+    setCfg((prev) => {
+      const next = typeof action === "function" ? (action as (p: AssistantConfig) => AssistantConfig)(prev) : action;
+      // sync to API (debounced via fire-and-forget)
+      saveAssistantConfigApi(next).catch(() => {});
+      return next;
+    });
+  };
+  return { cfg, setCfg: setCfgApi, rawSetCfg: setCfg, ready, reset };
 }

@@ -4,11 +4,14 @@ import { MessageCircle, Mail, MapPin, User, Send } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
+import { API_BASE } from "../lib/api";
 
 export default function ContactPage() {
   const { t } = useLang();
   const p = t.contactPage;
   const [ok, setOk] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -115,25 +118,52 @@ export default function ContactPage() {
             <div className="mt-1 h-[3px] w-[50px] rounded-full bg-[#E67E22]" />
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
+                setErr(null);
+                setLoading(true);
                 const fd = new FormData(e.target as HTMLFormElement);
-                const entry = {
-                  id: Date.now().toString(),
+                const payload = {
                   name: String(fd.get("name") ?? ""),
+                  city: "-", // contact page has no city field — send placeholder; backend city optional
+                  whatsapp: "-",
+                  interest: String(fd.get("subject") ?? "General"),
                   email: String(fd.get("email") ?? ""),
-                  subject: String(fd.get("subject") ?? ""),
                   message: String(fd.get("message") ?? ""),
-                  date: new Date().toISOString(),
+                  source: "contact_page",
                 };
                 try {
-                  const cur = JSON.parse(localStorage.getItem("nf_inquiries") ?? "[]");
-                  cur.push(entry);
-                  localStorage.setItem("nf_inquiries", JSON.stringify(cur));
-                } catch {}
+                  const res = await fetch(`${API_BASE}/inquiries`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  });
+                  const json = await res.json().catch(() => null);
+                  if (!res.ok) {
+                    const msg = json?.error?.message || `Failed (${res.status})`;
+                    throw new Error(msg);
+                  }
+                } catch (err: unknown) {
+                  const msg = err instanceof Error ? err.message : "Failed";
+                  const isNetwork = msg.toLowerCase().includes("network") || msg.includes("Failed to fetch");
+                  if (isNetwork) {
+                    // fallback to localStorage for offline dev
+                    try {
+                      const entry = { id: Date.now().toString(), name: payload.name, city: "-", whatsapp: "-", interest: payload.interest, email: payload.email, message: payload.message, date: new Date().toISOString() };
+                      const cur = JSON.parse(localStorage.getItem("nf_inquiries") ?? "[]");
+                      cur.push(entry);
+                      localStorage.setItem("nf_inquiries", JSON.stringify(cur));
+                    } catch {}
+                  } else {
+                    setErr(msg);
+                    setLoading(false);
+                    return;
+                  }
+                }
                 setOk(true);
                 (e.target as HTMLFormElement).reset();
-                setTimeout(() => setOk(false), 3000);
+                setTimeout(() => setOk(false), 4000);
+                setLoading(false);
               }}
               className="mt-6 grid gap-5"
             >
@@ -191,11 +221,14 @@ export default function ContactPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#E67E22] py-3.5 text-[13px] font-semibold tracking-[0.05em] text-white transition-all hover:bg-[#D35400] hover:shadow-lg active:scale-[0.98]"
+                disabled={loading}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#E67E22] py-3.5 text-[13px] font-semibold tracking-[0.05em] text-white transition-all hover:bg-[#D35400] hover:shadow-lg active:scale-[0.98] disabled:opacity-60"
               >
                 <Send className="h-4 w-4" />
-                {p.formSubmit.toUpperCase()}
+                {loading ? "SENDING…" : p.formSubmit.toUpperCase()}
               </button>
+
+              {err && <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-center"><p className="text-[12px] text-red-700">{err}</p></div>}
 
               {/* Success Message */}
               {ok && (
@@ -203,6 +236,7 @@ export default function ContactPage() {
                   <p className="text-[13px] text-green-700">
                     {p.formThanks} — {p.formThanksSuffix}
                   </p>
+                  <p className="mt-1 text-[10px] text-green-600">POST /inquiries · fallback to localStorage if offline</p>
                 </div>
               )}
             </form>

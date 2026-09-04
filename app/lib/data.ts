@@ -1,17 +1,19 @@
-export type Product = { slug: string; cat: "choco" | "matcha"; title: string; note: string; tag: string; img: string; desc: string };
+export type ProductType = "home-brand" | "small-pack" | "general";
+export type Product = { slug: string; cat: "choco" | "matcha"; title: string; note: string; tag: string; img: string; desc: string; type?: ProductType; isHighlight?: boolean };
 export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string };
 export type Edu = { id: string; title: string; desc: string; duration: string; level: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string };
 export type Inquiry = { id: string; name: string; city: string; whatsapp: string; interest: string; date: string };
+export type OfficialPartner = { id: string; name: string; description: string; image: string; background: string; isPublished: boolean };
 
 export const SEED_PRODUCTS: Product[] = [
-  { slug: "belgian-dark-72", cat: "choco", title: "Belgian Dark 72%", note: "Callets · Single origin Ecuador", tag: "Bulk · 2.5kg", img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=700&q=80", desc: "Single-origin Ecuador beans, 72% — stable temper, clean snap. For enrobing, moulding & dark ganache." },
-  { slug: "milk-couverture-33", cat: "choco", title: "Milk Couverture 33%", note: "Creamy & caramel — for drinks & ganache", tag: "2.5kg · 10kg", img: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=700&q=80", desc: "Caramel-forward milk, 33% cocoa. Great for hot chocolate, soft ganache and bakery fillings." },
-  { slug: "white-chocolate-28", cat: "choco", title: "White Chocolate 28%", note: "Valrhona-style · for pastry & glaze", tag: "2.5kg", img: "https://images.unsplash.com/photo-1549007990-7d2dd8e7499a?w=700&q=80", desc: "28% cocoa butter, vanilla-forward. Pastry, glaze and white ganache." },
-  { slug: "uji-ceremonial-yame", cat: "matcha", title: "Uji Ceremonial — Yame", note: "First harvest · hand-picked", tag: "Grade A · 30g / 500g", img: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=700&q=80", desc: "First harvest Yame, hand-picked, stone-milled. Vibrant, umami, low bitterness." },
-  { slug: "culinary-matcha-nishio", cat: "matcha", title: "Culinary Matcha — Nishio", note: "For latte, bakery & gelato", tag: "Grade B · 1kg", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=700&q=80", desc: "Robust colour & flavour for latte, bakery and gelato. Cost-efficient at scale." },
-  { slug: "hojicha-roasted", cat: "matcha", title: "Hojicha Roasted", note: "Low caffeine · nutty caramel", tag: "500g · 1kg", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=700&q=80", desc: "Roasted tencha, nutty caramel, low caffeine. Latte, dessert and HSR." },
+  { slug: "belgian-dark-72", cat: "choco", title: "Belgian Dark 72%", note: "Callets · Single origin Ecuador", tag: "Bulk · 2.5kg", img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=700&q=80", desc: "Single-origin Ecuador beans, 72% — stable temper, clean snap. For enrobing, moulding & dark ganache.", type: "home-brand", isHighlight: true },
+  { slug: "milk-couverture-33", cat: "choco", title: "Milk Couverture 33%", note: "Creamy & caramel — for drinks & ganache", tag: "2.5kg · 10kg", img: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=700&q=80", desc: "Caramel-forward milk, 33% cocoa. Great for hot chocolate, soft ganache and bakery fillings.", type: "home-brand", isHighlight: true },
+  { slug: "white-chocolate-28", cat: "choco", title: "White Chocolate 28%", note: "Valrhona-style · for pastry & glaze", tag: "2.5kg", img: "https://images.unsplash.com/photo-1549007990-7d2dd8e7499a?w=700&q=80", desc: "28% cocoa butter, vanilla-forward. Pastry, glaze and white ganache.", type: "small-pack", isHighlight: false },
+  { slug: "uji-ceremonial-yame", cat: "matcha", title: "Uji Ceremonial — Yame", note: "First harvest · hand-picked", tag: "Grade A · 30g / 500g", img: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=700&q=80", desc: "First harvest Yame, hand-picked, stone-milled. Vibrant, umami, low bitterness.", type: "general", isHighlight: true },
+  { slug: "culinary-matcha-nishio", cat: "matcha", title: "Culinary Matcha — Nishio", note: "For latte, bakery & gelato", tag: "Grade B · 1kg", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=700&q=80", desc: "Robust colour & flavour for latte, bakery and gelato. Cost-efficient at scale.", type: "small-pack", isHighlight: false },
+  { slug: "hojicha-roasted", cat: "matcha", title: "Hojicha Roasted", note: "Low caffeine · nutty caramel", tag: "500g · 1kg", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=700&q=80", desc: "Roasted tencha, nutty caramel, low caffeine. Latte, dessert and HSR.", type: "general", isHighlight: false },
 ];
 
 export const SEED_ARTICLES: Article[] = [
@@ -69,4 +71,13 @@ export const SEED_JOBS: Job[] = [
   { id: "sales-jkt", title: "Sales — HORECA Jakarta", dept: "Sales", loc: "Jakarta", type: "Full-time", desc: "Own 60+ café accounts, samples, training coordination. 2y F&B sales required." },
   { id: "qc-warehouse", title: "QC & Warehouse Staff", dept: "Operations", loc: "Jakarta", type: "Full-time", desc: "Temp-log, batch QC, cold-chain handling. HACCP knowledge a plus." },
   { id: "barista-trainer", title: "Barista Trainer (Matcha & Choco)", dept: "Education", loc: "Jakarta · Surabaya", type: "Part-time", desc: "Deliver academy classes, menu development with partners." },
+];
+
+export const SEED_OFFICIAL_PARTNERS: OfficialPartner[] = [
+  { id: "bensdorp", name: "Bens Dorp", description: "Cocoa powder berkualitas tinggi untuk cita rasa cokelat yang kaya dan autentik.", image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80", background: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1200&q=80", isPublished: true },
+  { id: "afya", name: "Afya", description: "Bubuk teh hijau premium dengan warna cerah dan rasa khas jepang.", image: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=600&q=80", background: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=1200&q=80", isPublished: true },
+  { id: "trang-nghi", name: "Trang Nghi", description: "Filling premium untuk berbagai kreasi roti, kue, dan pastry dengan tekstur lembut dan rasa istimewa.", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80", background: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80", isPublished: true },
+  { id: "ofi", name: "OFI", description: "Kacang pilihan dengan kualitas terbaik untuk kreasi yang lebih beragam.", image: "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=600&q=80", background: "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=1200&q=80", isPublished: true },
+  { id: "le-bourne", name: "Le Bourne", description: "Cokelat berkualitas tinggi dengan rasa lezat dan tekstur sempurna untuk berbagai kebutuhan.", image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80", background: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=1200&q=80", isPublished: true },
+  { id: "kingland", name: "KingLand", description: "Kismis berkualitas dari pilihan terbaik untuk rasa manis alami dan tekstur yang sempurna.", image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&q=80", background: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=1200&q=80", isPublished: true },
 ];

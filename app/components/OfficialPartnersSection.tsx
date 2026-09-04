@@ -1,8 +1,12 @@
 "use client";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useStore } from "../lib/store";
+import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
+import { apiFetch } from "../lib/api";
+import type { OfficialPartner } from "../lib/data";
 
 type PartnerCard = {
   title: string;
@@ -12,7 +16,15 @@ type PartnerCard = {
   brandName: string;
   link: string;
   color: string;
+  background?: string;
 };
+
+function stringToColor(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+  return "#" + "00000".substring(0, 6 - c.length) + c;
+}
 
 const partnerCards: PartnerCard[] = [
   {
@@ -90,6 +102,8 @@ const partnerCards: PartnerCard[] = [
 ];
 
 function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
+  const mainImage = card.background && card.background.trim() !== "" ? card.background : card.image;
+  const logo = card.brandLogo && card.brandLogo.trim() !== "" ? card.brandLogo : card.image;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -105,7 +119,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
     >
       <Link href={card.link} className="block aspect-[4/3] relative">
         <img
-          src={card.image}
+          src={mainImage}
           alt={card.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -134,11 +148,13 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex items-center gap-3">
-            <img
-              src={card.brandLogo}
-              alt={card.brandName}
-              className="h-8 w-auto object-contain"
-            />
+            {logo ? (
+              <img
+                src={logo}
+                alt={card.brandName}
+                className="h-8 w-auto max-w-[72px] object-contain rounded bg-white"
+              />
+            ) : null}
             <span className="text-xs font-medium text-gray-700">
               {card.brandName}
             </span>
@@ -659,6 +675,50 @@ function Reveal({
 }
 
 export default function OfficialPartnersSection() {
+  const { officialPartners } = useStore();
+  const [apiPartners, setApiPartners] = useState<OfficialPartner[] | null>(null);
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      try {
+        const json = await apiFetch<OfficialPartner[]>("/official-partners?isPublished=true&q=&page=1&limit=50");
+        if (!cancel && json.success && Array.isArray(json.data) && json.data.length) {
+          const norm = (json.data as unknown as Record<string, unknown>[]).map((p) => ({
+            id: String(p.id ?? ""),
+            name: String(p.name ?? ""),
+            description: String(p.description ?? ""),
+            image: String(p.image ?? ""),
+            background: String(p.background ?? ""),
+            isPublished: p.isPublished ?? true ? true : false,
+          })) as OfficialPartner[];
+          setApiPartners(norm.filter((p) => p.isPublished !== false));
+        }
+      } catch {}
+    })();
+    return () => { cancel = true; };
+  }, []);
+  const sourcePartners = apiPartners ?? (officialPartners ?? SEED_OFFICIAL_PARTNERS);
+  const publishedPartners = sourcePartners.filter((p) => p.isPublished !== false);
+  // Map OfficialPartner (id, name, description, image, background, isPublished) -> PartnerCard
+  const cards: PartnerCard[] = publishedPartners.length
+    ? publishedPartners.map((p) => ({
+        title: p.name,
+        description: p.description,
+        image: p.image || p.background || `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
+        brandLogo: p.image || p.background,
+        brandName: p.name,
+        link: "/products",
+        color: stringToColor(p.id),
+        background: p.background,
+      }))
+    : partnerCards.map((c) => ({
+        ...c,
+        background: undefined,
+      }));
+
+  // Fallback to static cards if no dynamic partners published
+  const displayCards = cards.length ? cards : partnerCards;
+
   return (
     <>
       {/* Official Partner For Indonesia Section */}
@@ -683,11 +743,15 @@ export default function OfficialPartnersSection() {
             </div>
           </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {partnerCards.map((card, index) => (
-              <PartnerCard key={card.title} card={card} index={index} />
-            ))}
-          </div>
+          {displayCards.length === 0 ? (
+            <p className="text-center text-sm text-[#8B6F47]">No official partners published.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {displayCards.map((card, index) => (
+                <PartnerCard key={card.title + index} card={card} index={index} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
