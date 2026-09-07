@@ -145,7 +145,7 @@ export default function Home() {
           </div>
         </section> */}
 
-        <HighlightedProductsSection />
+        {/* <HighlightedProductsSection /> */}
         <OfficialPartnersSection />
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">

@@ -89,7 +89,6 @@ export default function AdminShell({ counts, labels, children }: Props) {
             <div className="mt-3"><Sidebar /></div>
             <div className="mt-4 rounded-xl bg-white border border-[#2D4A22]/10 p-3">
               <p className="text-[11px] font-medium text-[#2D4A22]">{a.dashTitle}</p>
-              <p className="mt-1 text-[11px] leading-5 text-[#8B6F47]">API-first: data persists via <code className="rounded bg-[#F5EFE0] px-1 py-0.5">/api/v1</code> with localStorage fallback.</p>
             </div>
           </div>
           <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">Env: <code className="rounded bg-white px-1 py-0.5">NEXT_PUBLIC_API_URL</code> — defaults to <code className="rounded bg-white px-1 py-0.5">http://localhost:4000/api/v1</code></div>

@@ -56,16 +56,67 @@ function normalizeArticles(raw: unknown): Article[] {
   })).filter((a) => a.slug && a.title);
 }
 
+function parseOrder(v: unknown): number | undefined {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) return Number(v);
+  return undefined;
+}
+
 function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {
   if (!Array.isArray(raw)) return SEED_OFFICIAL_PARTNERS;
-  return raw.map((p: Record<string, unknown>) => ({
-    id: String(p.id ?? ""),
-    name: String(p.name ?? ""),
-    description: String(p.description ?? p.desc ?? ""),
-    image: String(p.image ?? p.brandLogo ?? ""),
-    background: String(p.background ?? p.mainImage ?? ""),
-    isPublished: p.isPublished ?? p.is_published ?? true ? true : false,
-  })).filter((p) => p.id && p.name);
+  return raw.map((p: Record<string, unknown>, idx: number) => {
+    // Semantics: background = single right-side visual, images[] = bottom-bar logos (more than one)
+    const rawImages = p.images ?? (p as Record<string, unknown>).logos ?? null;
+    let images: string[] | undefined;
+    if (Array.isArray(rawImages)) images = rawImages.map((v) => String(v ?? "")).filter(Boolean);
+    else if (typeof rawImages === "string" && rawImages) images = [rawImages];
+    const image = String((p.image as unknown) ?? (Array.isArray(p.image) ? (p.image as unknown[])[0] : "") ?? p.brandLogo ?? images?.[0] ?? "");
+    const background = String(p.background ?? p.mainImage ?? "");
+    const rawColor = typeof p.color === "string" ? p.color.trim() : "";
+    const order = parseOrder(p.order ?? (p as Record<string, unknown>).sortOrder) ?? idx;
+    return {
+      id: String(p.id ?? ""),
+      name: String(p.name ?? ""),
+      description: String(p.description ?? p.desc ?? ""),
+      image,
+      background,
+      ...(images && images.length ? { images } : {}),
+      ...(rawColor ? { color: rawColor } : {}),
+      order,
+      isPublished: p.isPublished ?? p.is_published ?? true ? true : false,
+    };
+  }).filter((p) => p.id && p.name);
+}
+
+function isValidHexColor(v: unknown): v is string {
+  return typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v.trim());
+}
+
+function parseStringArray(v: unknown): string[] | undefined {
+  if (Array.isArray(v)) {
+    const out = (v as unknown[]).map((x) => String(x ?? "")).filter(Boolean);
+    return out.length ? out : undefined;
+  }
+  return undefined;
+}
+
+function migrateOfficialPartners(list: OfficialPartner[]): OfficialPartner[] {
+  return (Array.isArray(list) ? list : []).map((p, idx) => {
+    const raw = p as unknown as Record<string, unknown>;
+    // merge legacy logos[] into images[] (bottom logos), deduped
+    const fromImages = parseStringArray(p.images);
+    const fromLogos = parseStringArray(raw.logos);
+    const merged = [...(fromImages ?? []), ...(fromLogos ?? [])].filter((v, i, a) => v && a.indexOf(v) === i);
+    const images = merged.length ? merged : undefined;
+    const image = String(p.image ?? images?.[0] ?? "");
+    const { logos: _drop, ...rest } = raw as Record<string, unknown> & { logos?: unknown };
+    void _drop;
+    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: parseOrder(p.order) ?? idx } as OfficialPartner;
+  });
+}
+
+export function sortOfficialPartners<T extends { order?: number; name?: string }>(list: T[]): T[] {
+  return [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function useStore() {
@@ -87,7 +138,7 @@ export function useStore() {
     const localEdu = load(KEYS.edu, SEED_EDU);
     const localInnovation = load(KEYS.innovation, SEED_INNOVATION);
     const localJobs = load(KEYS.jobs, SEED_JOBS);
-    const localPartners = load(KEYS.officialPartners, SEED_OFFICIAL_PARTNERS);
+    const localPartners = migrateOfficialPartners(load(KEYS.officialPartners, SEED_OFFICIAL_PARTNERS));
     const localInquiries = load(KEYS.inquiries, [] as Inquiry[]);
 
     if (!cancelled) {
@@ -221,7 +272,7 @@ export function getProductsByType(type: Product["type"]): Product[] {
   return getSeedProducts().filter((p) => (p.type ?? "general") === type);
 }
 export function getSeedOfficialPartners(): OfficialPartner[] {
-  try { const v = localStorage.getItem(KEYS.officialPartners); if (v) return JSON.parse(v) as OfficialPartner[]; } catch {}
+  try { const v = localStorage.getItem(KEYS.officialPartners); if (v) return migrateOfficialPartners(JSON.parse(v) as OfficialPartner[]); } catch {}
   return SEED_OFFICIAL_PARTNERS;
 }
 export function getPublishedOfficialPartners(): OfficialPartner[] {

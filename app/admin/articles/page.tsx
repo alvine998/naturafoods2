@@ -129,7 +129,6 @@ export default function ArticlesPage() {
             </div>
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || !f.slug || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
-          <p className="mt-2 text-[10px] text-[#8B6F47]">API: <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">POST /admin/articles</code> · <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">PUT /admin/articles/:slug</code></p>
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">

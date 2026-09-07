@@ -118,7 +118,6 @@ export default function UsersPage() {
       <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {u.title}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{u.title}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">Signed in: <b className="text-[#2D4A22]">{me}</b></span></div>
       <div className="mt-4 grid gap-3">
         <Toolbar q={q} setQ={setQ} total={meta?.total ?? users.length} filtered={filteredCount} onAdd={() => { setNu(""); setNp(""); setErr(""); setModalOpen(true); }} addLabel={u.addUser} />
-        {loading && <div className="rounded-xl bg-white border border-[#2D4A22]/10 px-4 py-3 text-[11px] text-[#8B6F47]">Loading… via <code className="rounded bg-[#F5EFE0] px-1 py-0.5">GET /admin/users</code></div>}
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={`${u.addUser} — ${u.title}`}>
           <div className="grid gap-3">
             <Field label={u.username}><Input value={nu} onChange={(e) => setNu(e.target.value)} placeholder="newuser" /></Field>

@@ -127,14 +127,93 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
           <input type="file" accept={accept} className="hidden" disabled={uploading} onChange={(e) => { handleFile(e.target.files?.[0]); e.currentTarget.value = ""; }} />
         </label>
         {value && <button type="button" onClick={() => onChange("")} disabled={uploading} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-50">Remove</button>}
-        <span className="text-[10px] text-[#8B6F47]">via <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">POST /admin/uploads</code> → R2 / local · fallback dataURL</span>
       </div>
       {err && <p className="text-[11px] text-red-600">{err}</p>}
-      {value && value.startsWith("http") && <p className="truncate text-[10px] text-[#8B6F47]">URL: {value}</p>}
-      {value && value.startsWith("data:") && <p className="text-[10px] text-amber-700">Using dataURL fallback (offline) — will be replaced via R2 on next upload when API available.</p>}
     </div>
   );
 }
 
 // Keep legacy export name for compatibility
 export { FileUpload as FileUploadLegacy };
+
+export function MultiFileUpload({ value = [], onChange, accept = "image/*", folder = "partners", max = 10 }: { value?: string[]; onChange: (v: string[]) => void; accept?: string; folder?: string; max?: number }) {
+  const [uploading, setUploading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const list = Array.isArray(value) ? value.filter(Boolean) : [];
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setErr(null);
+    const remaining = Math.max(0, max - list.length);
+    const picked = Array.from(files).slice(0, remaining || files.length);
+    if (picked.length === 0) { setErr(`Max ${max} images`); return; }
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of picked) {
+        const isVid = file.type.startsWith("video/");
+        const limit = isVid ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > limit) { setErr(`"${file.name}" too large (max ${isVid ? "20MB" : "5MB"})`); continue; }
+        try {
+          const url = await apiUploadFile(file, folder);
+          uploaded.push(url);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Upload failed";
+          const isNetwork = msg.toLowerCase().includes("network") || (e as { status?: number })?.status === 0;
+          if (isNetwork) {
+            const dataUrl: string = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result ?? ""));
+              reader.onerror = () => reject(new Error("read failed"));
+              reader.readAsDataURL(file);
+            });
+            if (dataUrl) uploaded.push(dataUrl);
+          } else {
+            setErr(msg);
+          }
+        }
+      }
+      if (uploaded.length) onChange([...list, ...uploaded].slice(0, max));
+    } finally {
+      setUploading(false);
+    }
+  };
+  const move = (idx: number, dir: -1 | 1) => {
+    const next = [...list];
+    const j = idx + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+  const removeAt = (idx: number) => onChange(list.filter((_, i) => i !== idx));
+  return (
+    <div className="grid gap-2">
+      {list.length === 0 ? (
+        <div className="grid place-items-center rounded-xl border border-dashed border-[#2D4A22]/15 bg-white px-4 py-6 text-center text-[11px] text-[#8B6F47]">No images yet — upload up to {max}</div>
+      ) : (
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {list.map((src, i) => (
+            <div key={src + i} className="group relative overflow-hidden rounded-xl border border-[#2D4A22]/15 bg-[#F5EFE0]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`image ${i + 1}`} className="h-20 w-full object-cover" />
+              <span className={`absolute left-1 top-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${i === 0 ? "bg-[#2D4A22] text-white" : "bg-white/90 text-[#2D4A22]"}`}>{i === 0 ? "★ Main" : `#${i + 1}`}</span>
+              <div className="absolute inset-x-1 bottom-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="flex-1 rounded-md bg-white/95 px-1 py-0.5 text-[10px] disabled:opacity-40">◀</button>
+                <button type="button" onClick={() => move(i, 1)} disabled={i === list.length - 1} className="flex-1 rounded-md bg-white/95 px-1 py-0.5 text-[10px] disabled:opacity-40">▶</button>
+                <button type="button" onClick={() => removeAt(i)} className="flex-1 rounded-md bg-red-600/90 px-1 py-0.5 text-[10px] text-white">✕</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 items-center">
+        <label className={`cursor-pointer rounded-full px-4 py-1.5 text-[11px] tracking-[0.08em] text-white ${uploading ? "bg-[#8B6F47] cursor-wait opacity-70" : "bg-[#2D4A22] hover:bg-[#1e3317]"}`}>
+          {uploading ? "Uploading…" : list.length ? `Add more (${list.length}/${max})` : "Upload images"}
+          <input type="file" accept={accept} multiple className="hidden" disabled={uploading || list.length >= max} onChange={(e) => { handleFiles(e.target.files); e.currentTarget.value = ""; }} />
+        </label>
+        {list.length > 0 && <button type="button" onClick={() => onChange([])} disabled={uploading} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-50">Clear all</button>}
+        <span className="text-[10px] text-[#8B6F47]">first image = main · hover to reorder / remove</span>
+      </div>
+      {err && <p className="text-[11px] text-red-600">{err}</p>}
+    </div>
+  );
+}

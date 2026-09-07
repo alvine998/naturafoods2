@@ -17,11 +17,13 @@ type PartnerCard = {
   link: string;
   color: string;
   background?: string;
+  images?: string[];
 };
 
 function stringToColor(str: string): string {
   let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < str.length; i++)
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
   const c = (hash & 0x00ffffff).toString(16).toUpperCase();
   return "#" + "00000".substring(0, 6 - c.length) + c;
 }
@@ -102,8 +104,18 @@ const partnerCards: PartnerCard[] = [
 ];
 
 function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
-  const mainImage = card.background && card.background.trim() !== "" ? card.background : card.image;
-  const logo = card.brandLogo && card.brandLogo.trim() !== "" ? card.brandLogo : card.image;
+  // Semantics: color = solid card background,
+  // background = single right-side product visual,
+  // images[] = bottom-bar logos (more than one)
+  const rightVisual = card.background && card.background.trim() !== "" ? card.background : "";
+  const bottomLogos =
+    Array.isArray(card.images) && card.images.filter(Boolean).length
+      ? card.images.filter(Boolean)
+      : card.brandLogo && card.brandLogo.trim() !== ""
+        ? [card.brandLogo]
+        : card.image
+          ? [card.image]
+          : [];
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -115,50 +127,69 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
         ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ y: -8, transition: { duration: 0.25 } }}
-      className="group relative overflow-hidden rounded-2xl shadow-lg"
+      className="group relative overflow-hidden rounded-[22px] shadow-lg"
+      style={{ background: card.color }}
     >
-      <Link href={card.link} className="block aspect-[4/3] relative">
-        <img
-          src={mainImage}
-          alt={card.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${card.color}cc 0%, ${card.color}99 50%, ${card.color}66 100%)`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <Link
+        href={card.link}
+        className="flex h-full min-h-[320px] flex-col p-6 pb-4"
+      >
+        {/* header: title + arrow */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-white text-[22px] font-bold leading-tight">
+              {card.title}
+            </h3>
+            <div className="mt-2 h-[3px] w-10 bg-white/90" />
+          </div>
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white shadow transition-transform group-hover:translate-x-1">
+            <ArrowRight className="h-5 w-5 text-black" />
+          </div>
+        </div>
 
-        <div className="absolute top-4 left-4 right-12">
-          <h3 className="text-white text-xl font-semibold mb-2 drop-shadow-lg">
-            {card.title}
-          </h3>
-          <p className="text-white/90 text-sm leading-relaxed line-clamp-2">
+        {/* body: description left, single product visual right (from background) */}
+        <div className="mt-4 flex flex-1 items-center gap-4">
+          <p className="flex-1 text-white/95 text-[15px] leading-relaxed">
             {card.description}
           </p>
+          {rightVisual !== "" && (
+            <div className="w-[42%] shrink-0">
+              <div className="relative aspect-square w-full">
+                <img
+                  src={rightVisual}
+                  alt={card.title}
+                  className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="absolute top-4 right-4">
-          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
-            <ArrowRight className="w-5 h-5 text-white transform group-hover:translate-x-1 transition-transform" />
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex items-center gap-3">
-            {logo ? (
-              <img
-                src={logo}
-                alt={card.brandName}
-                className="h-8 w-auto max-w-[72px] object-contain rounded bg-white"
-              />
-            ) : null}
-            <span className="text-xs font-medium text-gray-700">
+        {/* bottom logo bar */}
+        <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
+          {bottomLogos.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              {bottomLogos.slice(0, 4).map((src, i) => (
+                <img
+                  key={src + i}
+                  src={src}
+                  alt={
+                    i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
+                  }
+                  className="h-9 w-auto max-w-[130px] object-contain"
+                />
+              ))}
+              {bottomLogos.length > 4 && (
+                <span className="text-[11px] font-medium text-black/60">
+                  +{bottomLogos.length - 4}
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-center text-sm font-semibold text-black/70">
               {card.brandName}
-            </span>
-          </div>
+            </p>
+          )}
         </div>
       </Link>
     </motion.div>
@@ -676,41 +707,102 @@ function Reveal({
 
 export default function OfficialPartnersSection() {
   const { officialPartners } = useStore();
-  const [apiPartners, setApiPartners] = useState<OfficialPartner[] | null>(null);
+  const [apiPartners, setApiPartners] = useState<OfficialPartner[] | null>(
+    null,
+  );
   useEffect(() => {
     let cancel = false;
     (async () => {
       try {
-        const json = await apiFetch<OfficialPartner[]>("/official-partners?isPublished=true&q=&page=1&limit=50");
-        if (!cancel && json.success && Array.isArray(json.data) && json.data.length) {
-          const norm = (json.data as unknown as Record<string, unknown>[]).map((p) => ({
-            id: String(p.id ?? ""),
-            name: String(p.name ?? ""),
-            description: String(p.description ?? ""),
-            image: String(p.image ?? ""),
-            background: String(p.background ?? ""),
-            isPublished: p.isPublished ?? true ? true : false,
-          })) as OfficialPartner[];
+        const json = await apiFetch<OfficialPartner[]>(
+          "/official-partners?isPublished=true&q=&page=1&limit=50",
+        );
+        if (
+          !cancel &&
+          json.success &&
+          Array.isArray(json.data) &&
+          json.data.length
+        ) {
+          const norm = (json.data as unknown as Record<string, unknown>[]).map(
+            (p) => {
+              // background = single right visual, images[] = bottom logos
+              const rawImages = p.images ?? (p as Record<string, unknown>).logos ?? p.gallery;
+              let images: string[] | undefined;
+              if (Array.isArray(rawImages))
+                images = (rawImages as unknown[])
+                  .map((v) => String(v ?? ""))
+                  .filter(Boolean);
+              else if (typeof rawImages === "string" && rawImages)
+                images = [rawImages];
+              const image = String(
+                (p.image as unknown) ??
+                  (Array.isArray(p.image) ? (p.image as unknown[])[0] : "") ??
+                  images?.[0] ??
+                  "",
+              );
+              return {
+                id: String(p.id ?? ""),
+                name: String(p.name ?? ""),
+                description: String(p.description ?? (p.desc as string) ?? ""),
+                image,
+                background: String(
+                  p.background ?? (p.mainImage as string) ?? "",
+                ),
+                ...(images && images.length ? { images } : {}),
+                ...(typeof p.color === "string" &&
+                /^#[0-9a-fA-F]{6}$/.test(p.color.trim())
+                  ? { color: p.color.trim() }
+                  : {}),
+                order:
+                  typeof p.order === "number" && Number.isFinite(p.order)
+                    ? p.order
+                    : 0,
+                isPublished: (p.isPublished ?? true) ? true : false,
+              };
+            },
+          ) as OfficialPartner[];
           setApiPartners(norm.filter((p) => p.isPublished !== false));
         }
       } catch {}
     })();
-    return () => { cancel = true; };
+    return () => {
+      cancel = true;
+    };
   }, []);
-  const sourcePartners = apiPartners ?? (officialPartners ?? SEED_OFFICIAL_PARTNERS);
-  const publishedPartners = sourcePartners.filter((p) => p.isPublished !== false);
-  // Map OfficialPartner (id, name, description, image, background, isPublished) -> PartnerCard
+  const sourcePartners =
+    apiPartners ?? officialPartners ?? SEED_OFFICIAL_PARTNERS;
+  const publishedPartners = sourcePartners
+    .filter((p) => p.isPublished !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
   const cards: PartnerCard[] = publishedPartners.length
-    ? publishedPartners.map((p) => ({
-        title: p.name,
-        description: p.description,
-        image: p.image || p.background || `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
-        brandLogo: p.image || p.background,
-        brandName: p.name,
-        link: "/products",
-        color: stringToColor(p.id),
-        background: p.background,
-      }))
+    ? publishedPartners.map((p) => {
+        const rightVisual = p.background || "";
+        const bottomLogos =
+          Array.isArray(p.images) && p.images.filter(Boolean).length
+            ? p.images.filter(Boolean)
+            : p.image
+              ? [p.image]
+              : [];
+        return {
+          title: p.name,
+          description: p.description,
+          image:
+            p.image ||
+            bottomLogos[0] ||
+            `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
+          brandLogo: bottomLogos[0] || p.image || "",
+          brandName: p.name,
+          link: "/products",
+          color:
+            typeof p.color === "string" &&
+            /^#[0-9a-fA-F]{6}$/.test(p.color.trim())
+              ? p.color.trim()
+              : stringToColor(p.id),
+          background: rightVisual,
+          images: bottomLogos.length ? bottomLogos : undefined,
+        };
+      })
     : partnerCards.map((c) => ({
         ...c,
         background: undefined,
@@ -744,11 +836,17 @@ export default function OfficialPartnersSection() {
           </Reveal>
 
           {displayCards.length === 0 ? (
-            <p className="text-center text-sm text-[#8B6F47]">No official partners published.</p>
+            <p className="text-center text-sm text-[#8B6F47]">
+              No official partners published.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {displayCards.map((card, index) => (
-                <PartnerCard key={card.title + index} card={card} index={index} />
+                <PartnerCard
+                  key={card.title + index}
+                  card={card}
+                  index={index}
+                />
               ))}
             </div>
           )}

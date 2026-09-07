@@ -47,7 +47,6 @@ export default function AdminLoginPage() {
             <div className="grid gap-1.5"><Label htmlFor="login-pass">PASSWORD</Label><Input id="login-pass" name="pass" required type="password" placeholder={a.pass} autoComplete="current-password" className="bg-white focus:bg-white" /></div>
             {err && <p role="alert" className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-[12px] text-red-700">{err}</p>}
             <button disabled={loading} className="rounded-full bg-[#2D4A22] py-3.5 text-[11px] tracking-[0.16em] text-white hover:bg-[#1e3317] shadow-[0_4px_16px_rgba(45,74,34,0.25)] disabled:opacity-60">{loading ? "Signing in…" : a.signIn}</button>
-            <p className="text-center text-[11px] text-[#8B6F47]">API auth via <code className="rounded bg-[#F5EFE0] px-1 py-0.5">POST /auth/login</code> · fallback to local demo.</p>
           </div>
         </form>
       </div>

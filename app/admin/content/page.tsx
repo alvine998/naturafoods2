@@ -567,7 +567,6 @@ export default function ContentPage() {
         </div>
       </div>
 
-      {saved && <div className="mt-3 rounded-xl bg-[#2D4A22] px-4 py-2 text-[12px] text-white">{a.contentSaved} · via <code className="rounded bg-white/10 px-1 py-0.5">PUT /admin/site-content/:locale</code></div>}
       {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
 
       <Card className="mt-4 p-3 sm:p-4">
