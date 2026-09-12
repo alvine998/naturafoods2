@@ -76,13 +76,13 @@ export default function DashboardPage() {
         <div>
           <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · Dashboard</p>
           <h1 className="mt-1 font-[var(--font-display)] text-[26px] font-light leading-none text-[#2D4A22] sm:text-[30px]">{a.dashTitle}</h1>
-          <p className="mt-2 max-w-[60ch] text-[12px] leading-5 text-[#1a1a16]/60">Overview. Pick a section to manage. {stats ? "· Live from GET /admin/stats" : loadingStats ? "· Loading stats…" : "· Local fallback (offline)"}</p>
+          <p className="mt-2 max-w-[60ch] text-[12px] leading-5 text-[#1a1a16]/60">Overview. Pick a section to manage. {stats ? "· Live stats" : loadingStats ? "· Loading stats…" : "· Local fallback (offline)"}</p>
         </div>
         <button onClick={() => { if (confirm(a.resetConfirm)) s.reset(); }} className="self-start rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-[#2D4A22]/5 sm:self-auto">{a.reset}</button>
       </div>
       {stats && (
         <Card className="mt-4 p-3">
-          <p className="text-[10px] tracking-[0.12em] text-[#8B6F47]">API STATS · GET /admin/stats</p>
+          <p className="text-[10px] tracking-[0.12em] text-[#8B6F47]">API STATS</p>
           <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
             <span className="rounded-xl bg-[#F5EFE0] px-3 py-2">products: <b>{stats.products ?? counts[0]}</b>{typeof stats.productsHighlighted === "number" && ` · highlighted: ${stats.productsHighlighted}`}</span>
             <span className="rounded-xl bg-[#F5EFE0] px-3 py-2">partners: <b>{stats.officialPartners ?? counts[1]}</b>{typeof stats.officialPartnersPublished === "number" && ` · published: ${stats.officialPartnersPublished}`}</span>

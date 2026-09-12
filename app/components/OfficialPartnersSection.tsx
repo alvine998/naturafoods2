@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "../lib/store";
-import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
+import { SEED_OFFICIAL_PARTNERS, SEED_PRODUCTS } from "../lib/data";
 import { apiFetch } from "../lib/api";
 import type { OfficialPartner } from "../lib/data";
 
@@ -107,7 +107,8 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   // Semantics: color = solid card background,
   // background = single right-side product visual,
   // images[] = bottom-bar logos (more than one)
-  const rightVisual = card.background && card.background.trim() !== "" ? card.background : "";
+  const rightVisual =
+    card.background && card.background.trim() !== "" ? card.background : "";
   const bottomLogos =
     Array.isArray(card.images) && card.images.filter(Boolean).length
       ? card.images.filter(Boolean)
@@ -176,7 +177,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                   alt={
                     i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
                   }
-                  className="h-9 w-auto max-w-[130px] object-contain"
+                  className="h-12 w-auto max-w-[150px] object-contain"
                 />
               ))}
               {bottomLogos.length > 4 && (
@@ -196,7 +197,41 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   );
 }
 
+type BrandTile = { slug: string; title: string; img: string };
+
 function RetailBrandSection() {
+  const { products } = useStore();
+  const [apiTiles, setApiTiles] = useState<BrandTile[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const json = await apiFetch<unknown[]>(
+          "/products?type=home-brand&limit=6",
+        );
+        if (cancelled || !json.success || !Array.isArray(json.data)) return;
+        const norm = (json.data as unknown as Record<string, unknown>[])
+          .map((p) => ({
+            slug: String(p.slug ?? p.id ?? ""),
+            title: String(p.title ?? ""),
+            img: String(p.img ?? p.image ?? ""),
+          }))
+          .filter((p) => p.slug && p.img);
+        if (norm.length) setApiTiles(norm);
+      } catch {}
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const fallback: BrandTile[] = (
+    products?.length ? products : SEED_PRODUCTS
+  ).filter((p) => p.type === "home-brand" && p.img);
+  const tiles = (apiTiles ?? fallback).slice(0, 6);
+  if (!tiles.length) return null;
+
   return (
     <section className="py-16 bg-white">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
@@ -207,7 +242,7 @@ function RetailBrandSection() {
             </h2>
             <div className="flex justify-center">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Avante_logo.svg/1200px-Avante_logo.svg.png"
+                src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/LOGO%20AVANTE%20FIX%20FINAL.png"
                 alt="Avante Ingredients Series"
                 className="h-32 sm:h-40 object-contain"
               />
@@ -217,34 +252,9 @@ function RetailBrandSection() {
 
         <Reveal delay={0.2}>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {[
-              {
-                img: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=300&q=80",
-                alt: "Cocoa products",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=300&q=80",
-                alt: "Tea products",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&q=80",
-                alt: "Filling products",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=300&q=80",
-                alt: "Nuts products",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=300&q=80",
-                alt: "Chocolate products",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=300&q=80",
-                alt: "Raisin products",
-              },
-            ].map((item, i) => (
+            {tiles.map((item, i) => (
               <motion.div
-                key={i}
+                key={item.slug}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -253,7 +263,7 @@ function RetailBrandSection() {
               >
                 <img
                   src={item.img}
-                  alt={item.alt}
+                  alt={item.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </motion.div>
@@ -726,7 +736,8 @@ export default function OfficialPartnersSection() {
           const norm = (json.data as unknown as Record<string, unknown>[]).map(
             (p) => {
               // background = single right visual, images[] = bottom logos
-              const rawImages = p.images ?? (p as Record<string, unknown>).logos ?? p.gallery;
+              const rawImages =
+                p.images ?? (p as Record<string, unknown>).logos ?? p.gallery;
               let images: string[] | undefined;
               if (Array.isArray(rawImages))
                 images = (rawImages as unknown[])
