@@ -237,9 +237,9 @@ export function useStore() {
 
   useEffect(() => {
     let cancelled = false;
-    // Load local first for instant paint
+    // Load local first for instant paint (articles skipped — API is source of truth)
     const localProducts = migrateProducts(load(KEYS.products, SEED_PRODUCTS));
-    const localArticles = load(KEYS.articles, SEED_ARTICLES);
+    const localArticles = SEED_ARTICLES;
     const localEdu = load(KEYS.edu, SEED_EDU);
     const localInnovation = load(KEYS.innovation, SEED_INNOVATION);
     const localJobs = load(KEYS.jobs, SEED_JOBS);
