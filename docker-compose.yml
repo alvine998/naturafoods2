@@ -1,0 +1,10 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3016:3016"
+    env_file:
+      - .env
+    environment:
+      - PORT=3016
+    restart: unless-stopped
