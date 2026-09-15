@@ -36,29 +36,16 @@ const ICONS = [LayoutDashboard, Package, Tag, Store, Handshake, Newspaper, Gradu
 // Sections hidden from the sidebar — pages stay reachable by direct URL
 const HIDDEN_NAV = new Set<string>(["/admin/assistant", "/admin/content"]);
 
-export default function AdminShell({ counts, labels, children }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { t } = useLang();
-  const a = t.admin;
-  const [mobileOpen, setMobileOpen] = useState(false);
+type NavItem = { label: string; href: string; Icon: (typeof ICONS)[number]; count?: number; active: boolean };
 
-  // first item is Dashboard, rest map to labels
-  const nav = [
-    { label: "Dashboard", href: ROUTES[0], Icon: ICONS[0], count: undefined as number | undefined, active: pathname === ROUTES[0] },
-    ...labels.map((l, i) => {
-      const href = ROUTES[i + 1];
-      return { label: l, href, Icon: ICONS[i + 1] ?? Package, count: counts[i] ?? 0, active: pathname === href || pathname.startsWith(href + "/") };
-    }),
-  ].filter((n) => !HIDDEN_NAV.has(n.href));
-
-  const Sidebar = () => (
+function SidebarNav({ nav, onNavigate }: { nav: NavItem[]; onNavigate: () => void }) {
+  return (
     <nav className="grid gap-1">
       {nav.map((n) => (
         <Link
           key={n.href}
           href={n.href}
-          onClick={() => setMobileOpen(false)}
+          onClick={onNavigate}
           className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-[12px] tracking-[0.02em] transition ${n.active ? "bg-[#2D4A22] text-white shadow-[0_4px_16px_rgba(45,74,34,0.25)]" : "text-[#2D4A22]/70 hover:bg-[#2D4A22]/[0.06] hover:text-[#2D4A22]"}`}
         >
           <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${n.active ? "bg-white/15 text-white" : "bg-white border border-[#2D4A22]/10"}`}><n.Icon className="h-3.5 w-3.5" /></span>
@@ -68,6 +55,23 @@ export default function AdminShell({ counts, labels, children }: Props) {
       ))}
     </nav>
   );
+}
+
+export default function AdminShell({ counts, labels, children }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { t } = useLang();
+  const a = t.admin;
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // first item is Dashboard, rest map to labels
+  const nav: NavItem[] = [
+    { label: "Dashboard", href: ROUTES[0], Icon: ICONS[0], count: undefined, active: pathname === ROUTES[0] },
+    ...labels.map((l, i) => {
+      const href = ROUTES[i + 1];
+      return { label: l, href, Icon: ICONS[i + 1] ?? Package, count: counts[i] ?? 0, active: pathname === href || pathname.startsWith(href + "/") };
+    }),
+  ].filter((n) => !HIDDEN_NAV.has(n.href));
 
   return (
     <div className="flex h-screen h-[100dvh] flex-col overflow-hidden bg-white">
@@ -94,7 +98,7 @@ export default function AdminShell({ counts, labels, children }: Props) {
         <aside className="hidden w-[260px] shrink-0 flex-col gap-4 overflow-y-auto overscroll-contain py-6 lg:flex">
           <div className="rounded-2xl bg-white border border-[#2D4A22]/10 p-4 shadow-[0_2px_12px_rgba(26,26,22,0.04)]">
             <p className="text-[10px] tracking-[0.16em] text-[#8B6F47]">NAVIGATION</p>
-            <div className="mt-3"><Sidebar /></div>
+            <div className="mt-3"><SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} /></div>
             <div className="mt-4 rounded-xl bg-white border border-[#2D4A22]/10 p-3">
               <p className="text-[11px] font-medium text-[#2D4A22]">{a.dashTitle}</p>
             </div>
@@ -110,7 +114,7 @@ export default function AdminShell({ counts, labels, children }: Props) {
                 <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">MENU</span>
                 <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white"><X className="h-4 w-4" /></button>
               </div>
-              <div className="mt-4"><Sidebar /></div>
+              <div className="mt-4"><SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} /></div>
               <Link href="/" onClick={() => setMobileOpen(false)} className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white py-2.5 text-[11px] tracking-[0.12em] text-[#2D4A22]"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
             </div>
           </div>

@@ -39,7 +39,11 @@ export default function QuillEditor({ value, onChange, placeholder, className }:
   const quillRef = useRef<InstanceType<typeof import("quill").default> | null>(null);
   const onChangeRef = useRef(onChange);
   const [notice, setNotice] = useState<string | null>(null);
-  onChangeRef.current = onChange;
+
+  // Keep the latest handler reachable from Quill's listeners without re-initialising the editor.
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   useEffect(() => {
     let quill: InstanceType<typeof import("quill").default> | null = null;

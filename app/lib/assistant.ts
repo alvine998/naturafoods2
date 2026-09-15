@@ -285,11 +285,12 @@ export function useAssistantConfig() {
       .finally(() => {
         if (!cancelled) setReady(true);
       });
-    if (!cancelled && !ready) {
-      // ensure ready even if fetch hangs
-      const t = setTimeout(() => { if (!cancelled) setReady(true); }, 2500);
-      return () => clearTimeout(t);
-    }
+    // ensure ready even if fetch hangs
+    const t = setTimeout(() => { if (!cancelled) setReady(true); }, 2500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, []);
   useEffect(() => {
     if (ready) saveAssistantConfig(cfg);

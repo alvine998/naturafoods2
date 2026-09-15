@@ -175,7 +175,7 @@ export default function AssistantPage() {
           {/* Tuning: persona + behavior controls that change how answers are formed */}
           <Card className="p-4 sm:p-5 border-[#2D4A22]/20">
             <h3 className="flex items-center gap-2 text-[11px] tracking-[0.14em] text-[#2D4A22]"><Sparkles className="h-3.5 w-3.5" /> TUNING — how the assistant answers</h3>
-            <p className="mt-1 text-[11px] leading-5 text-[#8B6F47]">Persona shapes the bot's role & constraints. Behavior knobs below change answer style (applied to every reply, including knowledge matches). Test in Playground.</p>
+            <p className="mt-1 text-[11px] leading-5 text-[#8B6F47]">Persona shapes the bot&apos;s role & constraints. Behavior knobs below change answer style (applied to every reply, including knowledge matches). Test in Playground.</p>
             <div className="mt-4 grid gap-4">
               <Field label="Persona / system prompt">
                 <TextArea value={cfg.persona} onChange={(e) => setCfg((c) => ({ ...c, persona: e.target.value }))} rows={3} placeholder={DEFAULT_ASSISTANT.persona} />

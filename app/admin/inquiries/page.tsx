@@ -7,6 +7,7 @@ import { isAuthed } from "../../lib/auth";
 import AdminShell from "../AdminShell";
 import { Card, Input, TableWrap, Pagination, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
 import { apiFetch, API_BASE, getAccessToken } from "../../lib/api";
+import type { Inquiry } from "../../lib/data";
 
 export default function InquiriesPage() {
   const router = useRouter();
@@ -22,8 +23,8 @@ export default function InquiriesPage() {
   const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
-    if (!n) return s.inquiries as any[];
-    return (s.inquiries as any[]).filter((x: any) => `${x.name} ${x.city} ${x.interest}`.toLowerCase().includes(n));
+    if (!n) return s.inquiries;
+    return s.inquiries.filter((x) => `${x.name} ${x.city} ${x.interest}`.toLowerCase().includes(n));
   }, [s.inquiries, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -31,16 +32,17 @@ export default function InquiriesPage() {
 
   const remove = async (realIdx: number) => {
     if (!confirmAdminDelete("this inquiry")) return;
-    const inq = (s.inquiries as any[])[realIdx];
+    const inq: Inquiry | undefined = s.inquiries[realIdx];
+    if (!inq) return;
     const snap = [...s.inquiries];
-    s.setInquiries((prev: any[]) => prev.filter((_, idx) => idx !== realIdx));
+    s.setInquiries((prev) => prev.filter((_, idx) => idx !== realIdx));
     try {
       await apiFetch(`/admin/inquiries/${encodeURIComponent(inq.id)}`, { method: "DELETE" });
     } catch (e) {
       const status = (e as { status?: number })?.status;
       const code = (e as { code?: string })?.code;
       if (status && status !== 0 && code !== "NETWORK_ERROR") {
-        s.setInquiries(snap as any);
+        s.setInquiries(snap);
         setErr(e instanceof Error ? e.message : "Delete failed");
         setTimeout(() => setErr(null), 2500);
       }
@@ -67,8 +69,8 @@ export default function InquiriesPage() {
       setTimeout(() => setErr(null), 2500);
       // fallback: local CSV
       try {
-        const rows = [["id","name","city","whatsapp","interest","date"], ...filtered.map((x: any) => [x.id, x.name, x.city, x.whatsapp, x.interest, x.date])];
-        const csv = rows.map((r) => r.map((v: string) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const rows: string[][] = [["id","name","city","whatsapp","interest","date"], ...filtered.map((x) => [x.id, x.name, x.city, x.whatsapp, x.interest, x.date])];
+        const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
         const blob = new Blob([csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const el = document.createElement("a");
@@ -92,8 +94,8 @@ export default function InquiriesPage() {
               <table className="w-full min-w-[640px] text-[12px]">
                 <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="text-left px-4 py-3 font-medium">Name</th><th className="text-left px-4 py-3 font-medium">City</th><th className="text-left px-4 py-3 font-medium">WhatsApp</th><th className="text-left px-4 py-3 font-medium">Interest</th><th className="text-left px-4 py-3 font-medium">Date</th><th className="px-4 py-3"></th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((inq: any, i: number) => {
-                    const realIdx = (s.inquiries as any[]).indexOf(inq);
+                  {paged.map((inq, i) => {
+                    const realIdx = s.inquiries.indexOf(inq);
                     return (
                       <tr key={inq.id + i} className="hover:bg-white/60"><td className="px-4 py-3 font-medium text-[#2D4A22]">{inq.name}</td><td className="px-4 py-3 text-[#1a1a16]/70">{inq.city}</td><td className="px-4 py-3">{inq.whatsapp}</td><td className="px-4 py-3"><span className="rounded-full bg-[#2D4A22]/10 px-2.5 py-1 text-[11px] text-[#2D4A22]">{inq.interest}</span></td><td className="px-4 py-3 text-[#8B6F47]">{new Date(inq.date).toLocaleDateString()}</td><td className="px-4 py-3 text-right"><button onClick={() => remove(realIdx)} className="rounded-full bg-red-50 border border-red-200 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></td></tr>
                     );
