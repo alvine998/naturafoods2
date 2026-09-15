@@ -9,7 +9,7 @@ import { SITE_URL } from "../../lib/seo";
 import { useLang } from "../../i18n";
 import { SEED_ARTICLES } from "../../lib/data";
 import type { Article } from "../../lib/data";
-import { getArticleContent } from "../../lib/store";
+import { getArticleContent, fetchPublicArticles } from "../../lib/store";
 
 export default function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -17,27 +17,38 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<Article | null>(null);
   const [done, setDone] = useState(false);
   useEffect(() => {
-    let list: Article[] = SEED_ARTICLES;
-    try {
-      const v = localStorage.getItem("nf_articles");
-      if (v) {
-        const parsed = JSON.parse(v) as Article[];
-        list = parsed.map((a) => ({ ...a, contentId: a.contentId ?? a.content, contentEn: a.contentEn ?? a.content, contentZh: a.contentZh ?? a.content }));
-      }
-    } catch {}
-    setArticle(list.find((a) => a.slug === slug) ?? null);
-    setDone(true);
+    let cancelled = false;
+    (async () => {
+      let list: Article[] = SEED_ARTICLES;
+      try {
+        const v = localStorage.getItem("nf_articles");
+        if (v) {
+          const parsed = JSON.parse(v) as Article[];
+          list = parsed.map((a) => ({ ...a, contentId: a.contentId ?? a.content, contentEn: a.contentEn ?? a.content, contentZh: a.contentZh ?? a.content }));
+        }
+      } catch {}
+      const api = await fetchPublicArticles(50);
+      if (api?.length) list = api;
+      if (cancelled) return;
+      setArticle(list.find((a) => a.slug === slug) ?? null);
+      setDone(true);
+    })();
+    return () => { cancelled = true; };
   }, [slug]);
   if (!done) return <PageShell><p className="py-12 text-center text-[#8B6F47]">…</p></PageShell>;
   if (!article) return <PageShell><p className="py-12 text-center text-[#8B6F47]">{t.articleDetail.notFound}</p><Link href="/articles" className="mx-auto mt-4 block w-fit rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white">{t.articleDetail.back}</Link></PageShell>;
+  const img = article.img?.trim() ? article.img : null;
+  const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Articles", href: "/articles" }, { label: article.title }]} />
       <BreadcrumbJsonLd items={[{ name: "Home", url: SITE_URL }, { name: "Articles", url: `${SITE_URL}/articles` }, { name: article.title, url: `${SITE_URL}/articles/${article.slug}` }]} />
-      <ArticleJsonLd title={article.title} description={article.excerpt} datePublished={article.date} image={article.img} url={`${SITE_URL}/articles/${article.slug}`} category={article.category} />
+      <ArticleJsonLd title={article.title} description={article.excerpt} datePublished={article.date} image={img ?? undefined} url={`${SITE_URL}/articles/${article.slug}`} category={article.category} />
       <Link href="/articles" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.articleDetail.back}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
-        {article.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(article.img ?? "") ? <video src={article.img} controls className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" /> : <img src={article.img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />}
+        {img ? (
+          isVideo ? <video src={img} controls className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" /> : <img src={img} alt={article.title} className="h-[220px] sm:h-[320px] md:h-[360px] w-full object-cover" />
+        ) : null}
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-white px-3 py-1">{article.category}</span><span>{article.date}</span></div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-light leading-none text-[#2D4A22] break-words">{article.title}</h1>

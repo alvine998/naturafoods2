@@ -211,17 +211,28 @@ export async function apiFetch<T>(path: string, opts: RequestInit = {}): Promise
 // Convenience helpers matching FRONTEND_API_GUIDE.md
 // ---------------------------------------------------------------------------
 
-export async function uploadFile(file: File, folder: string): Promise<string> {
+export async function uploadFile(file: File, folder: string, _retried = false): Promise<string> {
   const token = getAccessToken();
-  if (!token) throw new ApiError("Not authenticated", 401, "UNAUTHORIZED", null, null);
+  // No session (e.g. legacy offline login while API is down) — caller falls back to dataURL
+  if (!token) throw new ApiError("Not authenticated (no session — API offline?)", 401, "UNAUTHORIZED", null, null);
   const form = new FormData();
   form.append("file", file);
   form.append("folder", folder);
-  const res = await fetch(`${API_BASE}/admin/uploads`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/admin/uploads`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch (e) {
+    throw new ApiError((e as Error)?.message || "Network error", 0, "NETWORK_ERROR", null, null);
+  }
+  // Access token may have expired while refresh token is still valid — same retry as apiFetch
+  if (res.status === 401 && !_retried) {
+    const ok = await tryRefresh().catch(() => false);
+    if (ok && getAccessToken()) return uploadFile(file, folder, true);
+  }
   const json = (await res.json().catch(() => null)) as Envelope<{ url: string }> | null;
   if (!res.ok || !json?.success) {
     const msg = json?.error?.message || res.statusText || "Upload failed";

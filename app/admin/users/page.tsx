@@ -6,7 +6,7 @@ import { useStore } from "../../lib/store";
 import { isAuthed, getCurrentUser, fetchUsers, createUser, deleteUser, updateUserPassword } from "../../lib/auth";
 import type { AdminUser } from "../../lib/auth";
 import AdminShell from "../AdminShell";
-import { Field, Input, Modal, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE } from "../_components";
+import { Field, Input, Modal, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
 
 export default function UsersPage() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function UsersPage() {
 
   useEffect(() => setPage(1), [q]);
 
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, users.length, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, users.length, 0, 0, s.salesContacts.length, s.socialMedia.length];
 
   // When API returns paginated data, users is already the page slice.
   // Fallback meta may indicate single page where filtering happened client side.
@@ -98,6 +98,7 @@ export default function UsersPage() {
   };
 
   const onDelete = async (usr: AdminUser) => {
+    if (!confirmAdminDelete(`user ${usr.username}`)) return;
     setErr("");
     try {
       await deleteUser(usr.id);

@@ -1,7 +1,11 @@
 "use client";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { SocialMedia } from "../lib/data";
+import { fetchPublicSocialMedia, getSeedSocialMedia } from "../lib/store";
 
 function Reveal({
   children,
@@ -25,40 +29,22 @@ function Reveal({
   );
 }
 
-type BrandSocial = {
-  name: string;
-  logo: string;
-  description: string;
-  instagram?: string;
-  facebook?: string;
-  tiktok?: string;
-};
-
-const brands: BrandSocial[] = [
-  {
-    name: "Barry Callebaut",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png",
-    description: "Solusi cokelat berkualitas tinggi untuk kreasi tak terbatas.",
-    instagram: "https://instagram.com/barrycallebaut",
-  },
-  {
-    name: "Bensdorp",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
-    description: "Cokelat premium legendaris sejak 1840.",
-    instagram: "https://instagram.com/bensdorp",
-    facebook: "https://facebook.com/bensdorp",
-  },
-  {
-    name: "Avante",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Avante_logo.svg/1200px-Avante_logo.svg.png",
-    description: "Inovasi bahan baku untuk hasil terbaik setiap hari.",
-    instagram: "https://instagram.com/avante",
-    tiktok: "https://tiktok.com/@avante",
-    facebook: "https://facebook.com/avante",
-  },
-];
-
 export default function SocialMediaPage() {
+  const [brands, setBrands] = useState<SocialMedia[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let cancelled = false;
+    // Paint from local cache first, then overwrite with the API list (admin CRUD source)
+    const cached = getSeedSocialMedia();
+    if (cached.length) setBrands(cached);
+    (async () => {
+      const list = await fetchPublicSocialMedia(50);
+      if (cancelled) return;
+      if (list?.length) setBrands(list);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
   return (
     <main className="min-h-screen">
       {/* Hero Section with Background */}
@@ -122,15 +108,31 @@ export default function SocialMediaPage() {
         </div>
       </section>
 
-      {/* Brands Social Media Section */}
+      {/* Brands Social Media Section — hidden until at least one brand exists */}
+      {(loading || brands.length > 0) && (
       <section className="py-2 bg-[#1a0f0a]">
         <div className="mx-auto max-w-250 px-4 sm:px-6 md:px-8">
           <Reveal>
             <div className="bg-white rounded-3xl p-8 sm:p-10 md:p-12 shadow-2xl">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
-                {brands.map((brand, index) => (
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="text-center">
+                      <div className="h-20 flex items-center justify-center mb-4">
+                        <Skeleton className="h-12 w-40" />
+                      </div>
+                      <Skeleton className="mx-auto h-3 w-4/5" />
+                      <Skeleton className="mx-auto mt-2 h-3 w-3/5 mb-6" />
+                      <div className="flex justify-center gap-4">
+                        {Array.from({ length: 3 }).map((__, j) => (
+                          <Skeleton key={j} className="w-12 h-12 rounded-full" />
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                ) : brands.map((brand, index) => (
                   <motion.div
-                    key={brand.name}
+                    key={brand.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -138,11 +140,15 @@ export default function SocialMediaPage() {
                     className="text-center"
                   >
                     <div className="h-20 flex items-center justify-center mb-4">
-                      <img
-                        src={brand.logo}
-                        alt={brand.name}
-                        className="max-h-16 w-auto object-contain"
-                      />
+                      {brand.image ? (
+                        <img
+                          src={brand.image}
+                          alt={brand.name}
+                          className="max-h-16 w-auto object-contain"
+                        />
+                      ) : (
+                        <span className="font-[var(--font-display)] text-xl text-[#2D4A22]">{brand.name}</span>
+                      )}
                     </div>
                     <p className="text-gray-600 text-sm leading-relaxed mb-6 min-h-[48px]">
                       {brand.description}
@@ -153,6 +159,7 @@ export default function SocialMediaPage() {
                           href={brand.instagram}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`${brand.name} on Instagram`}
                           className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform"
                         >
                           <svg
@@ -169,6 +176,7 @@ export default function SocialMediaPage() {
                           href={brand.facebook}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`${brand.name} on Facebook`}
                           className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform"
                         >
                           <svg
@@ -185,6 +193,7 @@ export default function SocialMediaPage() {
                           href={brand.tiktok}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`${brand.name} on TikTok`}
                           className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white hover:scale-110 transition-transform"
                         >
                           <svg
@@ -204,6 +213,7 @@ export default function SocialMediaPage() {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-12 bg-[#1a0f0a]">

@@ -20,6 +20,8 @@ type StatsData = {
   jobs?: number;
   inquiries?: number;
   users?: number;
+  salesContacts?: number;
+  sales?: number;
   counts?: number[];
 };
 
@@ -45,9 +47,9 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [gate]);
   if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
-  const fallbackCounts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const fallbackCounts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const apiCounts = stats?.counts;
-  const counts = apiCounts && apiCounts.length >= 10 ? apiCounts : (stats ? [
+  const counts = apiCounts && apiCounts.length >= 11 ? apiCounts : (stats ? [
     stats.products ?? s.products.length,
     stats.officialPartners ?? s.officialPartners.length,
     stats.articles ?? s.articles.length,
@@ -57,18 +59,26 @@ export default function DashboardPage() {
     stats.inquiries ?? s.inquiries.length,
     stats.users ?? 0,
     0, 0,
+    // Backend /admin/stats returns `sales` (src/routes/stats.js); accept the
+    // legacy `salesContacts` alias too.
+    stats.salesContacts ?? stats.sales ?? s.salesContacts.length,
   ] : fallbackCounts);
   const links = [
     { href: "/admin/products", label: a.tabs[0], c: counts[0], sub: "catalog" },
-    { href: "/admin/official-partners", label: a.tabs[1], c: counts[1], sub: "partners" },
-    { href: "/admin/articles", label: a.tabs[2], c: counts[2], sub: "published" },
-    { href: "/admin/education", label: a.tabs[3], c: counts[3], sub: "classes" },
-    { href: "/admin/innovation", label: a.tabs[4], c: counts[4], sub: "pilots" },
-    { href: "/admin/careers", label: a.tabs[5], c: counts[5], sub: "open roles" },
-    { href: "/admin/inquiries", label: a.tabs[6], c: counts[6], sub: "leads" },
-    { href: "/admin/users", label: a.tabs[7], c: counts[7], sub: "users" },
-    { href: "/admin/assistant", label: a.tabs[8], c: counts[8], sub: "fine-tuning" },
-    { href: "/admin/content", label: a.tabs[9] ?? "Content", c: counts[9], sub: "wording" },
+    { href: "/admin/product-categories", label: a.tabs[1], c: counts[1], sub: "categories" },
+    { href: "/admin/home-brands", label: a.tabs[2], c: counts[2], sub: "home brands" },
+    { href: "/admin/official-partners", label: a.tabs[3], c: counts[3], sub: "partners" },
+    { href: "/admin/articles", label: a.tabs[4], c: counts[4], sub: "published" },
+    { href: "/admin/education", label: a.tabs[5], c: counts[5], sub: "classes" },
+    { href: "/admin/innovation", label: a.tabs[6], c: counts[6], sub: "pilots" },
+    { href: "/admin/careers", label: a.tabs[7], c: counts[7], sub: "open roles" },
+    { href: "/admin/inquiries", label: a.tabs[8], c: counts[8], sub: "leads" },
+    { href: "/admin/users", label: a.tabs[9], c: counts[9], sub: "users" },
+    { href: "/admin/assistant", label: a.tabs[10], c: counts[10], sub: "fine-tuning" },
+    { href: "/admin/content", label: (a.tabs as unknown as string[])[11] ?? "Content", c: counts[11], sub: "wording" },
+    { href: "/admin/sales", label: (a.tabs as unknown as string[])[12] ?? "Sales", c: counts[12], sub: "contacts" },
+    { href: "/admin/social-media", label: (a.tabs as unknown as string[])[13] ?? "Social Media", c: counts[13] ?? 0, sub: "social channels" },
+    { href: "/admin/about", label: (a.tabs as unknown as string[])[14] ?? "About", c: counts[14] ?? 0, sub: "page content" },
   ];
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>

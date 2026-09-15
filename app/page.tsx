@@ -10,6 +10,8 @@ import SiteNav from "./components/SiteNav";
 import SiteFooter from "./components/SiteFooter";
 import OfficialPartnersSection from "./components/OfficialPartnersSection";
 import HighlightedProductsSection from "./components/HighlightedProductsSection";
+import LatestStoriesSection from "./components/LatestStoriesSection";
+import SalesContactCard from "./components/SalesContactCard";
 import { useLang } from "./i18n";
 
 function Reveal({ children, delay = 0, y = 24, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
@@ -145,8 +147,13 @@ export default function Home() {
           </div>
         </section> */}
 
-        {/* <HighlightedProductsSection /> */}
+        <HighlightedProductsSection />
         <OfficialPartnersSection />
+        <LatestStoriesSection />
+
+        <section className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-14 md:px-8">
+          <SalesContactCard />
+        </section>
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1280px] gap-8 sm:gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-start">

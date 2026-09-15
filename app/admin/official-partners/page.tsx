@@ -6,8 +6,12 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { OfficialPartner } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, MultiFileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE } from "../_components";
+import { Card, Field, FileUpload, MultiFileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
 import { apiFetch } from "../../lib/api";
+
+function slugify(input: string): string {
+  return (input ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "").slice(0, 64).replace(/-+$/g, "");
+}
 
 export default function OfficialPartnersPage() {
   const router = useRouter();
@@ -22,8 +26,9 @@ export default function OfficialPartnersPage() {
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const sortedAll = useMemo(() => {
     return [...(s.officialPartners as OfficialPartner[])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [s.officialPartners]);
@@ -54,7 +59,7 @@ export default function OfficialPartnersPage() {
   };
   const openAdd = () => {
     const maxOrder = (s.officialPartners as OfficialPartner[]).reduce((m, p) => Math.max(m, p.order ?? 0), -1);
-    setF({ isPublished: true, images: [], color: "#4A2A1F", order: maxOrder + 1 }); setEditIdx(null); setFormOpen(true); setErr(null);
+    setF({ isPublished: true, images: [], color: "#4A2A1F", order: maxOrder + 1 }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false);
   };
   const openEdit = (i: number) => {
     const p = s.officialPartners[i];
@@ -65,9 +70,9 @@ export default function OfficialPartnersPage() {
       ...p,
       images: baseImages.length ? baseImages : legacyLogos.length ? legacyLogos : p.image ? [p.image] : [],
     });
-    setEditIdx(i); setFormOpen(true); setErr(null);
+    setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true);
   };
-  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); };
+  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.id || !f.name) return;
     // images[] = bottom-bar logos (more than one), background = single right-side visual
@@ -142,6 +147,7 @@ export default function OfficialPartnersPage() {
     }
   };
   const remove = async (realIdx: number) => {
+    if (!confirmAdminDelete("this official partner")) return;
     const p = s.officialPartners[realIdx];
     const snap = [...s.officialPartners];
     s.setOfficialPartners((prev: OfficialPartner[]) => prev.filter((_, idx) => idx !== realIdx));
@@ -160,14 +166,14 @@ export default function OfficialPartnersPage() {
   if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
-      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[1]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[1]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.officialPartners.length}</span></div>
+      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[3]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[3]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.officialPartners.length}</span></div>
       {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
       {formOpen ? (
         <Card className="mt-4 p-4 sm:p-6">
-          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[1]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
+          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[2]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="id *"><Input value={f.id ?? ""} onChange={(e) => setF({ ...f, id: e.target.value })} placeholder="bensdorp" /></Field>
-            <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Bens Dorp" /></Field>
+            <Field label="id *"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="bensdorp" /></Field>
+            <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Bens Dorp" /></Field>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Short description for the partner card" /></Field></div>
             <Field label="card background color"><div className="flex flex-wrap items-center gap-2">
                 <input
@@ -225,7 +231,7 @@ export default function OfficialPartnersPage() {
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">
-          <Toolbar q={q} setQ={setQ} total={s.officialPartners.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[1]}`} />
+          <Toolbar q={q} setQ={setQ} total={s.officialPartners.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[2]}`} />
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[940px] text-[12px]">

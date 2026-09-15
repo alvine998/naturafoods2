@@ -53,12 +53,16 @@ export default function ProductDetailPage() {
   }, [slug]);
   if (!done) return <PageShell><p className="py-12 text-center text-[#8B6F47]">…</p></PageShell>;
   if (!product) return <PageShell><Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: t.productDetail.notFound }]} /><p className="py-12 text-center text-[#8B6F47]">{t.productDetail.notFound}</p><Link href="/products" className="mx-auto mt-4 block w-fit rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white">{t.productDetail.back}</Link></PageShell>;
+  const img = product.img?.trim() ? product.img : null;
+  const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: product.title }]} />
       <Link href="/products" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.productsPage.title}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
-        <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{product.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(product.img ?? "") ? <video src={product.img} controls className="h-full w-full object-cover" /> : <img src={product.img} alt={product.title} className="h-full w-full object-cover" />}</div>
+        {img ? (
+          <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{isVideo ? <video src={img} controls className="h-full w-full object-cover" /> : <img src={img} alt={product.title} className="h-full w-full object-cover" />}</div>
+        ) : null}
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[#2D4A22] px-3 py-1 text-[10px] tracking-[0.14em] text-white uppercase">{product.cat}</span>

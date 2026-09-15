@@ -6,6 +6,10 @@ import { Textarea as UiTextarea } from "@/components/ui/textarea";
 import { Card as UiCard } from "@/components/ui/card";
 import { uploadFile as apiUploadFile } from "../lib/api";
 
+export function confirmAdminDelete(label = "this item"): boolean {
+  return typeof window === "undefined" || window.confirm(`Are you sure you want to delete ${label}? This action cannot be undone.`);
+}
+
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="grid gap-1.5"><Label>{label}</Label><span className="normal-case tracking-normal">{children}</span></div>;
 }
@@ -71,18 +75,20 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
 // FileUpload — now API-aware per FRONTEND_API_GUIDE.md:10
 // Uses POST /admin/uploads (R2 / local fallback) and falls back to dataURL for offline dev
 // ---------------------------------------------------------------------------
-export function FileUpload({ value, onChange, accept = "image/*", folder = "products" }: { value?: string; onChange: (v: string) => void; accept?: string; folder?: string }) {
+export function FileUpload({ value, onChange, accept = "image/*", folder = "products", maxImageMB = 5, maxVideoMB = 20 }: { value?: string; onChange: (v: string) => void; accept?: string; folder?: string; maxImageMB?: number; maxVideoMB?: number }) {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const isVideo = !!value && (value.startsWith("data:video") || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(value));
+  const [notice, setNotice] = useState<string | null>(null);
+  const src = value?.trim() ? value.trim() : "";
+  const isVideo = !!src && (src.startsWith("data:video") || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(src));
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     setErr(null);
-    // Image 5MB, video 20MB limits per guide
+    // Size limits (MB) — configurable per caller, defaults per guide
     const isVid = file.type.startsWith("video/");
-    const max = isVid ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+    const max = isVid ? maxVideoMB * 1024 * 1024 : maxImageMB * 1024 * 1024;
     if (file.size > max) {
-      setErr(isVid ? "Video too large (max 20MB)" : "Image too large (max 5MB)");
+      setErr(isVid ? `Video too large (max ${maxVideoMB}MB)` : `Image too large (max ${maxImageMB}MB)`);
       return;
     }
     setUploading(true);
@@ -90,17 +96,27 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
       const url = await apiUploadFile(file, folder);
       onChange(url);
     } catch (e) {
-      // Fallback to base64 dataURL for offline dev / when API not reachable
+      // Fallback to base64 dataURL when the API can't be used:
+      // - network unreachable (backend down / offline dev)
+      // - no session (legacy offline login has no access token)
+      // Real server rejections (413 too large, 400, 403…) are shown as errors instead.
       const msg = e instanceof Error ? e.message : "Upload failed";
-      const isNetwork = msg.toLowerCase().includes("network") || (e as { status?: number })?.status === 0;
-      if (isNetwork) {
-        // fallback to dataURL so UX not blocked
+      const status = (e as { status?: number })?.status;
+      const code = (e as { code?: string })?.code;
+      const offline = !status || status === 0 || code === "NETWORK_ERROR" || code === "UNAUTHORIZED";
+      if (offline) {
         const reader = new FileReader();
         reader.onload = () => onChange(String(reader.result ?? ""));
         reader.readAsDataURL(file);
         setErr(null);
+        setNotice(
+          file.size > 2 * 1024 * 1024
+            ? "API offline — kept as local preview. File is large and may not persist after reload."
+            : "API offline — kept as local preview only, not synced to server."
+        );
       } else {
-        setErr(msg);
+        setNotice(null);
+        setErr(`Upload failed (${status}${code ? ` ${code}` : ""}): ${msg}`);
       }
     } finally {
       setUploading(false);
@@ -108,14 +124,14 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
   };
   return (
     <div className="grid gap-2">
-      {value ? (
+      {src ? (
         <div className="relative overflow-hidden rounded-xl border border-[#2D4A22]/15 bg-[#F5EFE0]">
           {isVideo ? (
             // eslint-disable-next-line jsx-a11y/media-has-caption
-            <video src={value} controls className="h-28 w-full object-cover" />
+            <video src={src} controls className="h-28 w-full object-cover" />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={value} alt="preview" className="h-28 w-full object-cover" />
+            <img src={src} alt="preview" className="h-28 w-full object-cover" />
           )}
         </div>
       ) : (
@@ -123,12 +139,13 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
       )}
       <div className="flex flex-wrap gap-2 items-center">
         <label className={`cursor-pointer rounded-full px-4 py-1.5 text-[11px] tracking-[0.08em] text-white ${uploading ? "bg-[#8B6F47] cursor-wait opacity-70" : "bg-[#2D4A22] hover:bg-[#1e3317]"}`}>
-          {uploading ? "Uploading…" : value ? "Replace file" : "Upload file"}
+          {uploading ? "Uploading…" : src ? "Replace file" : "Upload file"}
           <input type="file" accept={accept} className="hidden" disabled={uploading} onChange={(e) => { handleFile(e.target.files?.[0]); e.currentTarget.value = ""; }} />
         </label>
-        {value && <button type="button" onClick={() => onChange("")} disabled={uploading} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-50">Remove</button>}
+        {src && <button type="button" onClick={() => { if (confirmAdminDelete("this uploaded file")) onChange(""); }} disabled={uploading} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-50">Remove</button>}
       </div>
       {err && <p className="text-[11px] text-red-600">{err}</p>}
+      {notice && <p className="text-[11px] text-[#8B6F47]">{notice}</p>}
     </div>
   );
 }
@@ -139,7 +156,7 @@ export { FileUpload as FileUploadLegacy };
 export function MultiFileUpload({ value = [], onChange, accept = "image/*", folder = "partners", max = 10 }: { value?: string[]; onChange: (v: string[]) => void; accept?: string; folder?: string; max?: number }) {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const list = Array.isArray(value) ? value.filter(Boolean) : [];
+  const list = Array.isArray(value) ? value.map((v) => (typeof v === "string" ? v.trim() : "")).filter(Boolean) : [];
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setErr(null);
@@ -158,8 +175,10 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
           uploaded.push(url);
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Upload failed";
-          const isNetwork = msg.toLowerCase().includes("network") || (e as { status?: number })?.status === 0;
-          if (isNetwork) {
+          const status = (e as { status?: number })?.status;
+          const code = (e as { code?: string })?.code;
+          const offline = !status || status === 0 || code === "NETWORK_ERROR" || code === "UNAUTHORIZED";
+          if (offline) {
             const dataUrl: string = await new Promise((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = () => resolve(String(reader.result ?? ""));
@@ -168,7 +187,7 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
             });
             if (dataUrl) uploaded.push(dataUrl);
           } else {
-            setErr(msg);
+            setErr(`"${file.name}" failed (${status}${code ? ` ${code}` : ""}): ${msg}`);
           }
         }
       }
@@ -184,7 +203,10 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
     [next[idx], next[j]] = [next[j], next[idx]];
     onChange(next);
   };
-  const removeAt = (idx: number) => onChange(list.filter((_, i) => i !== idx));
+  const removeAt = (idx: number) => {
+    if (!confirmAdminDelete("this image")) return;
+    onChange(list.filter((_, i) => i !== idx));
+  };
   return (
     <div className="grid gap-2">
       {list.length === 0 ? (

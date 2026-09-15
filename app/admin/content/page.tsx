@@ -5,7 +5,7 @@ import { useLang, locales, type Locale, dict } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import AdminShell from "../AdminShell";
-import { Card } from "../_components";
+import { Card, confirmAdminDelete } from "../_components";
 import { loadRaw, saveRaw, clearOverrides, deepSet, fetchSiteContent, saveLocaleContent, deleteAllOverrides } from "../../lib/siteContent";
 
 type GroupKey = "home" | "nav" | "about" | "aboutDetail" | "products" | "articles" | "education" | "innovation" | "contact" | "careers";
@@ -489,6 +489,8 @@ export default function ContentPage() {
   const [draft, setDraft] = useState<Record<string, unknown>>({});
   const [saved, setSaved] = useState(false);
   const [q, setQ] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   useEffect(() => {
@@ -500,7 +502,7 @@ export default function ContentPage() {
   }, []);
   useEffect(() => { setEditLocale(locale); }, [locale]);
 
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
 
   // show base values for the language being edited, not the UI language
   const baseForEdit = useMemo(() => dict[editLocale] as unknown as Record<string, unknown>, [editLocale]);
@@ -525,8 +527,6 @@ export default function ContentPage() {
     });
   };
 
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
   const save = async () => {
     setErr(null); setSaving(true);
     try {
@@ -552,7 +552,7 @@ export default function ContentPage() {
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[9] ?? "Content"}</p>
+          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[11] ?? "Content"}</p>
           <h1 className="mt-1 font-[var(--font-display)] text-[22px] font-light leading-none text-[#2D4A22] sm:text-[26px]">{a.contentTitle}</h1>
           <p className="mt-2 max-w-[60ch] text-[12px] leading-5 text-[#1a1a16]/60">{a.contentDesc}</p>
         </div>
@@ -608,7 +608,7 @@ export default function ContentPage() {
                 )}
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                   <span className="text-[#8B6F47] line-clamp-1">{a.contentDefaultLabel}: {typeof baseVal === "string" ? baseVal.slice(0, 90) : Array.isArray(baseVal) ? `[${baseVal.length} items]` : String(baseVal ?? "")}</span>
-                  {isOverridden && <button onClick={() => { setDraft((prev) => { const cur = { ...(prev[editLocale] as Record<string, unknown> ?? {}) }; const del = (obj: Record<string, unknown>, p: string[]): Record<string, unknown> => { if (p.length === 0) return obj; const c = { ...obj }; let cur2: Record<string, unknown> = c; for (let i = 0; i < p.length - 1; i++) { const k = p[i]; const nxt = cur2[k] as Record<string, unknown>; if (!nxt || typeof nxt !== "object") return c; const copy = { ...nxt }; cur2[k] = copy; cur2 = copy; } delete cur2[p[p.length - 1]]; return c; }; return { ...prev, [editLocale]: del(cur as Record<string, unknown>, path) }; }); }} className="rounded-full border border-[#2D4A22]/15 bg-white px-3 py-1 text-[#2D4A22] hover:bg-white">{a.contentClearOverride}</button>}
+                  {isOverridden && <button onClick={() => { if (!confirmAdminDelete("this content override")) return; setDraft((prev) => { const cur = { ...(prev[editLocale] as Record<string, unknown> ?? {}) }; const del = (obj: Record<string, unknown>, p: string[]): Record<string, unknown> => { if (p.length === 0) return obj; const c = { ...obj }; let cur2: Record<string, unknown> = c; for (let i = 0; i < p.length - 1; i++) { const k = p[i]; const nxt = cur2[k] as Record<string, unknown>; if (!nxt || typeof nxt !== "object") return c; const copy = { ...nxt }; cur2[k] = copy; cur2 = copy; } delete cur2[p[p.length - 1]]; return c; }; return { ...prev, [editLocale]: del(cur as Record<string, unknown>, path) }; }); }} className="rounded-full border border-[#2D4A22]/15 bg-white px-3 py-1 text-[#2D4A22] hover:bg-white">{a.contentClearOverride}</button>}
                 </div>
               </div>
             );

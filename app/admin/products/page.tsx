@@ -6,9 +6,13 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { Product } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE } from "../_components";
+import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch } from "../../lib/api";
+
+function slugify(input: string): string {
+  return (input ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "").slice(0, 64).replace(/-+$/g, "");
+}
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -18,38 +22,43 @@ export default function ProductsPage() {
   const [gate, setGate] = useState(false);
   const [f, setF] = useState<Partial<Product>>({});
   const [q, setQ] = useState("");
+  const [catFilter, setCatFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return s.products as Product[];
-    return (s.products as Product[]).filter((p) => `${p.title} ${p.slug} ${p.cat} ${p.tag} ${p.type ?? ""} ${p.isHighlight ? "highlight" : ""}`.toLowerCase().includes(needle));
-  }, [s.products, q]);
-  useEffect(() => setPage(1), [q]);
+    let list = s.products as Product[];
+    if (catFilter !== "all") list = list.filter((p) => p.cat === catFilter);
+    if (needle) list = list.filter((p) => `${p.title} ${p.slug} ${p.cat} ${p.tag} ${p.type ?? ""} ${p.isHighlight ? "highlight" : ""}`.toLowerCase().includes(needle));
+    return list;
+  }, [s.products, q, catFilter]);
+  useEffect(() => setPage(1), [q, catFilter]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const openAdd = () => { setF({ type: "general", isHighlight: false, cat: "choco" }); setEditIdx(null); setFormOpen(true); setErr(null); };
-  const openEdit = (i: number) => { setF(s.products[i]); setEditIdx(i); setFormOpen(true); setErr(null); };
-  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); };
+  const openAdd = () => { setF({ type: "general", isHighlight: false, cat: s.productCategories[0]?.slug ?? "choco" }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
+  const openEdit = (i: number) => { setF(s.products[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.title || !f.slug) return;
-    const item: Product = { slug: String(f.slug), cat: (f.cat as any) ?? "choco", title: String(f.title), note: String(f.note ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? ""), desc: String(f.desc ?? ""), type: (f.type as Product["type"]) ?? "general", isHighlight: Boolean(f.isHighlight) };
+    const selectedCat = s.productCategories.find((c) => c.slug === f.cat);
+    const item: Product = { slug: String(f.slug), cat: (f.cat as string) ?? "choco", categoryId: selectedCat?.id, title: String(f.title), note: String(f.note ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? ""), desc: String(f.desc ?? ""), type: (f.type as Product["type"]) ?? "general", isHighlight: Boolean(f.isHighlight) };
     setSaving(true);
     setErr(null);
     const isEdit = editIdx !== null;
     const originalSlug = isEdit ? s.products[editIdx!]?.slug : null;
     try {
+      const payload = { slug: item.slug, categoryId: item.categoryId, type: item.type, title: item.title, note: item.note, tag: item.tag, img: item.img, desc: item.desc, isHighlight: item.isHighlight };
       if (isEdit) {
-        // PUT /admin/products/:slug — if slug changed, backend validates uniqueness
-        await apiFetch(`/admin/products/${encodeURIComponent(originalSlug!)}`, { method: "PUT", body: JSON.stringify(item) });
+        await apiFetch(`/admin/products/${encodeURIComponent(originalSlug!)}`, { method: "PUT", body: JSON.stringify(payload) });
         s.setProducts((prev: Product[]) => prev.map((x, i) => i === editIdx ? item : x));
       } else {
-        await apiFetch("/admin/products", { method: "POST", body: JSON.stringify(item) });
+        await apiFetch("/admin/products", { method: "POST", body: JSON.stringify(payload) });
         s.setProducts((prev: Product[]) => [...prev, item]);
       }
       closeForm();
@@ -57,7 +66,6 @@ export default function ProductsPage() {
       const msg = e instanceof Error ? e.message : "Save failed";
       const code = (e as { code?: string })?.code;
       const status = (e as { status?: number })?.status;
-      // Network error → fallback to local only (offline dev)
       if (!status || status === 0 || code === "NETWORK_ERROR") {
         if (isEdit) s.setProducts((prev: Product[]) => prev.map((x, i) => i === editIdx ? item : x));
         else s.setProducts((prev: Product[]) => [...prev, item]);
@@ -90,6 +98,7 @@ export default function ProductsPage() {
     }
   };
   const remove = async (realIdx: number) => {
+    if (!confirmAdminDelete("this product")) return;
     const p = s.products[realIdx];
     const snapshot = [...s.products];
     s.setProducts((prev: Product[]) => prev.filter((_, idx) => idx !== realIdx));
@@ -117,9 +126,9 @@ export default function ProductsPage() {
         <Card className="mt-4 p-4 sm:p-6">
           <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[0]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="slug"><Input value={f.slug ?? ""} onChange={(e) => setF({ ...f, slug: e.target.value })} placeholder="belgian-dark-72" /></Field>
-            <Field label="category"><Select value={f.cat ?? "choco"} onValueChange={(v) => setF({ ...f, cat: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="choco">choco</SelectItem><SelectItem value="matcha">matcha</SelectItem></SelectContent></Select></Field>
-            <Field label="title"><Input value={f.title ?? ""} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="Belgian Dark 72%" /></Field>
+            <Field label="slug"><Input value={f.slug ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, slug: slugify(e.target.value) }); }} placeholder="belgian-dark-72" /></Field>
+            <Field label="category"><Select value={f.cat ?? (s.productCategories[0]?.slug ?? "choco")} onValueChange={(v) => setF({ ...f, cat: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{s.productCategories.filter((c) => c.isActive).map((c) => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}</SelectContent></Select></Field>
+            <Field label="title"><Input value={f.title ?? ""} onChange={(e) => { const title = e.target.value; setF((prev) => ({ ...prev, title, ...(!slugTouched ? { slug: slugify(title) } : {}) })); }} placeholder="Belgian Dark 72%" /></Field>
             <Field label="type"><Select value={f.type ?? "general"} onValueChange={(v) => setF({ ...f, type: v as Product["type"] })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="home-brand">Home Brand</SelectItem><SelectItem value="small-pack">Small Pack</SelectItem><SelectItem value="general">General</SelectItem></SelectContent></Select></Field>
             <Field label="note"><Input value={f.note ?? ""} onChange={(e) => setF({ ...f, note: e.target.value })} placeholder="Callets · Single origin" /></Field>
             <Field label="tag"><Input value={f.tag ?? ""} onChange={(e) => setF({ ...f, tag: e.target.value })} placeholder="Bulk · 2.5kg" /></Field>
@@ -137,6 +146,13 @@ export default function ProductsPage() {
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button onClick={() => setCatFilter("all")} className={`rounded-full border px-3 py-1.5 text-[11px] tracking-[0.06em] transition ${catFilter === "all" ? "bg-[#2D4A22] border-[#2D4A22] text-white" : "bg-white border-[#2D4A22]/15 text-[#8B6F47] hover:bg-[#2D4A22]/5"}`}>All <span className="ml-1 opacity-60">{s.products.length}</span></button>
+            {s.productCategories.filter((c) => c.isActive).map((c) => {
+              const count = s.products.filter((p) => p.cat === c.slug).length;
+              return <button key={c.id} onClick={() => setCatFilter(c.slug)} className={`rounded-full border px-3 py-1.5 text-[11px] tracking-[0.06em] transition ${catFilter === c.slug ? "bg-[#2D4A22] border-[#2D4A22] text-white" : "bg-white border-[#2D4A22]/15 text-[#8B6F47] hover:bg-[#2D4A22]/5"}`}>{c.name} <span className="ml-1 opacity-60">{count}</span></button>;
+            })}
+          </div>
           <Toolbar q={q} setQ={setQ} total={s.products.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[0]}`} />
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
@@ -145,15 +161,16 @@ export default function ProductsPage() {
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((p: Product) => {
                     const realIdx = (s.products as Product[]).indexOf(p);
-                    const isVideo = p.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(p.img ?? "");
+                    const img = p.img?.trim() ? p.img : null;
+                    const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
                     const typeLabel = p.type === "home-brand" ? "Home Brand" : p.type === "small-pack" ? "Small Pack" : "General";
                     const typeCls = p.type === "home-brand" ? "bg-[#2D4A22] text-white border-[#2D4A22]" : p.type === "small-pack" ? "bg-[#EAF2FF] border-[#2D4A22]/15 text-[#2D4A22]" : "bg-white border-[#2D4A22]/15 text-[#8B6F47]";
                     return (
                       <tr key={p.slug + realIdx} className="hover:bg-white/60">
-                        <td className="px-3 py-2">{isVideo ? <video src={p.img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={p.img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />}</td>
+                        <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{p.title}<div className="text-[11px] font-normal text-[#8B6F47] line-clamp-1">{p.note}</div></td>
                         <td className="px-3 py-2 text-[#8B6F47]">{p.slug}</td>
-                        <td className="px-3 py-2"><span className={`rounded-full border px-2 py-0.5 text-[11px] ${p.cat === "matcha" ? "bg-[#E8F0E4] border-[#2D4A22]/15 text-[#2D4A22]" : "bg-[#FFF1D6] border-[#8B6F47]/15 text-[#8B6F47]"}`}>{p.cat}</span></td>
+                        <td className="px-3 py-2"><span className={`rounded-full border px-2 py-0.5 text-[11px] ${p.cat === "matcha" ? "bg-[#E8F0E4] border-[#2D4A22]/15 text-[#2D4A22]" : p.cat === "other" ? "bg-[#FFF3E0] border-[#E65100]/20 text-[#E65100]" : "bg-[#FFF1D6] border-[#8B6F47]/15 text-[#8B6F47]"}`}>{p.category?.name ?? p.cat}</span></td>
                         <td className="px-3 py-2"><span className={`rounded-full border px-2 py-0.5 text-[11px] ${typeCls}`}>{typeLabel}</span></td>
                         <td className="px-3 py-2"><button onClick={() => toggleHighlight(realIdx)} className={`rounded-full border px-2.5 py-1 text-[11px] ${p.isHighlight ? "bg-[#2D4A22] border-[#2D4A22] text-white" : "bg-white border-[#2D4A22]/15 text-[#8B6F47]"}`}>{p.isHighlight ? "Yes" : "No"}</button></td>
                         <td className="px-3 py-2 text-[#1a1a16]/70">{p.tag}</td>

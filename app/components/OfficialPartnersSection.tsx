@@ -4,9 +4,9 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "../lib/store";
-import { SEED_OFFICIAL_PARTNERS, SEED_PRODUCTS } from "../lib/data";
+import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
 import { apiFetch } from "../lib/api";
-import type { OfficialPartner } from "../lib/data";
+import type { OfficialPartner, SalesContact } from "../lib/data";
 
 type PartnerCard = {
   title: string;
@@ -197,10 +197,9 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   );
 }
 
-type BrandTile = { slug: string; title: string; img: string };
+type BrandTile = { slug: string; title: string; img: string; desc?: string };
 
 function RetailBrandSection() {
-  const { products } = useStore();
   const [apiTiles, setApiTiles] = useState<BrandTile[] | null>(null);
 
   useEffect(() => {
@@ -208,16 +207,17 @@ function RetailBrandSection() {
     (async () => {
       try {
         const json = await apiFetch<unknown[]>(
-          "/products?type=home-brand&limit=6",
+          "/home-brands?limit=6",
         );
         if (cancelled || !json.success || !Array.isArray(json.data)) return;
         const norm = (json.data as unknown as Record<string, unknown>[])
-          .map((p) => ({
-            slug: String(p.slug ?? p.id ?? ""),
-            title: String(p.title ?? ""),
-            img: String(p.img ?? p.image ?? ""),
+          .map((h) => ({
+            slug: String(h.id ?? h.slug ?? ""),
+            title: String(h.name ?? h.title ?? ""),
+            img: String(h.image ?? h.img ?? ""),
+            desc: String(h.desc ?? h.description ?? ""),
           }))
-          .filter((p) => p.slug && p.img);
+          .filter((h) => h.slug && h.img?.trim());
         if (norm.length) setApiTiles(norm);
       } catch {}
     })();
@@ -226,10 +226,7 @@ function RetailBrandSection() {
     };
   }, []);
 
-  const fallback: BrandTile[] = (
-    products?.length ? products : SEED_PRODUCTS
-  ).filter((p) => p.type === "home-brand" && p.img);
-  const tiles = (apiTiles ?? fallback).slice(0, 6);
+  const tiles = (apiTiles ?? []).slice(0, 6);
   if (!tiles.length) return null;
 
   return (
@@ -275,65 +272,77 @@ function RetailBrandSection() {
   );
 }
 
+type SmallPackTile = { slug: string; title: string; img: string };
+
 function SmallPackSection() {
+  const [tiles, setTiles] = useState<SmallPackTile[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const json = await apiFetch<unknown[]>("/products?type=small-pack&limit=50");
+        if (cancelled || !json.success || !Array.isArray(json.data)) return;
+        const norm = (json.data as unknown as Record<string, unknown>[])
+          .map((p) => ({
+            slug: String(p.slug ?? p.id ?? ""),
+            title: String(p.title ?? ""),
+            img: String(p.img ?? p.image ?? ""),
+          }))
+          .filter((p) => p.slug && p.img?.trim());
+        if (norm.length) setTiles(norm);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (!tiles.length) return null;
+
+  const doubled = [...tiles, ...tiles];
+
   return (
-    <section className="py-16 bg-[#F5EFE0]">
+    <section className="py-16">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
           <div className="text-center mb-12">
             <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
               Small Pack for Ingredients Store :
             </h2>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2005.51.14.png"
+              alt="Small Pack for Ingredients Store"
+              className="mx-auto max-w-xl rounded-xl object-contain"
+            />
           </div>
         </Reveal>
 
-        <Reveal delay={0.2}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-            {[
-              {
-                img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=400&q=80",
-                name: "Queen Anna Cocoa",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=400&q=80",
-                name: "Matcha Premium",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-                name: "Cocoa Powder",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
-                name: "Filling Mix",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80",
-                name: "Raisin Selection",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -5 }}
-                className="bg-white rounded-2xl p-4 shadow-md hover:shadow-lg transition-shadow"
+        <div className="overflow-hidden">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: tiles.length * 3, repeat: Infinity, ease: "linear" }}
+            className="flex w-max gap-2"
+          >
+            {doubled.map((item, i) => (
+              <div
+                key={item.slug + i}
+                className="w-[180px] shrink-0 rounded-2xl p-4"
               >
-                <div className="aspect-square rounded-xl overflow-hidden mb-3">
+                <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.img}
-                    alt={item.name}
+                    alt={item.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="text-sm text-center text-[#2D4A22] font-medium">
-                  {item.name}
-                </p>
-              </motion.div>
+                {/* <p className="text-sm text-center text-[#2D4A22] font-medium truncate">
+                  {item.title}
+                </p> */}
+              </div>
             ))}
-          </div>
-        </Reveal>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -354,6 +363,7 @@ type ContactPerson = {
   whatsapp: string;
   email: string;
   avatar: string;
+  gender?: string;
 };
 
 const barryCallebautProducts: CocoaProduct[] = [
@@ -451,6 +461,7 @@ const contactPersons: ContactPerson[] = [
     email: "iswarno@naturafoods.id",
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80",
+    gender: "male",
   },
   {
     region: "Center Indonesia",
@@ -460,6 +471,7 @@ const contactPersons: ContactPerson[] = [
     email: "dili@naturafoods.id",
     avatar:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80",
+    gender: "male",
   },
   {
     region: "East Indonesia",
@@ -469,6 +481,7 @@ const contactPersons: ContactPerson[] = [
     email: "robert@naturafoods.id",
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80",
+    gender: "male",
   },
 ];
 
@@ -533,6 +546,8 @@ function ContactCard({
   contact: ContactPerson;
   index: number;
 }) {
+  const prefix = contact.gender?.toLowerCase() === "female" ? "Ms." : "Mr.";
+  const displayName = contact.name.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, "").trim();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -548,7 +563,7 @@ function ContactCard({
       />
       <div>
         <p className="font-medium text-[#2D4A22]">{contact.region}</p>
-        <p className="text-sm font-semibold text-gray-800">{contact.name}</p>
+        <p className="text-sm font-semibold text-gray-800">{prefix} {displayName}</p>
         <p className="text-xs text-gray-500 mb-2">{contact.title}</p>
         <div className="flex gap-3">
           <a
@@ -679,13 +694,39 @@ function CocoaPowderSeriesSection() {
 }
 
 function ContactInfoSection() {
+  const [contacts, setContacts] = useState<ContactPerson[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const json = await apiFetch<SalesContact[]>("/sales?limit=50");
+        if (cancelled || !json.success || !Array.isArray(json.data)) return;
+        const mapped: ContactPerson[] = (json.data as unknown as Record<string, unknown>[])
+          .map((s) => ({
+            region: String(s.location ?? s.city ?? ""),
+            name: String(s.name ?? ""),
+            title: String(s.position ?? s.role ?? ""),
+            whatsapp: String(s.whatsapp ?? s.phone ?? ""),
+            email: String(s.email ?? ""),
+            avatar: String(s.photo ?? s.image ?? s.avatar ?? ""),
+            gender: String(s.gender ?? ""),
+          }))
+          .filter((c) => c.name && (c.whatsapp || c.email));
+        if (mapped.length) setContacts(mapped);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const items = contacts.length ? contacts : contactPersons;
   return (
     <div className="mt-8">
       <h4 className="text-center text-xl font-semibold text-[#2D4A22] mb-6">
         Requirement / Contact Info
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {contactPersons.map((contact, index) => (
+        {items.map((contact, index) => (
           <ContactCard key={contact.name} contact={contact} index={index} />
         ))}
       </div>

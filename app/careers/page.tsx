@@ -37,17 +37,17 @@ export default function CareersPage() {
     <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
 
-      <section className="relative overflow-hidden">
+      <section className="relative min-h-[560px] overflow-hidden sm:min-h-[640px]">
         {/* Full-bleed background image */}
         <img
-          src="https://images.unsplash.com/photo-1521737604893-d14cc237f19d?w=1600&q=80"
+          src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2007.03.34.png"
           alt="NaturaFoods careers"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[#1a1a16]/35" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a16]/45 via-[#1a1a16]/20 to-transparent" />
 
-        <div className="relative mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
+        <div className="relative mx-auto flex min-h-[560px] max-w-[1280px] items-end px-2 pb-10 pt-8 sm:min-h-[640px] sm:px-4 sm:pb-12 sm:pt-10 md:px-6 md:pb-14 md:pt-12">
           <div className="relative max-w-[560px] overflow-hidden rounded-[20px] bg-[#2D4A22] p-6 text-white shadow-[0_18px_50px_rgba(45,74,34,0.25)] sm:p-8 md:p-10">
             <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/5" />
             <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/[0.04]" />

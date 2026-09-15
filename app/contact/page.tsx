@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MessageCircle, Mail, MapPin, User, Send } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
+import SalesContactCard from "../components/SalesContactCard";
 import { useLang } from "../i18n";
 import { API_BASE } from "../lib/api";
 
@@ -95,15 +96,15 @@ export default function ContactPage() {
             <div className="mt-6 overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
               <iframe
                 title="PT Natura Inti Sukses — Location"
-                src="https://maps.google.com/maps?q=-6.1751,106.8650&z=15&ie=UTF8&iwloc=&output=embed"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.912818890287!2d106.79945!3d-6.142412300000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f786401f6e2f%3A0xd5ce0c33345e2661!2sNATURAFOODS!5e0!3m2!1sid!2sid!4v1789430467259!5m2!1sid!2sid"
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
                 className="h-[300px] w-full border-0 sm:h-[350px]"
               />
             </div>
             <a
-              href="https://www.google.com/maps/search/?api=1&query=-6.1751,106.8650"
+              href="https://www.google.com/maps/search/?api=1&query=NATURAFOODS"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-3 inline-block text-[12px] text-[#2D4A22] underline decoration-[#2D4A22]/30 underline-offset-4 hover:text-[#1e3317] transition-colors"
@@ -242,6 +243,11 @@ export default function ContactPage() {
             </form>
           </div>
         </div>
+      </section>
+
+      {/* Sales Team */}
+      <section className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8 pb-12 sm:pb-16">
+        <SalesContactCard />
       </section>
 
       <SiteFooter />

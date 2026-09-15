@@ -133,7 +133,7 @@ type ProductType = "home-brand" | "small-pack" | "general"; // default "general"
 type Product = {
   id: string;         // uuid (backend) – frontend uses `slug` as PK currently; backend must support both. Recommended: keep `slug` unique as public ID.
   slug: string;       // unique, ^[a-z0-9-]+$, 3-64 chars. e.g. "belgian-dark-72"
-  cat: "choco" | "matcha"; // category
+  cat: "choco" | "matcha" | "other"; // category
   type: ProductType;  // NEW: "Home Brand" | "Small Pack" | "General"
   title: string;      // required, 2-120 chars
   note: string;       // short note, e.g. "Callets · Single origin Ecuador"

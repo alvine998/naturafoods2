@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Package, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Menu, X, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Menu, X, ArrowLeft, Tag, Share2, Info } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -15,6 +15,8 @@ type Props = {
 const ROUTES = [
   "/admin/dashboard",
   "/admin/products",
+  "/admin/product-categories",
+  "/admin/home-brands",
   "/admin/official-partners",
   "/admin/articles",
   "/admin/education",
@@ -24,9 +26,15 @@ const ROUTES = [
   "/admin/users",
   "/admin/assistant",
   "/admin/content",
+  "/admin/sales",
+  "/admin/social-media",
+  "/admin/about",
 ] as const;
 
-const ICONS = [LayoutDashboard, Package, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type] as const;
+const ICONS = [LayoutDashboard, Package, Tag, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Share2, Info] as const;
+
+// Sections hidden from the sidebar — pages stay reachable by direct URL
+const HIDDEN_NAV = new Set<string>(["/admin/assistant", "/admin/content"]);
 
 export default function AdminShell({ counts, labels, children }: Props) {
   const router = useRouter();
@@ -42,7 +50,7 @@ export default function AdminShell({ counts, labels, children }: Props) {
       const href = ROUTES[i + 1];
       return { label: l, href, Icon: ICONS[i + 1] ?? Package, count: counts[i] ?? 0, active: pathname === href || pathname.startsWith(href + "/") };
     }),
-  ];
+  ].filter((n) => !HIDDEN_NAV.has(n.href));
 
   const Sidebar = () => (
     <nav className="grid gap-1">

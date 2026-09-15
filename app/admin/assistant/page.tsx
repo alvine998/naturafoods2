@@ -6,7 +6,7 @@ import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import AdminShell from "../AdminShell";
-import { Card, Field, Input, TextArea } from "../_components";
+import { Card, Field, Input, TextArea, confirmAdminDelete } from "../_components";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAssistantConfig, DEFAULT_ASSISTANT, DEFAULT_TUNING, type KnowledgeEntry, type LocaleCopy, type AssistantTuning, saveAssistantConfigApi } from "../../lib/assistant";
@@ -39,7 +39,7 @@ export default function AssistantPage() {
     else setGate(true);
   }, [router]);
 
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const tuning: AssistantTuning = cfg.tuning ?? DEFAULT_TUNING;
 
   const testReply = useMemo(() => {
@@ -63,7 +63,10 @@ export default function AssistantPage() {
   };
   const updateEntry = (id: string, patch: Partial<KnowledgeEntry>) =>
     setCfg((c) => ({ ...c, knowledge: c.knowledge.map((e) => (e.id === id ? { ...e, ...patch } : e)) }));
-  const removeEntry = (id: string) => setCfg((c) => ({ ...c, knowledge: c.knowledge.filter((e) => e.id !== id) }));
+  const removeEntry = (id: string) => {
+    if (!confirmAdminDelete("this knowledge entry")) return;
+    setCfg((c) => ({ ...c, knowledge: c.knowledge.filter((e) => e.id !== id) }));
+  };
   const moveEntry = (idx: number, dir: -1 | 1) =>
     setCfg((c) => {
       const next = [...c.knowledge];

@@ -7,9 +7,29 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { Article } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE } from "../_components";
+import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
 import { apiFetch } from "../../lib/api";
 const QuillEditor = dynamic(() => import("@/components/ui/quill-editor"), { ssr: false });
+
+function slugify(input: string): string {
+  return (input ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64)
+    .replace(/-+$/g, "");
+}
+
+function ensureUniqueSlug(base: string, existing: string[], current?: string | null): string {
+  const taken = new Set(existing.filter((s) => s !== current));
+  if (!taken.has(base)) return base;
+  let i = 2;
+  while (taken.has(`${base}-${i}`)) i++;
+  return `${base}-${i}`;
+}
 
 export default function ArticlesPage() {
   const router = useRouter();
@@ -25,8 +45,9 @@ export default function ArticlesPage() {
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0];
+  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return s.articles as Article[];
@@ -35,12 +56,29 @@ export default function ArticlesPage() {
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); };
-  const openEdit = (i: number) => { setF(s.articles[i]); setEditIdx(i); setFormOpen(true); setErr(null); };
-  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); };
+  const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
+  const openEdit = (i: number) => { setF(s.articles[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
+  const handleTitleChange = (title: string) => {
+    setF((prev) => ({
+      ...prev,
+      title,
+      // auto-create slug from title until the user edits slug manually
+      ...(!slugTouched ? { slug: slugify(title) } : {}),
+    }));
+  };
+  const handleSlugChange = (raw: string) => {
+    setSlugTouched(true);
+    setF((prev) => ({ ...prev, slug: slugify(raw) }));
+  };
   const save = async () => {
-    if (!f.title || !f.slug) return;
-    const item: Article = { slug: String(f.slug), title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? "") };
+    if (!f.title) return;
+    const baseSlug = f.slug?.trim() ? slugify(String(f.slug)) : slugify(String(f.title));
+    if (!baseSlug) { setErr("Title must contain at least 3 letters/numbers to generate a slug."); return; }
+    const isEdit = editIdx !== null;
+    const originalSlug = isEdit ? s.articles[editIdx!].slug : null;
+    const slug = ensureUniqueSlug(baseSlug, (s.articles as Article[]).map((x) => x.slug), originalSlug);
+    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? "") };
     // API expects also contentID/contentEN/contentZN aliases + isPublished etc — send both shapes for compat
     const payload: Record<string, unknown> = {
       slug: item.slug,
@@ -61,8 +99,6 @@ export default function ArticlesPage() {
       isPublished: true,
     };
     setSaving(true); setErr(null);
-    const isEdit = editIdx !== null;
-    const originalSlug = isEdit ? s.articles[editIdx!].slug : null;
     try {
       if (isEdit) {
         await apiFetch(`/admin/articles/${encodeURIComponent(originalSlug!)}`, { method: "PUT", body: JSON.stringify(payload) });
@@ -86,6 +122,7 @@ export default function ArticlesPage() {
     } finally { setSaving(false); }
   };
   const remove = async (realIdx: number) => {
+    if (!confirmAdminDelete("this article")) return;
     const ar = s.articles[realIdx];
     const snap = [...s.articles];
     s.setArticles((prev: Article[]) => prev.filter((_, idx) => idx !== realIdx));
@@ -104,14 +141,14 @@ export default function ArticlesPage() {
   if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
-      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[2]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[2]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.articles.length}</span></div>
+      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[4]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[4]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{s.apiReady ? `${filtered.length}/${s.articles.length}` : "…"}</span></div>
       {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
       {formOpen ? (
         <Card className="mt-4 p-4 sm:p-6">
-          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[2]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
+          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[3]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="slug"><Input value={f.slug ?? ""} onChange={(e) => setF({ ...f, slug: e.target.value })} placeholder="tempering-guide" /></Field>
-            <Field label="title"><Input value={f.title ?? ""} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="How to temper couverture" /></Field>
+            <Field label="title"><Input value={f.title ?? ""} onChange={(e) => handleTitleChange(e.target.value)} placeholder="How to temper couverture" /></Field>
+            <Field label="slug (auto from title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
             <Field label="category"><Input value={f.category ?? ""} onChange={(e) => setF({ ...f, category: e.target.value })} placeholder="Guide" /></Field>
             <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
             <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="articles" /></Field></div>
@@ -128,11 +165,25 @@ export default function ArticlesPage() {
               {localeTab === "zh" && <QuillEditor value={f.contentZh ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentZh: v }))} placeholder="撰写内容（中文）…" />}
             </div>
           </div>
-          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || !f.slug || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
+          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
+          {!f.title && <p className="mt-2 text-[11px] text-[#8B6F47]">Title required — slug is generated automatically.</p>}
         </Card>
+      ) : !s.apiReady ? (
+        <div className="mt-4 grid gap-3">
+          <div className="h-10 w-full animate-pulse rounded-full bg-[#2D4A22]/[0.06]" />
+          <div className="overflow-hidden rounded-2xl border border-[#2D4A22]/10 bg-white">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 border-b border-[#2D4A22]/10 px-3 py-3 last:border-0">
+                <span className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-[#2D4A22]/[0.06]" />
+                <span className="h-3 flex-1 animate-pulse rounded-full bg-[#2D4A22]/[0.06]" />
+                <span className="hidden h-3 w-28 animate-pulse rounded-full bg-[#2D4A22]/[0.06] sm:block" />
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="mt-4 grid gap-3">
-          <Toolbar q={q} setQ={setQ} total={s.articles.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[2]}`} />
+          <Toolbar q={q} setQ={setQ} total={s.articles.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[4]}`} />
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[720px] text-[12px]">
@@ -140,10 +191,11 @@ export default function ArticlesPage() {
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((ar: Article) => {
                     const realIdx = (s.articles as Article[]).indexOf(ar);
-                    const isVideo = ar.img?.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(ar.img ?? "");
+                    const img = ar.img?.trim() ? ar.img : null;
+                    const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
                     return (
                       <tr key={ar.slug + realIdx} className="hover:bg-white/60">
-                        <td className="px-3 py-2">{isVideo ? <video src={ar.img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={ar.img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />}</td>
+                        <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1">{ar.title}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.slug}</td>
                         <td className="px-3 py-2">{ar.category}</td>

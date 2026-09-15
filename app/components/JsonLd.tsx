@@ -24,7 +24,7 @@ export function BreadcrumbJsonLd({ items }: { items: { name: string; url: string
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
 }
 
-export function ArticleJsonLd(props: { title: string; description: string; datePublished: string; image: string; url: string; category?: string }) {
+export function ArticleJsonLd(props: { title: string; description: string; datePublished: string; image?: string; url: string; category?: string }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -35,7 +35,7 @@ export function ArticleJsonLd(props: { title: string; description: string; dateP
     author: { "@type": "Organization", name: SITE_NAME },
     publisher: { "@type": "Organization", name: SITE_NAME, logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` } },
     mainEntityOfPage: props.url,
-    image: props.image,
+    ...(props.image ? { image: props.image } : {}),
     articleSection: props.category,
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
