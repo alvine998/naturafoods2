@@ -1,6 +1,6 @@
 # Frontend Migration Guide — NaturaFoods CMS (API Contract v1.0.0)
 
-Base URL: `http://localhost:4000/api/v1` (staging: `https://staging-api-naturafoods.alvineitsolutions.com/api/v1`, prod: `https://api.naturaintisukses.com/api/v1`)
+Base URL: `http://localhost:4000/api/v1` (staging: `https://staging-api-naturafoods.alvineitsolutions.com/api/v1`, prod: `https://api-naturafoods.alvineitsolutions.com/api/v1`)
 
 This doc explains how to migrate frontend from `localStorage-only` (`nf_products`, `nf_articles`, etc.) to the new API contract defined in `backend.md`.
 

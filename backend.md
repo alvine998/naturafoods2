@@ -1,6 +1,6 @@
 # Backend API Contract — NaturaFoods CMS
 
-> Version: `1.0.0` • Base URL: `https://api.naturaintisukses.com/api/v1` (staging: `https://staging-api-naturafoods.alvineitsolutions.com/api/v1`)  
+> Version: `1.0.0` • Base URL: `https://api-naturafoods.alvineitsolutions.com/api/v1` (staging: `https://staging-api-naturafoods.alvineitsolutions.com/api/v1`)  
 > Current frontend state: **localStorage-only** (`nf_products`, `nf_articles`, `nf_edu`, `nf_innovation`, `nf_jobs`, `nf_official_partners`, `nf_inquiries`, `nf_admin_users`, `nf_content`, `nf_assistant_config`). All admin pages expect to be migrated to this API without UI changes.  
 > Auth: **Bearer JWT** (Admin only). No public auth.
 
@@ -489,7 +489,7 @@ Proposed `openapi.yaml` top-level paths:
 ```yaml
 openapi: 3.1.0
 servers:
-  - url: https://api.naturafoods.co.id/api/v1
+  - url: https://api-naturafoods.alvineitsolutions.com/api/v1
 paths:
   /auth/login: {post: {...}}
   /auth/refresh: {post: {...}}
@@ -650,12 +650,12 @@ model User {
 
 ```bash
 # login
-curl -X POST https://api.naturafoods.co.id/api/v1/auth/login \
+curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 
 # create product (highlighted home-brand)
-curl -X POST https://api.naturafoods.co.id/api/v1/admin/products \
+curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/admin/products \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
   -d '{
     "slug":"belgian-dark-72",
@@ -670,15 +670,15 @@ curl -X POST https://api.naturafoods.co.id/api/v1/admin/products \
   }'
 
 # get highlighted for home
-curl https://api.naturafoods.co.id/api/v1/products?isHighlight=true
+curl https://api-naturafoods.alvineitsolutions.com/api/v1/products?isHighlight=true
 
 # toggle partner publish
-curl -X PATCH https://api.naturafoods.co.id/api/v1/admin/official-partners/bensdorp/publish \
+curl -X PATCH https://api-naturafoods.alvineitsolutions.com/api/v1/admin/official-partners/bensdorp/publish \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
   -d '{"isPublished": false}'
 
 # upload
-curl -X POST https://api.naturafoods.co.id/api/v1/admin/uploads \
+curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/admin/uploads \
   -H "Authorization: Bearer <token>" -F "file=@./bensdorp.png" -F "folder=partners"
 ```
 

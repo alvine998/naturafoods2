@@ -5,8 +5,8 @@ RUN npm ci
 
 FROM node:20-alpine AS builder
 WORKDIR /app
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_API_URL=https://api-naturafoods.alvineitsolutions.com/api/v1
+ARG NEXT_PUBLIC_SITE_URL=https://naturafoods.alvineitsolutions.com
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 COPY --from=deps /app/node_modules ./node_modules
