@@ -1,5 +1,6 @@
 services:
   web:
+    image: ghcr.io/alvine998/naturafoods2:latest
     build: .
     ports:
       - "3016:3016"

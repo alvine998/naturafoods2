@@ -37,53 +37,49 @@ export default function CareersPage() {
     <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
 
-      <section className="relative min-h-[560px] overflow-hidden sm:min-h-[640px]">
+      <a
+        href={GLINTS_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={copy.cta}
+        className="group relative block min-h-[100svh] overflow-hidden"
+      >
         {/* Full-bleed background image */}
         <img
           src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2007.03.34.png"
           alt="NaturaFoods careers"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
         />
         <div className="absolute inset-0 bg-[#1a1a16]/35" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a16]/45 via-[#1a1a16]/20 to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[560px] max-w-[1280px] items-end px-2 pb-10 pt-8 sm:min-h-[640px] sm:px-4 sm:pb-12 sm:pt-10 md:px-6 md:pb-14 md:pt-12">
-          <div className="relative max-w-[560px] overflow-hidden rounded-[20px] bg-[#2D4A22] p-6 text-white shadow-[0_18px_50px_rgba(45,74,34,0.25)] sm:p-8 md:p-10">
-            <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/5" />
-            <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/[0.04]" />
+        <div className="relative mx-auto flex min-h-[100svh] max-w-[1280px] items-end px-4 pb-12 pt-24 text-white sm:px-6 sm:pb-16 md:px-8 md:pb-20">
+          <div className="max-w-[560px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]">
+            <p className="text-[10px] font-semibold tracking-[0.28em] text-white/85 sm:text-[11px]">
+              {copy.eyebrow}
+            </p>
+            <span className="mt-3 block h-[2px] w-10 bg-[#E0B25A]" />
 
-            <div className="relative flex h-full flex-col">
-              <p className="text-[10px] font-semibold tracking-[0.28em] text-white/85 sm:text-[11px]">
-                {copy.eyebrow}
-              </p>
-              <span className="mt-3 block h-[2px] w-10 bg-[#E0B25A]" />
+            <h1 className="mt-6 font-[var(--font-display)] text-[30px] font-light leading-[1.05] text-white sm:text-[40px] md:text-[44px]">
+              {copy.titleA}
+              <br />
+              <span className="font-semibold text-[#F2A65A]">{copy.titleB}</span>
+            </h1>
 
-              <h1 className="mt-6 font-[var(--font-display)] text-[30px] font-light leading-[1.05] text-white sm:text-[40px] md:text-[44px]">
-                {copy.titleA}
-                <br />
-                <span className="font-semibold text-[#F2A65A]">{copy.titleB}</span>
-              </h1>
+            <p className="mt-5 max-w-[44ch] text-[13px] leading-6 text-white/85 sm:text-[14px] sm:leading-7">
+              {copy.desc}
+            </p>
 
-              <p className="mt-5 max-w-[44ch] text-[13px] leading-6 text-white/85 sm:text-[14px] sm:leading-7">
-                {copy.desc}
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a
-                  href={GLINTS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[12px] font-semibold tracking-[0.12em] text-[#2D4A22] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:bg-white/90"
-                >
-                  {copy.cta}
-                  <ArrowUpRight className="h-4 w-4" />
-                </a>
-                <span className="text-[11px] tracking-[0.16em] text-white/65">{copy.via}</span>
-              </div>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[12px] font-semibold tracking-[0.12em] text-[#2D4A22] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition group-hover:bg-white/90">
+                {copy.cta}
+                <ArrowUpRight className="h-4 w-4" />
+              </span>
+              <span className="text-[11px] tracking-[0.16em] text-white/65">{copy.via}</span>
             </div>
           </div>
         </div>
-      </section>
+      </a>
 
       <section className="bg-white">
         <div className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-6 sm:pb-20 md:px-8 md:pb-24">
