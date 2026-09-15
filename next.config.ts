@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost" },
     ],
   },
+  allowedDevOrigins: ["e87c-118-99-107-253.ngrok-free.app",'192.168.83.154'],
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:4000/api/:path*",
+      },
+    ];
+  },
   async headers() {
     return [
       {
