@@ -133,7 +133,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
     >
       <Link
         href={card.link}
-        className="flex h-full min-h-[320px] flex-col p-6 pb-4"
+        className="flex h-full min-h-[320px] flex-col p-5 pb-4 sm:p-6 sm:pb-4"
       >
         {/* header: title + arrow */}
         <div className="flex items-start justify-between gap-4">
@@ -149,12 +149,12 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
         </div>
 
         {/* body: description left, single product visual right (from background) */}
-        <div className="mt-4 flex flex-1 items-center gap-4">
-          <p className="flex-1 text-white/95 text-[15px] leading-relaxed">
+        <div className="mt-4 flex flex-1 flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+          <p className="min-w-0 flex-1 text-white/95 text-[15px] leading-relaxed">
             {card.description}
           </p>
           {rightVisual !== "" && (
-            <div className="w-[42%] shrink-0">
+            <div className="w-full shrink-0 sm:w-[42%]">
               <div className="relative aspect-square w-full">
                 <img
                   src={rightVisual}
@@ -554,18 +554,18 @@ function ContactCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="flex items-center gap-4 bg-white rounded-xl p-4 shadow-md"
+      className="flex flex-col items-start gap-4 rounded-xl bg-white p-4 shadow-md min-[420px]:flex-row min-[420px]:items-center"
     >
       <img
         src={contact.avatar}
         alt={contact.name}
         className="w-16 h-16 rounded-full object-cover"
       />
-      <div>
+      <div className="min-w-0 flex-1">
         <p className="font-medium text-[#2D4A22]">{contact.region}</p>
         <p className="text-sm font-semibold text-gray-800">{prefix} {displayName}</p>
         <p className="text-xs text-gray-500 mb-2">{contact.title}</p>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-x-3 gap-y-2">
           <a
             href={`https://wa.me/${contact.whatsapp.replace("+", "")}`}
             className="flex items-center gap-1 text-xs text-green-600 hover:underline"
@@ -605,13 +605,13 @@ function CocoaPowderSeriesSection() {
     <section className="py-16 bg-white">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
-          <div className="flex items-center justify-between mb-12">
+          <div className="mb-10 flex flex-col items-center gap-4 text-center sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:text-left">
             <img
               src="/logo.png"
               alt="NaturaFoods"
-              className="h-12 object-contain"
+              className="h-10 object-contain sm:h-12"
             />
-            <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22]">
+            <h2 className="font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
               Cocoa Powder Series
             </h2>
           </div>
@@ -653,14 +653,14 @@ function CocoaPowderSeriesSection() {
         <Reveal delay={0.2}>
           <div className="border-t border-gray-200 pt-12">
             <div className="mb-8">
-              <div className="flex items-center justify-between gap-6 sm:gap-8 mb-6">
+              <div className="mb-6 flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:text-left">
                 <img
                   src="/logo.png"
                   alt="NaturaFoods"
-                  className="h-10 sm:h-12 object-contain"
+                  className="h-9 object-contain sm:h-12"
                 />
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-[#2D4A22]">
+                <div className="text-center sm:text-right">
+                  <h3 className="text-lg font-semibold leading-tight text-[#2D4A22] sm:text-xl">
                     Super Premium Cocoa Powder
                   </h3>
                   <p className="text-sm text-gray-600">(African Beans 100%)</p>
