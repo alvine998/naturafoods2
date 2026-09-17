@@ -6,11 +6,19 @@ import { useLang } from "../i18n";
 import { isAuthed } from "../lib/auth";
 import HeroSliderEditModal from "./HeroSliderEditModal";
 
-const FALLBACK_VIDEO_SRC = "https://cdn.alvineitsolutions.com/naturafoods/Video%20Home%20Website%20(1).mp4";
-const FALLBACK_VIDEO_POSTER = "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80";
+const FALLBACK_VIDEO_SRC =
+  "https://cdn.alvineitsolutions.com/naturafoods/Video%20Home%20Website%20(1).mp4";
+const FALLBACK_VIDEO_POSTER =
+  "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80";
 const CTA_ID = "contact";
 
-export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: string) => void; welcome?: { title: string; sub: string } }) {
+export default function HeroSlider({
+  onCta,
+  welcome: _welcome,
+}: {
+  onCta?: (id: string) => void;
+  welcome?: { title: string; sub: string };
+}) {
   void _welcome;
   const { t } = useLang();
   const videoSrc = t.heroVideoSrc || FALLBACK_VIDEO_SRC;
@@ -62,14 +70,12 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
 
   const handleCta = () => {
     if (onCta) onCta(CTA_ID);
-    else document.getElementById(CTA_ID)?.scrollIntoView({ behavior: "smooth" });
+    else
+      document.getElementById(CTA_ID)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section
-      aria-label="Highlights"
-      className="w-full"
-    >
+    <section aria-label="Highlights" className="w-full">
       <div className="relative overflow-hidden bg-[#1a1a16]">
         {/* Mobile: fill dynamic viewport minus sticky nav (64px), clamp to avoid too tall/small.
             svh = stable viewport, dvh = dynamic viewport for iOS/Android chrome handling.
@@ -118,13 +124,17 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
           )} */}
 
           {/* content overlay — bottom-aligned on mobile for thumb reach + readability, centered on sm+ */}
-          <div className="absolute inset-0 flex items-end sm:items-center">
+          {/* <div className="absolute inset-0 flex items-end sm:items-center">
             <div className="w-full mx-auto max-w-[1280px] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-12 sm:px-10 sm:pb-0 sm:pt-0 md:px-16 lg:px-20">
               <div className="max-w-[560px] sm:max-w-[600px]">
                 <motion.p
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.7,
+                    delay: 0.4,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   className="inline-flex rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[10px] tracking-[0.18em] text-white backdrop-blur"
                 >
                   {t.bannerEyebrow}
@@ -132,7 +142,11 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
                 <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.7,
+                    delay: 0.55,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   className="mt-3 whitespace-pre-line font-[var(--font-display)] text-[30px] font-light leading-[0.94] tracking-[-0.02em] text-white [text-wrap:balance] min-[375px]:text-[32px] sm:mt-4 sm:text-[36px] md:text-[44px] lg:text-[52px]"
                 >
                   {title}
@@ -140,7 +154,11 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.7,
+                    delay: 0.7,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   className="mt-3 max-w-[42ch] text-[14px] leading-6 text-white/85 [text-wrap:pretty] sm:mt-3 sm:text-[15px] sm:leading-7"
                 >
                   {t.bannerDesc}
@@ -148,15 +166,20 @@ export default function HeroSlider({ onCta, welcome: _welcome }: { onCta?: (id: 
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.7,
+                    delay: 0.85,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   onClick={handleCta}
                   className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[11px] font-medium tracking-[0.14em] text-[#2D4A22] shadow-lg transition hover:bg-white active:scale-[0.98] sm:mt-6 sm:w-auto sm:justify-start sm:px-7 sm:py-3 sm:shadow-none"
                 >
-                  {t.heroBannerCta} <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+                  {t.heroBannerCta}{" "}
+                  <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                 </motion.button>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {authed && (
             <button

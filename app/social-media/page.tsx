@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SocialMedia } from "../lib/data";
 import { fetchPublicSocialMedia, getSeedSocialMedia } from "../lib/store";
+import SiteNav from "../components/SiteNav";
 
 function Reveal({
   children,
@@ -47,6 +48,7 @@ export default function SocialMediaPage() {
   }, []);
   return (
     <main className="min-h-screen">
+      <SiteNav />
       {/* Hero Section with Background */}
       <section className="relative py-4 md:py-4 overflow-hidden">
         <div
@@ -91,8 +93,8 @@ export default function SocialMediaPage() {
 
           <Reveal delay={0.15}>
             <h1 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6">
-              <span className="text-white">Our </span>
-              <span className="text-[#4A6741] italic">Social Media</span>
+              <span className="text-white" style={{ WebkitTextStroke: '2px white', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>Our </span>
+              <span className="text-[#4A6741] italic" style={{ WebkitTextStroke: '2px #4A6741', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>Social Media</span>
             </h1>
           </Reveal>
 

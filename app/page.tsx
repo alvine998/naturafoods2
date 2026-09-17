@@ -147,7 +147,7 @@ export default function Home() {
           </div>
         </section> */}
 
-        <HighlightedProductsSection />
+        {/* <HighlightedProductsSection /> */}
         <OfficialPartnersSection />
         <LatestStoriesSection />
 

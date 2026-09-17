@@ -2,44 +2,10 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useLang } from "../i18n";
 import { useStore } from "../lib/store";
-import { SEED_ARTICLES } from "../lib/data";
 import type { Article } from "../lib/data";
-import { apiFetch } from "../lib/api";
-
-type RawArticle = Record<string, unknown> & Partial<Article>;
-
-function isPublishedArticle(a: RawArticle): boolean {
-  const v = a as Record<string, unknown>;
-  if (v.isPublished === false) return false;
-  const status = v.status;
-  if (typeof status === "string") {
-    const s = status.toLowerCase();
-    if (s === "draft" || s === "unpublished" || s === "archived" || s === "private") return false;
-    if (s === "published") return true;
-  }
-  return true;
-}
-
-function normalizeArticle(a: RawArticle): Article | null {
-  const slug = String(a.slug ?? a.id ?? "");
-  const title = String(a.title ?? "");
-  if (!slug || !title) return null;
-  return {
-    slug,
-    title,
-    excerpt: String(a.excerpt ?? ""),
-    content: String(a.content ?? a.contentEn ?? a.contentEN ?? ""),
-    contentId: String(a.contentId ?? (a as Record<string, unknown>).contentID ?? a.content ?? ""),
-    contentEn: String(a.contentEn ?? (a as Record<string, unknown>).contentEN ?? a.content ?? ""),
-    contentZh: String(a.contentZh ?? (a as Record<string, unknown>).contentZN ?? a.content ?? ""),
-    date: String(a.date ?? (a as Record<string, unknown>).published_date ?? (a as Record<string, unknown>).createdAt ?? ""),
-    category: String(a.category ?? "General"),
-    img: String(a.img ?? (a as Record<string, unknown>).thumbnail ?? ""),
-  };
-}
+import EduInnoSliderBanner from "./EduInnoSliderBanner";
 
 function sortByDateDesc(list: Article[]): Article[] {
   return [...list].sort((x, y) => {
@@ -67,48 +33,21 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 export default function LatestStoriesSection() {
   const { t } = useLang();
   const { articles } = useStore();
-  const [apiList, setApiList] = useState<Article[] | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      // Prefer a small, server-sorted query; fall back to a larger fetch.
-      const attempts = ["/articles?limit=3&sort=date:desc", "/articles?limit=50&sort=date:desc"];
-      for (const path of attempts) {
-        try {
-          const json = await apiFetch<unknown>(path);
-          if (!cancelled && json.success && Array.isArray(json.data)) {
-            const norm = (json.data as RawArticle[])
-              .filter(isPublishedArticle)
-              .map(normalizeArticle)
-              .filter((a): a is Article => a !== null);
-            if (norm.length) {
-              setApiList(sortByDateDesc(norm).slice(0, 3));
-              return;
-            }
-          }
-        } catch {
-          // try next attempt / fallback to store below
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const fallbackBase: Article[] = articles?.length ? articles : SEED_ARTICLES;
-  const fallback = sortByDateDesc(
-    (fallbackBase as unknown as RawArticle[]).filter(isPublishedArticle).map(normalizeArticle).filter((a): a is Article => a !== null),
+  const list: Article[] = sortByDateDesc(
+    (articles ?? []).filter((a): a is Article => a !== null && Boolean(a.slug) && Boolean(a.title))
   ).slice(0, 3);
 
-  const list: Article[] = (apiList && apiList.length ? apiList : fallback).slice(0, 3);
-  if (list.length === 0) return null;
+  if (!list.length) return null;
 
   return (
     <section id="latest-stories" className="bg-white py-12 sm:py-16 md:py-20">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <Reveal>
+          <EduInnoSliderBanner />
+        </Reveal>
+
+        <div className="mt-10 sm:mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <Reveal>
             <p className="text-[10px] tracking-[0.2em] text-[#8B6F47] sm:text-[11px] sm:tracking-[0.24em]">
               {t.articlesPage.eyebrow}

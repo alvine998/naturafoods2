@@ -2,11 +2,9 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useStore } from "../lib/store";
 import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
-import { apiFetch } from "../lib/api";
-import type { OfficialPartner, SalesContact } from "../lib/data";
+import type { OfficialPartner } from "../lib/data";
 
 type PartnerCard = {
   title: string;
@@ -200,33 +198,17 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
 type BrandTile = { slug: string; title: string; img: string; desc?: string };
 
 function RetailBrandSection() {
-  const [apiTiles, setApiTiles] = useState<BrandTile[] | null>(null);
+  const { homeBrands } = useStore();
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const json = await apiFetch<unknown[]>(
-          "/home-brands?limit=6",
-        );
-        if (cancelled || !json.success || !Array.isArray(json.data)) return;
-        const norm = (json.data as unknown as Record<string, unknown>[])
-          .map((h) => ({
-            slug: String(h.id ?? h.slug ?? ""),
-            title: String(h.name ?? h.title ?? ""),
-            img: String(h.image ?? h.img ?? ""),
-            desc: String(h.desc ?? h.description ?? ""),
-          }))
-          .filter((h) => h.slug && h.img?.trim());
-        if (norm.length) setApiTiles(norm);
-      } catch {}
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const tiles = (apiTiles ?? []).slice(0, 6);
+  const tiles: BrandTile[] = (homeBrands ?? [])
+    .slice(0, 6)
+    .map((h) => ({
+      slug: h.id,
+      title: h.name,
+      img: h.image,
+      desc: h.desc,
+    }))
+    .filter((h) => h.slug && h.img?.trim());
   if (!tiles.length) return null;
 
   return (
@@ -275,27 +257,16 @@ function RetailBrandSection() {
 type SmallPackTile = { slug: string; title: string; img: string };
 
 function SmallPackSection() {
-  const [tiles, setTiles] = useState<SmallPackTile[]>([]);
+  const { products } = useStore();
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const json = await apiFetch<unknown[]>("/products?type=small-pack&limit=50");
-        if (cancelled || !json.success || !Array.isArray(json.data)) return;
-        const norm = (json.data as unknown as Record<string, unknown>[])
-          .map((p) => ({
-            slug: String(p.slug ?? p.id ?? ""),
-            title: String(p.title ?? ""),
-            img: String(p.img ?? p.image ?? ""),
-          }))
-          .filter((p) => p.slug && p.img?.trim());
-        if (norm.length) setTiles(norm);
-      } catch {}
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
+  const tiles: SmallPackTile[] = (products ?? [])
+    .filter((p) => p.type === "small-pack")
+    .map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      img: p.img,
+    }))
+    .filter((p) => p.slug && p.img?.trim());
   if (!tiles.length) return null;
 
   const doubled = [...tiles, ...tiles];
@@ -354,6 +325,7 @@ type CocoaProduct = {
   brandLogo: string;
   description: string;
   image: string;
+  slug: string;
 };
 
 type ContactPerson = {
@@ -366,91 +338,9 @@ type ContactPerson = {
   gender?: string;
 };
 
-const barryCallebautProducts: CocoaProduct[] = [
-  {
-    code: "20/22 DP",
-    brand: "Barry Callebaut",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png",
-    description:
-      "Lightly dutched medium brown cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "22/24 MR",
-    brand: "Barry Callebaut",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png",
-    description:
-      "Medium Dutched high fat cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "20/22 DP",
-    brand: "Barry Callebaut",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png",
-    description:
-      "Lightly dutched medium brown cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "22/24 MR",
-    brand: "Barry Callebaut",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png",
-    description:
-      "Medium Dutched high fat cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-];
+const barryCallebautProducts: CocoaProduct[] = [];
 
-const bensdorpProducts: CocoaProduct[] = [
-  {
-    code: "20/22 DP",
-    brand: "Bensdorp",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
-    description:
-      "Lightly dutched medium brown cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "22/24 MR",
-    brand: "Bensdorp",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
-    description:
-      "Medium Dutched high fat cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "20/22 DP",
-    brand: "Bensdorp",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
-    description:
-      "Lightly dutched medium brown cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-  {
-    code: "22/24 MR",
-    brand: "Bensdorp",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
-    description:
-      "Medium Dutched high fat cocoa powder made from high quality West African cocoa beans.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=80",
-  },
-];
+const bensdorpProducts: CocoaProduct[] = [];
 
 const contactPersons: ContactPerson[] = [
   {
@@ -510,11 +400,13 @@ function CocoaProductCard({
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="font-semibold text-[#2D4A22]">{product.code}</span>
-          <img
-            src={product.brandLogo}
-            alt={product.brand}
-            className="h-6 object-contain"
-          />
+          {product.brandLogo ? (
+            <img
+              src={product.brandLogo}
+              alt={product.brand}
+              className="h-6 object-contain"
+            />
+          ) : null}
         </div>
         <p className="text-xs text-gray-600 leading-relaxed mb-3">
           {product.description}
@@ -601,6 +493,23 @@ function ContactCard({
 }
 
 function CocoaPowderSeriesSection() {
+  const { products, productCategories } = useStore();
+
+  const highlightedCategories = (productCategories ?? []).filter(
+    (c) => c.isHighlight && c.isActive
+  );
+
+  if (highlightedCategories.length === 0) return null;
+
+  const sections = highlightedCategories
+    .map((cat) => ({
+      category: cat,
+      products: (products ?? []).filter((p) => p.cat === cat.slug).slice(0, 4),
+    }))
+    .filter((s) => s.products.length > 0);
+
+  if (sections.length === 0) return null;
+
   return (
     <section className="py-16 bg-white">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
@@ -617,116 +526,67 @@ function CocoaPowderSeriesSection() {
           </div>
         </Reveal>
 
-        {/* Barry Callebaut Section */}
-        <Reveal delay={0.1}>
-          <div className="mb-12">
-            <div className="mb-8">
-              <div className="flex items-center justify-center gap-6 sm:gap-8 mb-4">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Barry_Callebaut_logo.svg/1200px-Barry_Callebaut_logo.svg.png"
-                  alt="Barry Callebaut"
-                  className="h-12 sm:h-16 object-contain"
-                />
-              </div>
-              <div className="text-center">
-                <h3 className="text-xl font-semibold text-[#2D4A22]">
-                  Premium Cocoa Powder
-                </h3>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {barryCallebautProducts.map((product, index) => (
-                <CocoaProductCard
-                  key={`${product.code}-${index}`}
-                  product={product}
-                  index={index}
-                />
-              ))}
-            </div>
-            <div className="mt-6">
-              <ContactInfoSection />
-            </div>
-          </div>
-        </Reveal>
-
-        {/* Bensdorp Section */}
-        <Reveal delay={0.2}>
-          <div className="border-t border-gray-200 pt-12">
-            <div className="mb-8">
-              <div className="mb-6 flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:text-left">
-                <img
-                  src="/logo.png"
-                  alt="NaturaFoods"
-                  className="h-9 object-contain sm:h-12"
-                />
-                <div className="text-center sm:text-right">
-                  <h3 className="text-lg font-semibold leading-tight text-[#2D4A22] sm:text-xl">
-                    Super Premium Cocoa Powder
+        {sections.map((section, sIdx) => (
+          <Reveal key={section.category.id} delay={sIdx * 0.1}>
+            <div className={sIdx > 0 ? "border-t border-gray-200 pt-12" : ""}>
+              <div className="mb-8">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-[#2D4A22]">
+                    {section.category.description || section.category.name}
                   </h3>
-                  <p className="text-sm text-gray-600">(African Beans 100%)</p>
                 </div>
               </div>
-              <div className="flex items-center justify-center gap-6 sm:gap-8">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png"
-                  alt="Bensdorp"
-                  className="h-12 sm:h-16 object-contain"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {section.products.map((product, index) => (
+                  <CocoaProductCard
+                    key={`${product.slug}-${index}`}
+                    product={{
+                      code: product.title,
+                      brand: section.category.name,
+                      brandLogo: "",
+                      description: product.desc,
+                      image: product.img,
+                      slug: product.slug,
+                    }}
+                    index={index}
+                  />
+                ))}
+              </div>
+              <div className="mt-6">
+                <ContactInfoSection />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {bensdorpProducts.map((product, index) => (
-                <CocoaProductCard
-                  key={`${product.code}-${index}`}
-                  product={product}
-                  index={index}
-                />
-              ))}
-            </div>
-            <div className="mt-6">
-              <ContactInfoSection />
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        ))}
       </div>
     </section>
   );
 }
 
 function ContactInfoSection() {
-  const [contacts, setContacts] = useState<ContactPerson[]>([]);
+  const { salesContacts } = useStore();
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const json = await apiFetch<SalesContact[]>("/sales?limit=50");
-        if (cancelled || !json.success || !Array.isArray(json.data)) return;
-        const mapped: ContactPerson[] = (json.data as unknown as Record<string, unknown>[])
-          .map((s) => ({
-            region: String(s.location ?? s.city ?? ""),
-            name: String(s.name ?? ""),
-            title: String(s.position ?? s.role ?? ""),
-            whatsapp: String(s.whatsapp ?? s.phone ?? ""),
-            email: String(s.email ?? ""),
-            avatar: String(s.photo ?? s.image ?? s.avatar ?? ""),
-            gender: String(s.gender ?? ""),
-          }))
-          .filter((c) => c.name && (c.whatsapp || c.email));
-        if (mapped.length) setContacts(mapped);
-      } catch {}
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  const contacts: ContactPerson[] = (salesContacts ?? [])
+    .filter((c) => c.published !== false)
+    .map((s) => ({
+      region: String(s.location ?? ""),
+      name: String(s.name ?? ""),
+      title: String(s.position ?? ""),
+      whatsapp: String(s.whatsapp ?? ""),
+      email: String(s.email ?? ""),
+      avatar: String(s.photo ?? ""),
+      gender: String(s.gender ?? ""),
+    }))
+    .filter((c) => c.name && (c.whatsapp || c.email));
 
-  const items = contacts.length ? contacts : contactPersons;
+  if (!contacts.length) return null;
   return (
     <div className="mt-8">
       <h4 className="text-center text-xl font-semibold text-[#2D4A22] mb-6">
         Requirement / Contact Info
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {items.map((contact, index) => (
+        {contacts.map((contact, index) => (
           <ContactCard key={contact.name} contact={contact} index={index} />
         ))}
       </div>
@@ -758,71 +618,7 @@ function Reveal({
 
 export default function OfficialPartnersSection() {
   const { officialPartners } = useStore();
-  const [apiPartners, setApiPartners] = useState<OfficialPartner[] | null>(
-    null,
-  );
-  useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        const json = await apiFetch<OfficialPartner[]>(
-          "/official-partners?isPublished=true&q=&page=1&limit=50",
-        );
-        if (
-          !cancel &&
-          json.success &&
-          Array.isArray(json.data) &&
-          json.data.length
-        ) {
-          const norm = (json.data as unknown as Record<string, unknown>[]).map(
-            (p) => {
-              // background = single right visual, images[] = bottom logos
-              const rawImages =
-                p.images ?? (p as Record<string, unknown>).logos ?? p.gallery;
-              let images: string[] | undefined;
-              if (Array.isArray(rawImages))
-                images = (rawImages as unknown[])
-                  .map((v) => String(v ?? ""))
-                  .filter(Boolean);
-              else if (typeof rawImages === "string" && rawImages)
-                images = [rawImages];
-              const image = String(
-                (p.image as unknown) ??
-                  (Array.isArray(p.image) ? (p.image as unknown[])[0] : "") ??
-                  images?.[0] ??
-                  "",
-              );
-              return {
-                id: String(p.id ?? ""),
-                name: String(p.name ?? ""),
-                description: String(p.description ?? (p.desc as string) ?? ""),
-                image,
-                background: String(
-                  p.background ?? (p.mainImage as string) ?? "",
-                ),
-                ...(images && images.length ? { images } : {}),
-                ...(typeof p.color === "string" &&
-                /^#[0-9a-fA-F]{6}$/.test(p.color.trim())
-                  ? { color: p.color.trim() }
-                  : {}),
-                order:
-                  typeof p.order === "number" && Number.isFinite(p.order)
-                    ? p.order
-                    : 0,
-                isPublished: (p.isPublished ?? true) ? true : false,
-              };
-            },
-          ) as OfficialPartner[];
-          setApiPartners(norm.filter((p) => p.isPublished !== false));
-        }
-      } catch {}
-    })();
-    return () => {
-      cancel = true;
-    };
-  }, []);
-  const sourcePartners =
-    apiPartners ?? officialPartners ?? SEED_OFFICIAL_PARTNERS;
+  const sourcePartners = officialPartners ?? SEED_OFFICIAL_PARTNERS;
   const publishedPartners = sourcePartners
     .filter((p) => p.isPublished !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
