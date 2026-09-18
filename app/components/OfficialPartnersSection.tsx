@@ -350,6 +350,7 @@ type CocoaProduct = {
   description: string;
   image: string;
   slug: string;
+  file?: string;
 };
 
 type ContactPerson = {
@@ -437,17 +438,10 @@ function CocoaProductCard({
         </p>
         <div className="flex gap-2">
           <a
-            href="#"
+            href={product.file || "#"}
             className="text-xs text-[#2D4A22] underline hover:no-underline"
           >
             Download Product
-          </a>
-          <span className="text-xs text-gray-400">|</span>
-          <a
-            href="#"
-            className="text-xs text-[#2D4A22] underline hover:no-underline"
-          >
-            Spec & Halal
           </a>
         </div>
       </div>
@@ -572,6 +566,7 @@ function CocoaPowderSeriesSection() {
                         description: product.desc,
                         image: product.img,
                         slug: product.slug,
+                        file: product.file ?? undefined,
                       }}
                       index={index}
                     />
