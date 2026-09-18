@@ -311,7 +311,11 @@ function initStore() {
     // Load local first for instant paint
     patchStore({
       products: migrateProducts(load(KEYS.products, SEED_PRODUCTS)),
-      articles: SEED_ARTICLES as Article[],
+      // Load cached articles like every other entity (getSeedArticles migrates
+      // legacy single-content rows and falls back to SEED_ARTICLES). Previously
+      // hardcoded to the empty seed, so LatestStoriesSection always nulled on
+      // first paint until the API round-trip finished.
+      articles: getSeedArticles(),
       edu: load(KEYS.edu, SEED_EDU) as Edu[],
       innovation: load(KEYS.innovation, SEED_INNOVATION) as Innovation[],
       jobs: load(KEYS.jobs, SEED_JOBS) as Job[],

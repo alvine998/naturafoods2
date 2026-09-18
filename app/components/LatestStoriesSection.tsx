@@ -32,13 +32,17 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 
 export default function LatestStoriesSection() {
   const { t } = useLang();
-  const { articles } = useStore();
+  const { articles, edu, innovation, ready } = useStore();
 
   const list: Article[] = sortByDateDesc(
     (articles ?? []).filter((a): a is Article => a !== null && Boolean(a.slug) && Boolean(a.title))
   ).slice(0, 3);
 
-  if (!list.length) return null;
+  // NOTE: the education/innovation banner lives in this section, so it must
+  // not be gated on articles. Only skip the whole section once loading is
+  // done AND every source is confirmed empty.
+  const hasEduInno = (edu ?? []).length > 0 || (innovation ?? []).length > 0;
+  if (ready && !hasEduInno && list.length === 0) return null;
 
   return (
     <section id="latest-stories" className="bg-white py-12 sm:py-16 md:py-20">
@@ -47,6 +51,8 @@ export default function LatestStoriesSection() {
           <EduInnoSliderBanner />
         </Reveal>
 
+        {list.length > 0 && (
+        <>
         <div className="mt-10 sm:mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <Reveal>
             <p className="text-[10px] tracking-[0.2em] text-[#8B6F47] sm:text-[11px] sm:tracking-[0.24em]">
@@ -123,6 +129,8 @@ export default function LatestStoriesSection() {
             );
           })}
         </div>
+        </>
+        )}
       </div>
     </section>
   );
