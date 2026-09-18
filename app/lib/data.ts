@@ -1,8 +1,8 @@
 export type ProductType = "home-brand" | "small-pack" | "general";
 export type ProductCategory = { id: string; slug: string; name: string; description?: string; isActive: boolean; isHighlight?: boolean };
-export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; title: string; note: string; tag: string; img: string; desc: string; type?: ProductType; isHighlight?: boolean };
+export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; title: string; note: string; tag: string; img: string; desc: string; type?: ProductType; isHighlight?: boolean; specFile?: string | null };
 export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string };
-export type Edu = { id: string; title: string; desc: string; duration: string; level: string; img: string; link?: string; cta?: string; eyebrow?: string };
+export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string };
 export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string };
 export type Inquiry = { id: string; name: string; city: string; whatsapp: string; interest: string; date: string };

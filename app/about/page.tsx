@@ -2,12 +2,10 @@
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, Eye, Compass, Pencil } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Eye, Compass } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
-import { isAuthed } from "../lib/auth";
-import AboutHeroEditModal from "../components/AboutHeroEditModal";
 
 function Reveal({ children, delay = 0, y = 18, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
   return <motion.div initial={{ opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>{children}</motion.div>;
@@ -19,30 +17,18 @@ export default function AboutPage() {
   const vision = L.values[0];
   const mission = L.values[1];
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const { scrollYProgress } = useScroll({ target: mounted ? heroRef : undefined, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 180]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
 
-  const aboutVideoSrc = L.aboutHeroVideoSrc || "https://cdn.alvineitsolutions.com/naturafoods/Video%20About%20Website.mp4";
   const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
   const [aboutVideoReady, setAboutVideoReady] = useState(false);
-  const [authed, setAuthed] = useState<boolean>(false);
-  const [aboutEditOpen, setAboutEditOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setAboutVideoReady(true), 1500);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    setAuthed(isAuthed());
-    const onChange = () => setAuthed(isAuthed());
-    window.addEventListener("storage", onChange);
-    window.addEventListener("nf_auth_changed" as never, onChange as never);
-    return () => {
-      window.removeEventListener("storage", onChange);
-      window.removeEventListener("nf_auth_changed" as never, onChange as never);
-    };
   }, []);
 
   const scrollTo = (id: string) => {
@@ -65,62 +51,18 @@ export default function AboutPage() {
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${aboutVideoReady ? "opacity-0" : "opacity-100"}`}
             />
             <iframe
-              src="https://www.youtube.com/embed/FT558Ad3rfY?autoplay=1&mute=1&loop=1&playlist=FT558Ad3rfY&controls=0"
+              src="https://www.youtube.com/embed/FT558Ad3rfY?autoplay=1&mute=1&loop=1&playlist=FT558Ad3rfY&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
               title="About Hero Video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
-            <div className="absolute inset-0 bg-[#2D4A22]/15 mix-blend-multiply" />
-
-            <div className="absolute inset-0 flex items-end p-4 sm:p-12 md:p-16 lg:p-20">
-              <div className="max-w-[640px]">
-                <motion.p
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-[9px] tracking-[0.18em] text-white backdrop-blur sm:px-3 sm:text-[10px]"
-                >
-                  {L.aboutHeroEyebrow}
-                </motion.p>
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-3 font-[var(--font-display)] text-[28px] font-light leading-[0.95] text-white sm:mt-4 sm:text-[34px] md:text-[46px] lg:text-[52px]"
-                >
-                  {L.aboutHeroTitle}
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-3 max-w-[52ch] text-[13px] leading-6 text-white/80 sm:mt-4 sm:text-[14px]"
-                >
-                  {L.aboutHeroDesc}
-                </motion.p>
-              </div>
-            </div>
-
-            {authed && (
-              <button
-                type="button"
-                onClick={() => setAboutEditOpen(true)}
-                aria-label="Edit About Hero"
-                className="group absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[10px] tracking-[0.16em] text-[#2D4A22] shadow-md backdrop-blur transition hover:bg-white sm:right-5 sm:top-5"
-              >
-                <Pencil className="h-3 w-3" />
-                <span>EDIT</span>
-              </button>
-            )}
           </div>
         </div>
-        <AboutHeroEditModal open={aboutEditOpen} onClose={() => setAboutEditOpen(false)} />
       </section>
 
       {/* PROFILE */}
-      <section id="profile" ref={heroRef} className="relative overflow-hidden">
+      {/* <section id="profile" ref={heroRef} className="relative overflow-hidden">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
           <div className="grid gap-8 py-8 sm:py-10 md:grid-cols-[1.15fr_0.85fr] md:items-center md:py-14 lg:py-16">
             <div>
@@ -157,7 +99,7 @@ export default function AboutPage() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* DESCRIPTION */}
       <section id="description" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-24">

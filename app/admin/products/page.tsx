@@ -47,13 +47,13 @@ export default function ProductsPage() {
   const save = async () => {
     if (!f.title || !f.slug) return;
     const selectedCat = s.productCategories.find((c) => c.slug === f.cat);
-    const item: Product = { slug: String(f.slug), cat: (f.cat as string) ?? "choco", categoryId: selectedCat?.id, title: String(f.title), note: String(f.note ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? ""), desc: String(f.desc ?? ""), type: (f.type as Product["type"]) ?? "general", isHighlight: Boolean(f.isHighlight) };
+    const item: Product = { slug: String(f.slug), cat: (f.cat as string) ?? "choco", categoryId: selectedCat?.id, title: String(f.title), note: String(f.note ?? ""), tag: String(f.tag ?? ""), img: String(f.img ?? ""), desc: String(f.desc ?? ""), type: (f.type as Product["type"]) ?? "general", isHighlight: Boolean(f.isHighlight), specFile: f.specFile ?? null };
     setSaving(true);
     setErr(null);
     const isEdit = editIdx !== null;
     const originalSlug = isEdit ? s.products[editIdx!]?.slug : null;
     try {
-      const payload = { slug: item.slug, categoryId: item.categoryId, type: item.type, title: item.title, note: item.note, tag: item.tag, img: item.img, desc: item.desc, isHighlight: item.isHighlight };
+      const payload = { slug: item.slug, categoryId: item.categoryId, type: item.type, title: item.title, note: item.note, tag: item.tag, img: item.img, desc: item.desc, isHighlight: item.isHighlight, specFile: item.specFile };
       if (isEdit) {
         await apiFetch(`/admin/products/${encodeURIComponent(originalSlug!)}`, { method: "PUT", body: JSON.stringify(payload) });
         s.setProducts((prev: Product[]) => prev.map((x, i) => i === editIdx ? item : x));
@@ -138,8 +138,9 @@ export default function ProductsPage() {
                 <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${f.isHighlight ? "bg-[#2D4A22] text-white" : "bg-[#8B6F47]/10 text-[#8B6F47]"}`}>{f.isHighlight ? "Highlighted — shows on Home" : "Not highlighted"}</span>
               </label>
             </Field>
-            <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="products" /></Field></div>
+            <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="products" maxImageMB={10} /></Field></div>
             <div className="sm:col-span-2"><Field label="desc"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={3} /></Field></div>
+            <div className="sm:col-span-2"><Field label="Product Specification"><FileUpload value={f.specFile ?? ""} onChange={(v) => setF({ ...f, specFile: v })} accept=".pdf" folder="products" /></Field></div>
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || !f.slug || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
           {(!f.title || !f.slug) && <p className="mt-2 text-[11px] text-[#8B6F47]">Title & slug required.</p>}

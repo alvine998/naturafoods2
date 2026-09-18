@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "videos.pexels.com" },
       { protocol: "https", hostname: "cdn.naturafoods.co.id" },
       { protocol: "https", hostname: "cdn.alvineitsolutions.com" },
+      { protocol: "https", hostname: "api-naturafoods.alvineitsolutions.com" },
       { protocol: "http", hostname: "localhost" },
     ],
   },

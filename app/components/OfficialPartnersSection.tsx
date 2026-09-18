@@ -281,7 +281,7 @@ function SmallPackSection() {
             </h2>
             <div className="mx-auto max-w-xl aspect-video rounded-xl overflow-hidden">
               <iframe
-                src="https://www.youtube.com/embed/7NYnW0M_obg?autoplay=1&mute=1"
+                src="https://www.youtube.com/embed/7NYnW0M_obg?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
                 title="Small Pack for Ingredients Store"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
