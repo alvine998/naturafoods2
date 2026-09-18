@@ -81,6 +81,7 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
   const [notice, setNotice] = useState<string | null>(null);
   const src = value?.trim() ? value.trim() : "";
   const isVideo = !!src && (src.startsWith("data:video") || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(src));
+  const isPdf = accept === ".pdf" || (src && /\.pdf(\?|$)/i.test(src));
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     setErr(null);
@@ -129,6 +130,11 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
           {isVideo ? (
             // eslint-disable-next-line jsx-a11y/media-has-caption
             <video src={src} controls className="h-28 w-full object-cover" />
+          ) : isPdf ? (
+            <div className="flex h-28 w-full items-center justify-center gap-2 text-[12px] text-[#2D4A22]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+              <span className="font-medium">PDF uploaded</span>
+            </div>
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={src} alt="preview" className="h-28 w-full object-cover" />

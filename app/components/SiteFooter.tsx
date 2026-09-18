@@ -8,7 +8,7 @@ export default function SiteFooter() {
       <div className="mx-auto flex max-w-[1280px] flex-col gap-4 text-[10px] leading-5 tracking-[0.14em] sm:text-[11px] text-[#8B6F47] md:flex-row md:items-center md:justify-between md:gap-6">
         <span className="break-words" suppressHydrationWarning>© {new Date().getFullYear()} {t.footerCopy}</span>
         <span className="flex flex-wrap gap-4 sm:gap-6">
-          <Link href="/products" className="hover:text-[#2D4A22]">{t.footerLinks[0]}</Link>
+          <a href="https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#2D4A22]">{t.footerLinks[0]}</a>
           <a href="https://instagram.com" target="_blank" className="hover:text-[#2D4A22]">{t.footerLinks[1]}</a>
           <Link href="/careers" className="hover:text-[#2D4A22]">{t.footerLinks[2]}</Link>
           <Link href="/admin/login" className="hover:text-[#2D4A22]">ADMIN</Link>
