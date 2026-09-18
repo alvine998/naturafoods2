@@ -12,6 +12,7 @@ import OfficialPartnersSection from "./components/OfficialPartnersSection";
 import HighlightedProductsSection from "./components/HighlightedProductsSection";
 import LatestStoriesSection from "./components/LatestStoriesSection";
 import SalesContactCard from "./components/SalesContactCard";
+import ScrollToTop from "./components/ScrollToTop";
 import { useLang } from "./i18n";
 
 function Reveal({ children, delay = 0, y = 24, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
@@ -161,12 +162,13 @@ export default function Home() {
             <div className="rounded-[20px] bg-white p-5 sm:p-6 md:p-7 text-center">
               <p className="text-[13px] leading-6 text-[#1a1a16]/60">Full inquiry form moved to</p>
               <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white">CONTACT US</Link>
-              <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-[12px]"><a href="mailto:hello@naturafoods.id" className="underline text-[#2D4A22] break-all">hello@naturafoods.id</a><a href="https://wa.me/6281234567890" className="underline text-[#2D4A22]">WhatsApp</a></div>
+              <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-[12px]"><a href="mailto:hello@naturafoods.id" className="underline text-[#2D4A22] break-all">hello@naturafoods.id</a></div>
             </div>
           </div>
         </section>
 
         <SiteFooter />
+        <ScrollToTop />
       </motion.div>
     </>
   );

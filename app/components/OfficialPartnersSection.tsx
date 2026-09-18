@@ -230,7 +230,7 @@ function RetailBrandSection() {
         </Reveal>
 
         <Reveal delay={0.2}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 sm:gap-6">
             {tiles.map((item, i) => (
               <motion.div
                 key={item.slug}
@@ -238,12 +238,12 @@ function RetailBrandSection() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                className="aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
               >
                 <img
                   src={item.img}
                   alt={item.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover hover:scale-150 transition-transform duration-300"
                 />
               </motion.div>
             ))}
@@ -279,12 +279,15 @@ function SmallPackSection() {
             <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
               Small Pack for Ingredients Store :
             </h2>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2005.51.14.png"
-              alt="Small Pack for Ingredients Store"
-              className="mx-auto max-w-xl rounded-xl object-contain"
-            />
+            <div className="mx-auto max-w-xl aspect-video rounded-xl overflow-hidden">
+              <iframe
+                src="https://www.youtube.com/embed/7NYnW0M_obg?autoplay=1&mute=1"
+                title="Small Pack for Ingredients Store"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </Reveal>
 

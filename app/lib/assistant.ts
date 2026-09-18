@@ -141,7 +141,7 @@ export const DEFAULT_KNOWLEDGE: KnowledgeEntry[] = [
 export const DEFAULT_TUNING: AssistantTuning = { tone: "friendly", length: "medium", strict: false };
 
 export const DEFAULT_ASSISTANT: AssistantConfig = {
-  waLink: "https://wa.me/6281234567890",
+  waLink: "https://wa.me/6281295071397",
   persona: "You are Natura Assistant for PT Natura Inti Sukses — helpful, concise, B2B, focused on choco & matcha, MOQ 6kg, cold-chain, training. Reply in user's language.",
   tuning: DEFAULT_TUNING,
   copy: DEFAULT_COPY,

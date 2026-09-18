@@ -25,18 +25,13 @@ export default function AboutPage() {
 
   const aboutVideoSrc = L.aboutHeroVideoSrc || "https://cdn.alvineitsolutions.com/naturafoods/Video%20About%20Website.mp4";
   const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
-  const aboutVideoRef = useRef<HTMLVideoElement>(null);
   const [aboutVideoReady, setAboutVideoReady] = useState(false);
   const [authed, setAuthed] = useState<boolean>(false);
   const [aboutEditOpen, setAboutEditOpen] = useState(false);
 
   useEffect(() => {
-    const el = aboutVideoRef.current;
-    if (!el) return;
-    const onPlay = () => setAboutVideoReady(true);
-    el.addEventListener("playing", onPlay);
-    el.play().catch(() => {});
-    return () => el.removeEventListener("playing", onPlay);
+    const timer = setTimeout(() => setAboutVideoReady(true), 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -69,15 +64,11 @@ export default function AboutPage() {
               alt=""
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${aboutVideoReady ? "opacity-0" : "opacity-100"}`}
             />
-            <video
-              key={aboutVideoSrc}
-              ref={aboutVideoRef}
-              src={aboutVideoSrc}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
+            <iframe
+              src="https://www.youtube.com/embed/FT558Ad3rfY?autoplay=1&mute=1&loop=1&playlist=FT558Ad3rfY&controls=0"
+              title="About Hero Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />

@@ -107,21 +107,30 @@ export default function HeroSlider({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 sm:from-black/70 sm:via-black/20" />
           <div className="absolute inset-0 bg-[#2D4A22]/10 mix-blend-multiply" />
 
-          {/* welcome badge */}
-          {/* {welcome && (
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-1/2 top-6 sm:top-8 md:top-10 -translate-x-1/2 z-10 max-w-[92%] text-center"
-            >
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.28em] text-white backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#F5EFE0]" />
-                {welcome.title}
-              </p>
-              <p className="mt-2 hidden sm:block text-[11px] sm:text-[12px] leading-5 text-white/80">{welcome.sub}</p>
-            </motion.div>
-          )} */}
+          {/* welcome text + logo — left-aligned */}
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 z-10 flex items-center"
+          >
+            <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-10 md:px-12 lg:px-14">
+              <div className="max-w-[480px] sm:max-w-[540px] md:max-w-[600px]">
+                <h1 className="font-[var(--font-display)] text-[24px] sm:text-[32px] md:text-[42px] lg:text-[52px] font-light leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg">
+                  Welcome To<br className="hidden sm:block" />{" "}
+                  <span className="whitespace-nowrap">PT. Natura Inti Sukses</span>
+                </h1>
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Logo%20Natura%20Outline.png"
+                  alt="PT. Natura Inti Sukses Logo"
+                  className="h-[60px] sm:h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain drop-shadow-lg"
+                />
+              </div>
+            </div>
+          </motion.div>
 
           {/* content overlay — bottom-aligned on mobile for thumb reach + readability, centered on sm+ */}
           {/* <div className="absolute inset-0 flex items-end sm:items-center">
