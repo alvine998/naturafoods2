@@ -49,7 +49,7 @@ export default function ContactPage() {
             <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
               {/* WhatsApp Card */}
               <a
-                href={`https://wa.me/${p.phone.replace(/[^0-9]/g, "")}`}
+                href={`https://wa.me/${p.phone.replace(/[^0-9]/g, "").replace(/^0/, "62")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:border-[#25D366]/30"
