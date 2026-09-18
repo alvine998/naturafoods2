@@ -152,7 +152,10 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                   src={rightVisual}
                   alt={card.title}
                   className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display =
+                      "none";
+                  }}
                 />
               </div>
             </div>
@@ -171,7 +174,10 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                     i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
                   }
                   className="h-12 w-auto max-w-[150px] object-contain"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display =
+                      "none";
+                  }}
                 />
               ))}
               {bottomLogos.length > 4 && (
@@ -191,7 +197,13 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   );
 }
 
-type BrandTile = { slug: string; title: string; img: string; desc?: string; brandIds: string[] };
+type BrandTile = {
+  slug: string;
+  title: string;
+  img: string;
+  desc?: string;
+  brandIds: string[];
+};
 
 function RetailBrandSection() {
   const { homeBrands } = useStore();
@@ -240,7 +252,10 @@ function RetailBrandSection() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
               >
-                <Link href={brandLink(item.brandIds)} className="block w-full h-full">
+                <Link
+                  href={brandLink(item.brandIds)}
+                  className="block w-full h-full"
+                >
                   <img
                     src={item.img}
                     alt={item.title}
@@ -296,7 +311,11 @@ function SmallPackSection() {
         <div className="overflow-hidden">
           <motion.div
             animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: tiles.length * 3, repeat: Infinity, ease: "linear" }}
+            transition={{
+              duration: tiles.length * 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
             className="flex w-max gap-2"
           >
             {doubled.map((item, i) => (
@@ -444,7 +463,9 @@ function ContactCard({
   index: number;
 }) {
   const prefix = contact.gender?.toLowerCase() === "female" ? "Ms." : "Mr.";
-  const displayName = contact.name.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, "").trim();
+  const displayName = contact.name
+    .replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, "")
+    .trim();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -460,7 +481,9 @@ function ContactCard({
       />
       <div className="min-w-0 flex-1">
         <p className="font-medium text-[#2D4A22]">{contact.region}</p>
-        <p className="text-sm font-semibold text-gray-800">{prefix} {displayName}</p>
+        <p className="text-sm font-semibold text-gray-800">
+          {prefix} {displayName}
+        </p>
         <p className="text-xs text-gray-500 mb-2">{contact.title}</p>
         <div className="flex flex-wrap gap-x-3 gap-y-2">
           <a
@@ -501,7 +524,7 @@ function CocoaPowderSeriesSection() {
   const { products, productCategories } = useStore();
 
   const highlightedCategories = (productCategories ?? []).filter(
-    (c) => c.isHighlight && c.isActive
+    (c) => c.isHighlight && c.isActive,
   );
 
   if (highlightedCategories.length === 0) return null;
@@ -518,49 +541,47 @@ function CocoaPowderSeriesSection() {
   return (
     <section className="py-16 bg-white">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
-        <Reveal>
-          <div className="mb-10 flex flex-col items-center gap-4 text-center sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:text-left">
-            <img
-              src="/logo.png"
-              alt="NaturaFoods"
-              className="h-10 object-contain sm:h-12"
-            />
-            <h2 className="font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
-              Cocoa Powder Series
-            </h2>
-          </div>
-        </Reveal>
-
         {sections.map((section, sIdx) => (
           <Reveal key={section.category.id} delay={sIdx * 0.1}>
-            <div className={sIdx > 0 ? "border-t border-gray-200 pt-12" : ""}>
-              <div className="mb-8">
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-[#2D4A22]">
-                    {section.category.description || section.category.name}
-                  </h3>
+            <Reveal>
+              <div className="mb-2 flex flex-col items-center gap-4 text-center sm:mb-10 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                <img
+                  src="/logo.png"
+                  alt="NaturaFoods"
+                  className="h-10 object-contain sm:h-12"
+                />
+                <h2 className="text-center font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
+                  {section.category.name}
+                  <br />
+                  <span className="text-[20px] text-[#2D4A22]/80 font-normal">
+                    {section.category?.description || ""}
+                  </span>
+                </h2>
+              </div>
+            </Reveal>
+            <Reveal>
+              <div className={sIdx > 0 ? "border-t border-gray-200 pt-12" : ""}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {section.products.map((product, index) => (
+                    <CocoaProductCard
+                      key={`${product.slug}-${index}`}
+                      product={{
+                        code: product.title,
+                        brand: section.category.name,
+                        brandLogo: "",
+                        description: product.desc,
+                        image: product.img,
+                        slug: product.slug,
+                      }}
+                      index={index}
+                    />
+                  ))}
+                </div>
+                <div className="mt-6 mb-12">
+                  <ContactInfoSection />
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {section.products.map((product, index) => (
-                  <CocoaProductCard
-                    key={`${product.slug}-${index}`}
-                    product={{
-                      code: product.title,
-                      brand: section.category.name,
-                      brandLogo: "",
-                      description: product.desc,
-                      image: product.img,
-                      slug: product.slug,
-                    }}
-                    index={index}
-                  />
-                ))}
-              </div>
-              <div className="mt-6">
-                <ContactInfoSection />
-              </div>
-            </div>
+            </Reveal>
           </Reveal>
         ))}
       </div>
