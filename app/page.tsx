@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Minus } from "lucide-react";
@@ -20,7 +20,9 @@ function Reveal({ children, delay = 0, y = 24, className = "" }: { children: Rea
 }
 function Parallax({ children, offset = 80, className = "" }: { children: React.ReactNode; offset?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const { scrollYProgress } = useScroll({ target: mounted ? ref : undefined, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [-offset, offset]);
   return <div ref={ref} className={className} style={{ overflow: "clip" }}><motion.div style={{ y }}>{children}</motion.div></div>;
 }

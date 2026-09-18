@@ -67,19 +67,24 @@ function ProductsInner() {
   const sp = useSearchParams();
   const { productCategories, masterBrands } = useStore();
   const initialCat = sp.get("cat") ?? null;
-  const initialBrand = sp.get("brand") ?? null;
+  const initialBrands = sp.get("brand")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
   const [cat, setCat] = useState<string>(initialCat ?? "all");
-  const [brand, setBrand] = useState<string>(initialBrand ?? "all");
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(initialBrands);
   const [items, setItems] = useState<Product[]>([]);
   const [apiItems, setApiItems] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
-  useEffect(() => { setItems(loadProducts()); if (initialCat) setCat(initialCat); if (initialBrand) setBrand(initialBrand); }, [initialCat, initialBrand]);
+  useEffect(() => { setItems(loadProducts()); if (initialCat) setCat(initialCat); }, [initialCat, initialBrands.join(",")]);
+
+  const toggleBrand = (id: string) => {
+    setSelectedBrands((prev) => (prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]));
+  };
 
   // API fetch — FRONTEND_API_GUIDE.md:3 GET /products with filters
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, brandId: brand !== "all" ? brand : undefined, limit: 50, sort: "createdAt:desc" });
+    const brandParam = selectedBrands.length > 0 ? selectedBrands.join(",") : undefined;
+    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, brandId: brandParam, limit: 50, sort: "createdAt:desc" });
     apiFetch<Product[]>(`/products${q}`)
       .then((json) => {
         if (!cancelled && json.success && Array.isArray(json.data)) {
@@ -101,10 +106,10 @@ function ProductsInner() {
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [cat, brand]);
+  }, [cat, selectedBrands.join(",")]);
 
   const source = apiItems ?? items;
-  const filtered = source.filter((x) => (cat === "all" || x.cat === cat) && (brand === "all" || x.brandId === brand));
+  const filtered = source.filter((x) => (cat === "all" || x.cat === cat) && (selectedBrands.length === 0 || selectedBrands.includes(x.brandId ?? "")));
   const cats = [
     ["all", p.all],
     ...productCategories.filter((c) => c.isActive).map((c) => [c.slug, c.name] as const),
@@ -113,7 +118,7 @@ function ProductsInner() {
     ["all", "All Brands"],
     ...masterBrands.filter((b) => b.isActive).map((b) => [b.id, b.name] as const),
   ];
-  const hasActive = cat !== "all" || brand !== "all";
+  const hasActive = cat !== "all" || selectedBrands.length > 0;
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Products" }]} />
@@ -135,21 +140,24 @@ function ProductsInner() {
           {brands.length > 1 && (
             <>
               <span className="shrink-0 self-center w-px h-5 bg-[#2D4A22]/10" />
-              {brands.map(([k, label]) => (
+              {brands.map(([k, label]) => {
+                const isActive = k === "all" ? selectedBrands.length === 0 : selectedBrands.includes(k);
+                return (
                 <button
                   key={`brand-${k}`}
-                  onClick={() => setBrand(k)}
-                  aria-pressed={brand === k}
-                  className={`shrink-0 snap-start rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] min-h-[38px] whitespace-nowrap transition-all ${brand === k ? "bg-[#8B6F47] text-white border-[#8B6F47] shadow-[0_2px_8px_rgba(139,111,71,0.18)]" : "bg-white text-[#8B6F47] border-[#8B6F47]/12 hover:border-[#8B6F47]/25 active:scale-[0.97]"}`}
+                  onClick={() => k === "all" ? setSelectedBrands([]) : toggleBrand(k)}
+                  aria-pressed={isActive}
+                  className={`shrink-0 snap-start rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] min-h-[38px] whitespace-nowrap transition-all ${isActive ? "bg-[#8B6F47] text-white border-[#8B6F47] shadow-[0_2px_8px_rgba(139,111,71,0.18)]" : "bg-white text-[#8B6F47] border-[#8B6F47]/12 hover:border-[#8B6F47]/25 active:scale-[0.97]"}`}
                 >
                   {label}
                 </button>
-              ))}
+                );
+              })}
             </>
           )}
         </div>
         {hasActive && (
-          <button onClick={() => { setCat("all"); setBrand("all"); }} className="mt-2 text-[11px] tracking-[0.06em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear filters</button>
+          <button onClick={() => { setCat("all"); setSelectedBrands([]); }} className="mt-2 text-[11px] tracking-[0.06em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear filters</button>
         )}
       </div>
 
@@ -188,12 +196,12 @@ function ProductsInner() {
                 <p className="text-[10px] font-medium tracking-[0.18em] text-[#8B6F47]/70 mb-2.5">Brand</p>
                 <div className="flex flex-col gap-0.5">
                   {brands.map(([k, label]) => {
-                    const isActive = brand === k;
+                    const isActive = k === "all" ? selectedBrands.length === 0 : selectedBrands.includes(k);
                     const count = k === "all" ? source.length : source.filter((x) => x.brandId === k).length;
                     return (
                       <button
                         key={`brand-${k}`}
-                        onClick={() => setBrand(k)}
+                        onClick={() => k === "all" ? setSelectedBrands([]) : toggleBrand(k)}
                         aria-pressed={isActive}
                         className={`group flex items-center justify-between rounded-[10px] px-3 py-2 text-left text-[12px] transition-all ${isActive ? "bg-[#8B6F47] text-white" : "text-[#8B6F47] hover:bg-[#8B6F47]/[0.06]"}`}
                       >
@@ -211,7 +219,7 @@ function ProductsInner() {
             <div className="p-4 flex items-center justify-between">
               <p className="text-[11px] text-[#8B6F47]"><span className="font-medium text-[#2D4A22]">{filtered.length}</span> {filtered.length === 1 ? "product" : "products"}</p>
               {hasActive && (
-                <button onClick={() => { setCat("all"); setBrand("all"); }} className="text-[10px] tracking-[0.08em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear</button>
+                <button onClick={() => { setCat("all"); setSelectedBrands([]); }} className="text-[10px] tracking-[0.08em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear</button>
               )}
             </div>
           </div>

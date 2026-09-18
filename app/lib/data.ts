@@ -8,7 +8,7 @@ export type Job = { id: string; title: string; dept: string; loc: string; type: 
 export type Inquiry = { id: string; name: string; city: string; whatsapp: string; interest: string; date: string };
 export type OfficialPartner = { id: string; name: string; description: string; image: string; background: string; images?: string[]; color?: string; order?: number; isPublished: boolean };
 export type SalesContact = { id: string; name: string; gender: string; position: string; whatsapp: string; email: string; photo: string; location: string; published: boolean; isPublished?: boolean };
-export type HomeBrand = { id: string; name: string; image: string; desc: string; createdAt?: string; updatedAt?: string };
+export type HomeBrand = { id: string; name: string; image: string; desc: string; brandIds?: string[]; createdAt?: string; updatedAt?: string };
 export type SocialMedia = { id: string; name: string; description: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string };
 export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean };
 

@@ -47,6 +47,7 @@ export default function HomeBrandsPage() {
       name: String(f.name),
       image: String(f.image ?? ""),
       desc: String(f.desc ?? ""),
+      brandIds: f.brandIds ?? [],
     };
     if (editIdx === null) {
       const exists = s.homeBrands.some((h) => h.id === item.id);
@@ -111,6 +112,31 @@ export default function HomeBrandsPage() {
             <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Brand Name" /></Field>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={3} placeholder="Short description for this home brand" /></Field></div>
             <div className="sm:col-span-2"><Field label="image"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="home-brands" /></Field></div>
+            {s.masterBrands.length > 0 && (
+              <div className="sm:col-span-2">
+                <Field label="Brands">
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {s.masterBrands.filter((b) => b.isActive).map((b) => {
+                      const checked = (f.brandIds ?? []).includes(b.id);
+                      return (
+                        <label key={b.id} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] cursor-pointer transition-all ${checked ? "bg-[#8B6F47] text-white border-[#8B6F47]" : "bg-white text-[#8B6F47] border-[#8B6F47]/20 hover:border-[#8B6F47]/40"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              const prev = f.brandIds ?? [];
+                              setF({ ...f, brandIds: checked ? prev.filter((id) => id !== b.id) : [...prev, b.id] });
+                            }}
+                            className="sr-only"
+                          />
+                          {b.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </Field>
+              </div>
+            )}
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.id || !f.name || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
           {(!f.id || !f.name) && <p className="mt-2 text-[11px] text-[#8B6F47]">ID & name required. ID must be unique.</p>}
@@ -121,7 +147,7 @@ export default function HomeBrandsPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Brands</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((h: HomeBrand) => {
                     const realIdx = s.homeBrands.indexOf(h);
@@ -135,6 +161,16 @@ export default function HomeBrandsPage() {
                         </td>
                         <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{h.name}</div><div className="text-[11px] text-[#8B6F47]">{h.id}</div></td>
                         <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={h.desc}>{h.desc || "—"}</div></td>
+                        <td className="px-3 py-2">
+                          {(h.brandIds ?? []).length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {h.brandIds!.map((bid) => {
+                                const mb = s.masterBrands.find((b) => b.id === bid);
+                                return <span key={bid} className="inline-block rounded-full bg-[#8B6F47]/10 px-2 py-0.5 text-[10px] text-[#8B6F47]">{mb?.name ?? bid}</span>;
+                              })}
+                            </div>
+                          ) : <span className="text-[#8B6F47]/40">—</span>}
+                        </td>
                         <td className="px-3 py-2 text-right"><div className="inline-flex gap-1.5"><button onClick={() => openEdit(realIdx)} className="rounded-full border bg-white px-3 py-1 text-[11px]">{a.edit}</button><button onClick={() => remove(realIdx)} className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></div></td>
                       </tr>
                     );

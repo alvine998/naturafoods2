@@ -85,6 +85,10 @@ Replace `app/lib/store.ts` `localStorage.getItem("nf_products")` and `app/lib/da
 const q = buildQuery({ q:search, cat, type, isHighlight, page, limit:8, sort:"createdAt:desc" });
 const { data, meta } = await apiFetch<Product[]>(`/products${q}`);
 
+// multi-brand filter — comma-separated brandIds
+const q2 = buildQuery({ brandId: "brand-a,brand-b,brand-c", limit: 50 });
+const { data: brandProducts } = await apiFetch<Product[]>(`/products${q2}`);
+
 // highlighted for Home
 const { data: highlighted } = await apiFetch<Product[]>("/products?isHighlight=true&limit=8");
 // or convenience alias same result

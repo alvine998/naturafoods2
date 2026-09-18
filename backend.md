@@ -158,6 +158,7 @@ Query:
 | `q` | string | search `title, slug, cat, tag, type` (ilike) |
 | `cat` | `choco|matcha|all` | optional |
 | `type` | `home-brand|small-pack|general` | optional |
+| `brandId` | string | optional – comma-separated for multi-brand (`?brandId=a,b,c`) |
 | `isHighlight` | `true|false` | optional – home uses `?isHighlight=true` |
 | `page,limit,sort` |  | standard |
 

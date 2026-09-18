@@ -137,6 +137,7 @@ function normalizeHomeBrands(raw: unknown): HomeBrand[] {
     name: String(h.name ?? ""),
     image: String(h.image ?? h.img ?? ""),
     desc: String(h.desc ?? h.description ?? ""),
+    brandIds: Array.isArray(h.brandIds) ? (h.brandIds as string[]) : [],
     createdAt: h.createdAt as string | undefined,
     updatedAt: h.updatedAt as string | undefined,
   })).filter((h) => h.id && h.name);
@@ -280,8 +281,11 @@ function getStoreSnapshot(): StoreState {
 function patchStore(partial: StoreSetter) {
   const next = typeof partial === "function" ? partial(storeState) : partial;
   if (!Object.keys(next).length) return;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Object.assign(storeState, next);
+  // IMPORTANT: replace the reference (immutable update). useSyncExternalStore
+  // bails out when getSnapshot() returns the same reference (Object.is), so
+  // the previous Object.assign(storeState, next) mutation meant API results
+  // were stored but no component ever re-rendered — UI stayed on seed data.
+  storeState = { ...storeState, ...next };
   // Save updated values to localStorage
   const s = storeState;
   if (s.ready) {
@@ -320,12 +324,16 @@ function initStore() {
       inquiries: load(KEYS.inquiries, [] as Inquiry[]) as Inquiry[],
     });
 
+    // Skip API if localStorage was populated recently (5 min)
+    const CACHE_TTL_MS = 5 * 60 * 1000;
+    const lastFetch = Number(localStorage.getItem("nf_last_fetch_ts") || "0");
+    if (Date.now() - lastFetch < CACHE_TTL_MS) {
+      patchStore({ ready: true, apiReady: true });
+      return;
+    }
+
     // Then try API — overwrite if successful
     const fetchSalesList = async (): Promise<unknown> => {
-      try {
-        const json = await apiFetch<unknown>("/sales?limit=50");
-        if (json.success && json.data != null) return json.data as unknown;
-      } catch {}
       try {
         const json = await apiFetch<unknown>("/sales-contacts?limit=50");
         if (json.success && json.data != null) return json.data as unknown;
@@ -407,6 +415,7 @@ function initStore() {
     } catch {}
 
     patchStore(patch);
+    try { localStorage.setItem("nf_last_fetch_ts", String(Date.now())); } catch {}
 
     // Fallback: if API never responds, still mark ready after timeout
     setTimeout(() => {
@@ -430,6 +439,7 @@ export function useStore() {
       socialMedia: SEED_SOCIAL_MEDIA, masterBrands: SEED_MASTER_BRANDS,
     });
     Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
+    try { localStorage.removeItem("nf_last_fetch_ts"); } catch {}
   };
 
   return {

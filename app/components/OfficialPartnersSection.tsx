@@ -191,7 +191,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   );
 }
 
-type BrandTile = { slug: string; title: string; img: string; desc?: string };
+type BrandTile = { slug: string; title: string; img: string; desc?: string; brandIds: string[] };
 
 function RetailBrandSection() {
   const { homeBrands } = useStore();
@@ -203,9 +203,13 @@ function RetailBrandSection() {
       title: h.name,
       img: h.image,
       desc: h.desc,
+      brandIds: h.brandIds ?? [],
     }))
     .filter((h) => h.slug && h.img?.trim());
   if (!tiles.length) return null;
+
+  const brandLink = (brandIds: string[]) =>
+    brandIds.length > 0 ? `/products?brand=${brandIds.join(",")}` : "/products";
 
   return (
     <section className="py-16 bg-white">
@@ -236,11 +240,13 @@ function RetailBrandSection() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
               >
-                <img
-                  src={item.img}
-                  alt={item.title}
-                  className="w-full h-full object-cover hover:scale-150 transition-transform duration-300"
-                />
+                <Link href={brandLink(item.brandIds)} className="block w-full h-full">
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-full object-cover hover:scale-150 transition-transform duration-300"
+                  />
+                </Link>
               </motion.div>
             ))}
           </div>
