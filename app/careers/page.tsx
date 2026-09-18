@@ -48,37 +48,10 @@ export default function CareersPage() {
         <img
           src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2007.03.34.png"
           alt="NaturaFoods careers"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+          className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
         />
-        <div className="absolute inset-0 bg-[#1a1a16]/35" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a16]/45 via-[#1a1a16]/20 to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-[1280px] items-end px-4 pb-12 pt-24 text-white sm:px-6 sm:pb-16 md:px-8 md:pb-20">
-          <div className="max-w-[560px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]">
-            <p className="text-[10px] font-semibold tracking-[0.28em] text-white/85 sm:text-[11px]">
-              {copy.eyebrow}
-            </p>
-            <span className="mt-3 block h-[2px] w-10 bg-[#E0B25A]" />
 
-            <h1 className="mt-6 font-[var(--font-display)] text-[30px] font-light leading-[1.05] text-white sm:text-[40px] md:text-[44px]">
-              {copy.titleA}
-              <br />
-              <span className="font-semibold text-[#F2A65A]">{copy.titleB}</span>
-            </h1>
-
-            <p className="mt-5 max-w-[44ch] text-[13px] leading-6 text-white/85 sm:text-[14px] sm:leading-7">
-              {copy.desc}
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[12px] font-semibold tracking-[0.12em] text-[#2D4A22] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition group-hover:bg-white/90">
-                {copy.cta}
-                <ArrowUpRight className="h-4 w-4" />
-              </span>
-              <span className="text-[11px] tracking-[0.16em] text-white/65">{copy.via}</span>
-            </div>
-          </div>
-        </div>
       </a>
 
       <section className="bg-white">

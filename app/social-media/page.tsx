@@ -64,7 +64,7 @@ export default function SocialMediaPage() {
           <Reveal>
             <div className="flex justify-center mb-6">
               <img
-                src="/logo.png"
+                src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Logo%20Natura%20Outline.png"
                 alt="NaturaFoods"
                 className="h-24 object-contain"
               />
