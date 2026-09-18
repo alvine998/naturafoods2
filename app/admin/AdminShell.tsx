@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Package, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Menu, X, ArrowLeft, Tag, Share2, Info } from "lucide-react";
+import { LayoutDashboard, Package, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Menu, X, ArrowLeft, Tag, Share2, Info, Bookmark } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -16,6 +16,7 @@ const ROUTES = [
   "/admin/dashboard",
   "/admin/products",
   "/admin/product-categories",
+  "/admin/master-brands",
   "/admin/home-brands",
   "/admin/official-partners",
   "/admin/articles",
@@ -31,7 +32,7 @@ const ROUTES = [
   "/admin/about",
 ] as const;
 
-const ICONS = [LayoutDashboard, Package, Tag, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Share2, Info] as const;
+const ICONS = [LayoutDashboard, Package, Tag, Bookmark, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Share2, Info] as const;
 
 // Sections hidden from the sidebar — pages stay reachable by direct URL
 const HIDDEN_NAV = new Set<string>(["/admin/assistant", "/admin/content"]);

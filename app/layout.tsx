@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "./i18n";
 import { baseMetadata } from "./lib/seo";
 import { OrgJsonLd } from "./components/JsonLd";
+import ScrollToTopOnNav from "./components/ScrollToTopOnNav";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}>
       <body className="min-h-full bg-white text-[#1a1a16]">
         <OrgJsonLd />
+        <ScrollToTopOnNav />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

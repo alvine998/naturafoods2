@@ -43,7 +43,7 @@ export default function SocialMediaAdminPage() {
   const [saving, setSaving] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const tabLabel = (a.tabs as unknown as string[])[13] ?? "Social Media";
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return s.socialMedia;

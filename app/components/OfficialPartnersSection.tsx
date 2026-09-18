@@ -33,8 +33,7 @@ const partnerCards: PartnerCard[] = [
       "Cocoa powder berkualitas tinggi untuk cita rasa cokelat yang kaya dan autentik.",
     image:
       "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Bens_Dorp_logo.svg/1200px-Bens_Dorp_logo.svg.png",
+    brandLogo: "",
     brandName: "Bens Dorp",
     link: "/products?cat=cocoa",
     color: "#5D4037",
@@ -45,8 +44,7 @@ const partnerCards: PartnerCard[] = [
       "Bubuk teh hijau premium dengan warna cerah dan rasa khas jepang.",
     image:
       "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Afiya_logo.svg/1200px-Afiya_logo.svg.png",
+    brandLogo: "",
     brandName: "Afya",
     link: "/products?cat=tea",
     color: "#2E7D32",
@@ -57,8 +55,7 @@ const partnerCards: PartnerCard[] = [
       "Filling premium untuk berbagai kreasi roti, kue, dan pastry dengan tekstur lembut dan rasa istimewa.",
     image:
       "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Trang_Nghi_logo.svg/1200px-Trang_Nghi_logo.svg.png",
+    brandLogo: "",
     brandName: "Trang Nghi",
     link: "/products?cat=filling",
     color: "#1565C0",
@@ -69,8 +66,7 @@ const partnerCards: PartnerCard[] = [
       "Kacang pilihan dengan kualitas terbaik untuk kreasi yang lebih beragam.",
     image:
       "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/OFI_logo.svg/1200px-OFI_logo.svg.png",
+    brandLogo: "",
     brandName: "OFI",
     link: "/products?cat=nuts",
     color: "#795548",
@@ -81,8 +77,7 @@ const partnerCards: PartnerCard[] = [
       "Cokelat berkualitas tinggi dengan rasa lezat dan tekstur sempurna untuk berbagai kebutuhan.",
     image:
       "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Le_Bourne_logo.svg/1200px-Le_Bourne_logo.svg.png",
+    brandLogo: "",
     brandName: "Le Bourne",
     link: "/products?cat=chocolate",
     color: "#3E2723",
@@ -93,8 +88,7 @@ const partnerCards: PartnerCard[] = [
       "Kismis berkualitas dari pilihan terbaik untuk rasa manis alami dan tekstur yang sempurna.",
     image:
       "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&q=80",
-    brandLogo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kingland_logo.svg/1200px-Kingland_logo.svg.png",
+    brandLogo: "",
     brandName: "KingLand",
     link: "/products?cat=raisin",
     color: "#827717",
@@ -158,6 +152,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                   src={rightVisual}
                   alt={card.title}
                   className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
             </div>
@@ -176,6 +171,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                     i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
                   }
                   className="h-12 w-auto max-w-[150px] object-contain"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
               ))}
               {bottomLogos.length > 4 && (

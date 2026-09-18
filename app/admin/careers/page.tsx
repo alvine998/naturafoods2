@@ -28,7 +28,7 @@ export default function CareersPage() {
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return s.jobs as Job[];
@@ -90,11 +90,11 @@ export default function CareersPage() {
   if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
-      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[7]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[7]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.jobs.length}</span></div>
+      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[8]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[8]}</h1></div><span className="rounded-full border bg-white px-3 py-1 text-[11px] text-[#8B6F47]">{filtered.length}/{s.jobs.length}</span></div>
       {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
       {formOpen ? (
         <Card className="mt-4 p-4 sm:p-6">
-          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[6]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
+          <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[7]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="id"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="job-001" /></Field>
             <Field label="title"><Input value={f.title ?? ""} onChange={(e) => { const title = e.target.value; setF((prev) => ({ ...prev, title, ...(!slugTouched ? { id: slugify(title) } : {}) })); }} placeholder="Sales Manager — HORECA" /></Field>
@@ -107,7 +107,7 @@ export default function CareersPage() {
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">
-          <Toolbar q={q} setQ={setQ} total={s.jobs.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[6]}`} />
+          <Toolbar q={q} setQ={setQ} total={s.jobs.length} filtered={filtered.length} onAdd={openAdd} addLabel={`${a.add} ${a.tabs[8]}`} />
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">

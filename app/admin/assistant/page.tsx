@@ -39,7 +39,7 @@ export default function AssistantPage() {
     else setGate(true);
   }, [router]);
 
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const tuning: AssistantTuning = cfg.tuning ?? DEFAULT_TUNING;
 
   const testReply = useMemo(() => {

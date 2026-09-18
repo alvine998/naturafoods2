@@ -20,7 +20,7 @@ export default function InquiriesPage() {
   const [err, setErr] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return s.inquiries;
@@ -83,7 +83,7 @@ export default function InquiriesPage() {
   if (!gate) return <div className="min-h-screen bg-white grid place-items-center p-12"><span className="h-8 w-8 animate-pulse rounded-full bg-[#2D4A22]/20" /></div>;
   return (
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
-      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[8]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[8]}</h1></div><div className="flex items-center gap-2"><span className="rounded-full bg-[#2D4A22] px-3 py-1 text-[11px] text-white">{filtered.length}</span><button onClick={handleExport} disabled={exporting} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-60">{exporting ? "Exporting…" : "Export CSV"}</button></div></div>
+      <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[9]}</p><h1 className="mt-1 text-[22px] font-light text-[#2D4A22]">{a.tabs[9]}</h1></div><div className="flex items-center gap-2"><span className="rounded-full bg-[#2D4A22] px-3 py-1 text-[11px] text-white">{filtered.length}</span><button onClick={handleExport} disabled={exporting} className="rounded-full border border-[#2D4A22]/15 bg-white px-4 py-1.5 text-[11px] text-[#2D4A22] hover:bg-white disabled:opacity-60">{exporting ? "Exporting…" : "Export CSV"}</button></div></div>
       {err && <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-[12px] text-red-700">{err}</div>}
       <p className="mt-2 text-[10px] text-[#8B6F47]">Admin: <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">GET /admin/inquiries?q=&interest=&city=&page=&limit=&sort=createdAt:desc</code> · <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">DELETE /admin/inquiries/:id</code> · <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">GET /admin/inquiries/export?format=csv</code> · fallback localStorage</p>
       {s.inquiries.length === 0 ? <Card className="mt-4 p-8 text-center text-[13px] text-[#8B6F47]">{a.noData}</Card> : (

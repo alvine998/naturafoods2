@@ -52,7 +52,7 @@ export default function UsersPage() {
 
   useEffect(() => setPage(1), [q]);
 
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, users.length, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, users.length, 0, 0, s.salesContacts.length, s.socialMedia.length];
 
   // When API returns paginated data, users is already the page slice.
   // Fallback meta may indicate single page where filtering happened client side.

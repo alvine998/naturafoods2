@@ -29,11 +29,20 @@ function ProductsSkeleton() {
       <Breadcrumbs items={[{ label: "Products" }]} />
       <PageHeader eyebrow="..." title="..." desc="..." />
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-start">
-        <aside className="hidden lg:block lg:w-[220px] lg:shrink-0 lg:sticky lg:top-[80px] lg:self-start">
-          <div className="rounded-[20px] border border-[#2D4A22]/10 bg-white p-2 shadow-[0_2px_16px_rgba(45,74,34,0.06)] animate-pulse">
-            <div className="h-3 bg-[#F5EFE0] rounded w-20 mx-3 mt-2 mb-3" />
-            <div className="grid gap-1.5 px-1">
-              {[1, 2, 3].map((i) => <div key={i} className="h-9 bg-[#F5EFE0] rounded-full" />)}
+        <aside className="hidden lg:block lg:w-[240px] lg:shrink-0 lg:sticky lg:top-[80px] lg:self-start">
+          <div className="rounded-[16px] border border-[#2D4A22]/8 bg-white overflow-hidden animate-pulse">
+            <div className="p-4 pb-3">
+              <div className="h-2.5 bg-[#F5EFE0] rounded w-16 mb-3" />
+              <div className="flex flex-col gap-1">
+                {[1, 2, 3, 4].map((i) => <div key={i} className="h-8 bg-[#F5EFE0] rounded-[10px]" />)}
+              </div>
+            </div>
+            <div className="mx-4 border-t border-[#2D4A22]/6" />
+            <div className="p-4 pt-3 pb-3">
+              <div className="h-2.5 bg-[#F5EFE0] rounded w-12 mb-3" />
+              <div className="flex flex-col gap-1">
+                {[1, 2].map((i) => <div key={i} className="h-8 bg-[#F5EFE0] rounded-[10px]" />)}
+              </div>
             </div>
           </div>
         </aside>
@@ -56,19 +65,21 @@ function ProductsInner() {
   const { t } = useLang();
   const p = t.productsPage;
   const sp = useSearchParams();
-  const { productCategories } = useStore();
-  const initial = sp.get("cat") ?? null;
-  const [cat, setCat] = useState<string>(initial ?? "all");
+  const { productCategories, masterBrands } = useStore();
+  const initialCat = sp.get("cat") ?? null;
+  const initialBrand = sp.get("brand") ?? null;
+  const [cat, setCat] = useState<string>(initialCat ?? "all");
+  const [brand, setBrand] = useState<string>(initialBrand ?? "all");
   const [items, setItems] = useState<Product[]>([]);
   const [apiItems, setApiItems] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
-  useEffect(() => { setItems(loadProducts()); if (initial) setCat(initial); }, [initial]);
+  useEffect(() => { setItems(loadProducts()); if (initialCat) setCat(initialCat); if (initialBrand) setBrand(initialBrand); }, [initialCat, initialBrand]);
 
   // API fetch — FRONTEND_API_GUIDE.md:3 GET /products with filters
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, limit: 50, sort: "createdAt:desc" });
+    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, brandId: brand !== "all" ? brand : undefined, limit: 50, sort: "createdAt:desc" });
     apiFetch<Product[]>(`/products${q}`)
       .then((json) => {
         if (!cancelled && json.success && Array.isArray(json.data)) {
@@ -82,6 +93,7 @@ function ProductsInner() {
             desc: String(raw.desc ?? raw.description ?? ""),
             type: (raw.type as Product["type"]) ?? "general",
             isHighlight: Boolean(raw.isHighlight ?? false),
+            brandId: (raw.brandId as string) ?? ((raw.brand as Record<string, unknown>)?.id as string) ?? null,
           })) as Product[];
           setApiItems(norm.filter((x) => x.slug));
         }
@@ -89,52 +101,118 @@ function ProductsInner() {
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [cat]);
+  }, [cat, brand]);
 
   const source = apiItems ?? items;
-  const filtered = cat === "all" ? source : source.filter((x) => x.cat === cat);
+  const filtered = source.filter((x) => (cat === "all" || x.cat === cat) && (brand === "all" || x.brandId === brand));
   const cats = [
     ["all", p.all],
     ...productCategories.filter((c) => c.isActive).map((c) => [c.slug, c.name] as const),
   ];
+  const brands = [
+    ["all", "All Brands"],
+    ...masterBrands.filter((b) => b.isActive).map((b) => [b.id, b.name] as const),
+  ];
+  const hasActive = cat !== "all" || brand !== "all";
   return (
     <PageShell>
       <Breadcrumbs items={[{ label: "Products" }]} />
       <PageHeader eyebrow={p.eyebrow} title={p.title} desc={p.desc} />
-      {loading && <p className="mb-3 text-[11px] text-[#8B6F47]">Loading from <code className="rounded bg-[#F5EFE0] px-1 py-0.5">GET /products{buildQuery({ cat: cat !== "all" ? cat : undefined })}</code>…</p>}
-      {/* Mobile filter — horizontal scroll with snap, edge-to-edge bleed handling */}
-      <div className="mb-6 -mx-4 flex gap-2 overflow-x-auto overscroll-x-contain px-4 pb-2 snap-x snap-mandatory scrollbar-none sm:mx-0 sm:px-0 sm:overflow-visible sm:snap-none lg:hidden">
-        {cats.map(([k, label]) => (
-          <button
-            key={k}
-            onClick={() => setCat(k)}
-            aria-pressed={cat === k}
-            className={`shrink-0 snap-start rounded-full border px-4 py-2.5 text-[11px] tracking-[0.14em] min-h-9 whitespace-nowrap transition ${cat === k ? "bg-[#2D4A22] text-white border-[#2D4A22] shadow-sm" : "bg-white text-[#2D4A22] border-[#2D4A22]/15 hover:border-[#2D4A22]/30 hover:bg-white active:scale-[0.98]"}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-start">
-        {/* Desktop sidebar — sticky category menu */}
-        <aside className="hidden lg:block lg:w-[220px] lg:shrink-0 lg:sticky lg:top-[80px] lg:self-start">
-          <div className="rounded-[20px] border border-[#2D4A22]/10 bg-white p-2 shadow-[0_2px_16px_rgba(45,74,34,0.06)]">
-            <p className="px-3 pt-2 pb-1 text-[10px] tracking-[0.18em] text-[#8B6F47]">CATEGORIES</p>
-            <div className="grid gap-1.5">
-              {cats.map(([k, label]) => (
+      {/* Mobile filter — unified scrollable bar */}
+      <div className="mb-8 lg:hidden">
+        <div className="-mx-4 flex gap-2 overflow-x-auto overscroll-x-contain px-4 pb-2 snap-x snap-mandatory scrollbar-none">
+          {cats.map(([k, label]) => (
+            <button
+              key={`cat-${k}`}
+              onClick={() => setCat(k)}
+              aria-pressed={cat === k}
+              className={`shrink-0 snap-start rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] min-h-[38px] whitespace-nowrap transition-all ${cat === k ? "bg-[#2D4A22] text-white border-[#2D4A22] shadow-[0_2px_8px_rgba(45,74,34,0.18)]" : "bg-white text-[#2D4A22] border-[#2D4A22]/12 hover:border-[#2D4A22]/25 active:scale-[0.97]"}`}
+            >
+              {label}
+            </button>
+          ))}
+          {brands.length > 1 && (
+            <>
+              <span className="shrink-0 self-center w-px h-5 bg-[#2D4A22]/10" />
+              {brands.map(([k, label]) => (
                 <button
-                  key={k}
-                  onClick={() => setCat(k)}
-                  aria-pressed={cat === k}
-                  className={`w-full rounded-full px-4 py-2.5 text-left text-[11px] tracking-[0.14em] border transition text-[#2D4A22] ${cat === k ? "bg-[#2D4A22] text-white border-[#2D4A22]" : "bg-white border-transparent hover:bg-[#2D4A22]/[0.06] hover:border-[#2D4A22]/10"}`}
+                  key={`brand-${k}`}
+                  onClick={() => setBrand(k)}
+                  aria-pressed={brand === k}
+                  className={`shrink-0 snap-start rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] min-h-[38px] whitespace-nowrap transition-all ${brand === k ? "bg-[#8B6F47] text-white border-[#8B6F47] shadow-[0_2px_8px_rgba(139,111,71,0.18)]" : "bg-white text-[#8B6F47] border-[#8B6F47]/12 hover:border-[#8B6F47]/25 active:scale-[0.97]"}`}
                 >
                   {label}
                 </button>
               ))}
+            </>
+          )}
+        </div>
+        {hasActive && (
+          <button onClick={() => { setCat("all"); setBrand("all"); }} className="mt-2 text-[11px] tracking-[0.06em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear filters</button>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-start">
+        {/* Desktop sidebar — sticky filter panel */}
+        <aside className="hidden lg:block lg:w-[240px] lg:shrink-0 lg:sticky lg:top-[80px] lg:self-start">
+          <div className="rounded-[16px] border border-[#2D4A22]/8 bg-white overflow-hidden">
+            {/* Categories */}
+            <div className="p-4 pb-3">
+              <p className="text-[10px] font-medium tracking-[0.18em] text-[#8B6F47]/70 mb-2.5">Category</p>
+              <div className="flex flex-col gap-0.5">
+                {cats.map(([k, label]) => {
+                  const isActive = cat === k;
+                  const count = k === "all" ? source.length : source.filter((x) => x.cat === k).length;
+                  return (
+                    <button
+                      key={k}
+                      onClick={() => setCat(k)}
+                      aria-pressed={isActive}
+                      className={`group flex items-center justify-between rounded-[10px] px-3 py-2 text-left text-[12px] transition-all ${isActive ? "bg-[#2D4A22] text-white" : "text-[#2D4A22] hover:bg-[#2D4A22]/[0.04]"}`}
+                    >
+                      <span className="tracking-[0.06em]">{label}</span>
+                      <span className={`text-[10px] tabular-nums ${isActive ? "text-white/60" : "text-[#8B6F47]/40 group-hover:text-[#8B6F47]/60"}`}>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="mx-3 mt-3 border-t border-[#2D4A22]/10 pt-3">
-              <p className="text-[11px] leading-5 text-[#8B6F47]">{filtered.length} {filtered.length === 1 ? "product" : "products"} {apiItems ? "· API" : "· local"}</p>
+
+            {/* Divider */}
+            <div className="mx-4 border-t border-[#2D4A22]/6" />
+
+            {/* Brands */}
+            {brands.length > 1 && (
+              <div className="p-4 pt-3 pb-3">
+                <p className="text-[10px] font-medium tracking-[0.18em] text-[#8B6F47]/70 mb-2.5">Brand</p>
+                <div className="flex flex-col gap-0.5">
+                  {brands.map(([k, label]) => {
+                    const isActive = brand === k;
+                    const count = k === "all" ? source.length : source.filter((x) => x.brandId === k).length;
+                    return (
+                      <button
+                        key={`brand-${k}`}
+                        onClick={() => setBrand(k)}
+                        aria-pressed={isActive}
+                        className={`group flex items-center justify-between rounded-[10px] px-3 py-2 text-left text-[12px] transition-all ${isActive ? "bg-[#8B6F47] text-white" : "text-[#8B6F47] hover:bg-[#8B6F47]/[0.06]"}`}
+                      >
+                        <span className="tracking-[0.06em]">{label}</span>
+                        <span className={`text-[10px] tabular-nums ${isActive ? "text-white/60" : "text-[#8B6F47]/40 group-hover:text-[#8B6F47]/60"}`}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Footer — count + clear */}
+            <div className="mx-4 border-t border-[#2D4A22]/6" />
+            <div className="p-4 flex items-center justify-between">
+              <p className="text-[11px] text-[#8B6F47]"><span className="font-medium text-[#2D4A22]">{filtered.length}</span> {filtered.length === 1 ? "product" : "products"}</p>
+              {hasActive && (
+                <button onClick={() => { setCat("all"); setBrand("all"); }} className="text-[10px] tracking-[0.08em] text-[#8B6F47] underline underline-offset-2 hover:text-[#2D4A22] transition-colors">Clear</button>
+              )}
             </div>
           </div>
         </aside>

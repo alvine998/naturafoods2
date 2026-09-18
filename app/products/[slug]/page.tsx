@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
             desc: String(raw.desc ?? raw.description ?? ""),
             type: (raw.type as Product["type"]) ?? "general",
             isHighlight: Boolean(raw.isHighlight ?? false),
-            specFile: (raw.specFile ?? raw.file ?? null) as string | null,
+            file: (raw.file ?? raw.file ?? null) as string | null,
           };
           if (norm.title) {
             setProduct(norm);
@@ -76,8 +76,8 @@ export default function ProductDetailPage() {
           <p className="mt-3 max-w-[65ch] text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{product.desc}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/contact" className="inline-flex rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">{t.productDetail.requestPrice}</Link>
-            {product.specFile && (
-              <a href={product.specFile} download className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:bg-[#F5EFE0]"><Download className="h-3 w-3" /> {t.productDetail.downloadSpec}</a>
+            {product.file && (
+              <a href={product.file} download className="inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:bg-[#F5EFE0]"><Download className="h-3 w-3" /> {t.productDetail.downloadSpec}</a>
             )}
             <Link href="/products" className="inline-flex rounded-full border border-[#2D4A22]/15 bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">{t.productDetail.viewAll}</Link>
           </div>

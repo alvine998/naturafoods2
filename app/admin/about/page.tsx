@@ -230,8 +230,8 @@ export default function AboutContentAdminPage() {
   }, []);
   useEffect(() => { setEditLocale(locale); }, [locale]);
 
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
-  const tabLabel = (a.tabs as unknown as string[])[14] ?? "About";
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const tabLabel = (a.tabs as unknown as string[])[15] ?? "About";
 
   const base = dict[editLocale] as unknown as Record<string, unknown>;
   const overrides = (draft[editLocale] ?? {}) as Record<string, unknown>;

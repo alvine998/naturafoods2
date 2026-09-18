@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useSyncExternalStore } from "react";
-import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_SOCIAL_MEDIA } from "./data";
-import type { Article, Edu, HomeBrand, Innovation, Job, OfficialPartner, Product, ProductCategory, Inquiry, SalesContact, SocialMedia } from "./data";
+import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_MASTER_BRANDS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_SOCIAL_MEDIA } from "./data";
+import type { Article, Edu, HomeBrand, Innovation, Job, MasterBrand, OfficialPartner, Product, ProductCategory, Inquiry, SalesContact, SocialMedia } from "./data";
 import { apiFetch, buildQuery } from "./api";
 
-const KEYS = { products: "nf_products", articles: "nf_articles", edu: "nf_edu", innovation: "nf_innovation", jobs: "nf_jobs", inquiries: "nf_inquiries", officialPartners: "nf_official_partners", salesContacts: "nf_sales_contacts", homeBrands: "nf_home_brands", productCategories: "nf_product_categories", socialMedia: "nf_social_media" } as const;
+const KEYS = { products: "nf_products", articles: "nf_articles", edu: "nf_edu", innovation: "nf_innovation", jobs: "nf_jobs", inquiries: "nf_inquiries", officialPartners: "nf_official_partners", salesContacts: "nf_sales_contacts", homeBrands: "nf_home_brands", productCategories: "nf_product_categories", socialMedia: "nf_social_media", masterBrands: "nf_master_brands" } as const;
 
 function load<T>(key: string, fallback: T): T {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) as T : fallback; } catch { return fallback; }
@@ -54,6 +54,7 @@ function normalizeProducts(raw: unknown): Product[] {
       desc: String(p.desc ?? p.description ?? ""),
       type: (p.type as Product["type"]) ?? "general",
       isHighlight: Boolean(p.isHighlight ?? p.is_highlight ?? false),
+      file: String(p.file ?? p.file ?? "") || null,
     };
   }).filter((p) => p.slug && p.title);
 }
@@ -236,6 +237,7 @@ type StoreState = {
   homeBrands: HomeBrand[];
   productCategories: ProductCategory[];
   socialMedia: SocialMedia[];
+  masterBrands: MasterBrand[];
   inquiries: Inquiry[];
 };
 
@@ -255,6 +257,7 @@ let storeState: StoreState = {
   homeBrands: SEED_HOMEBRANDS,
   productCategories: SEED_PRODUCT_CATEGORIES,
   socialMedia: SEED_SOCIAL_MEDIA,
+  masterBrands: SEED_MASTER_BRANDS,
   inquiries: [],
 };
 
@@ -292,6 +295,7 @@ function patchStore(partial: StoreSetter) {
     save(KEYS.homeBrands, s.homeBrands);
     save(KEYS.productCategories, s.productCategories);
     save(KEYS.socialMedia, s.socialMedia);
+    save(KEYS.masterBrands, s.masterBrands);
     save(KEYS.inquiries, s.inquiries);
   }
   emitChange();
@@ -312,6 +316,7 @@ function initStore() {
       homeBrands: load(KEYS.homeBrands, SEED_HOMEBRANDS) as HomeBrand[],
       productCategories: load(KEYS.productCategories, SEED_PRODUCT_CATEGORIES) as ProductCategory[],
       socialMedia: migrateSocialMedia(load(KEYS.socialMedia, SEED_SOCIAL_MEDIA)) as SocialMedia[],
+      masterBrands: load(KEYS.masterBrands, SEED_MASTER_BRANDS) as MasterBrand[],
       inquiries: load(KEYS.inquiries, [] as Inquiry[]) as Inquiry[],
     });
 
@@ -328,7 +333,7 @@ function initStore() {
       return null as unknown;
     };
 
-    const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia] = await Promise.all([
+    const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia, apiMasterBrands] = await Promise.all([
       fetchFromApi<unknown>("/products?limit=50", null as unknown),
       fetchFromApi<unknown>("/articles?limit=50", null as unknown),
       fetchFromApi<unknown>("/official-partners?limit=50", null as unknown),
@@ -339,6 +344,7 @@ function initStore() {
       fetchFromApi<unknown>("/home-brands?limit=50", null as unknown),
       fetchFromApi<unknown>("/categories?limit=50", null as unknown),
       fetchFromApi<unknown>("/social-media?limit=50", null as unknown),
+      fetchFromApi<unknown>("/brands?limit=50", null as unknown),
     ]);
 
     const patch: Partial<StoreState> = { ready: true, apiReady: true };
@@ -370,6 +376,17 @@ function initStore() {
     if (apiSocialMedia && Array.isArray(apiSocialMedia) && apiSocialMedia.length) {
       const norm = normalizeSocialMedia(apiSocialMedia);
       if (norm.length) patch.socialMedia = norm;
+    }
+    if (apiMasterBrands && Array.isArray(apiMasterBrands) && apiMasterBrands.length) {
+      const norm = apiMasterBrands.map((b: Record<string, unknown>) => ({
+        id: String(b.id ?? ""),
+        slug: String(b.slug ?? b.id ?? ""),
+        name: String(b.name ?? ""),
+        description: String(b.description ?? b.desc ?? ""),
+        logo: String(b.logo ?? b.image ?? ""),
+        isActive: b.isActive !== false && b.is_active !== false,
+      })).filter((b: MasterBrand) => b.id && b.name);
+      if (norm.length) patch.masterBrands = norm;
     }
 
     // inquiries is admin-only — try but ignore if unauthorized
@@ -410,7 +427,7 @@ export function useStore() {
       products: SEED_PRODUCTS, articles: SEED_ARTICLES, edu: SEED_EDU,
       innovation: SEED_INNOVATION, jobs: SEED_JOBS, officialPartners: SEED_OFFICIAL_PARTNERS,
       salesContacts: [], homeBrands: SEED_HOMEBRANDS, productCategories: SEED_PRODUCT_CATEGORIES,
-      socialMedia: SEED_SOCIAL_MEDIA,
+      socialMedia: SEED_SOCIAL_MEDIA, masterBrands: SEED_MASTER_BRANDS,
     });
     Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
   };
@@ -428,6 +445,7 @@ export function useStore() {
     setProductCategories: (v: FieldUpdater<ProductCategory[]>) => patchStore((s) => ({ productCategories: typeof v === "function" ? v(s.productCategories) : v })),
     setInquiries: (v: FieldUpdater<Inquiry[]>) => patchStore((s) => ({ inquiries: typeof v === "function" ? v(s.inquiries) : v })),
     setSocialMedia: (v: FieldUpdater<SocialMedia[]>) => patchStore((s) => ({ socialMedia: typeof v === "function" ? v(s.socialMedia) : v })),
+    setMasterBrands: (v: FieldUpdater<MasterBrand[]>) => patchStore((s) => ({ masterBrands: typeof v === "function" ? v(s.masterBrands) : v })),
     reset,
   };
 }
@@ -608,5 +626,24 @@ export async function apiToggleCategoryActive(slug: string, isActive: boolean): 
 }
 export async function apiDeleteProductCategory(slug: string): Promise<void> {
   const json = await apiFetch(`/admin/categories/${encodeURIComponent(slug)}`, { method: "DELETE" });
+  if (!json.success) throw new Error(json.error?.message || "Delete failed");
+}
+
+export async function apiCreateMasterBrand(payload: Partial<MasterBrand>): Promise<MasterBrand> {
+  const json = await apiFetch<MasterBrand>("/admin/brands", { method: "POST", body: JSON.stringify(payload) });
+  if (!json.success) throw new Error(json.error?.message || "Create failed");
+  return json.data;
+}
+export async function apiUpdateMasterBrand(slug: string, payload: Partial<MasterBrand>): Promise<MasterBrand> {
+  const json = await apiFetch<MasterBrand>(`/admin/brands/${encodeURIComponent(slug)}`, { method: "PUT", body: JSON.stringify(payload) });
+  if (!json.success) throw new Error(json.error?.message || "Update failed");
+  return json.data;
+}
+export async function apiToggleMasterBrandActive(slug: string, isActive: boolean): Promise<void> {
+  const json = await apiFetch(`/admin/brands/${encodeURIComponent(slug)}/active`, { method: "PATCH", body: JSON.stringify({ isActive }) });
+  if (!json.success) throw new Error(json.error?.message || "Toggle failed");
+}
+export async function apiDeleteMasterBrand(slug: string): Promise<void> {
+  const json = await apiFetch(`/admin/brands/${encodeURIComponent(slug)}`, { method: "DELETE" });
   if (!json.success) throw new Error(json.error?.message || "Delete failed");
 }

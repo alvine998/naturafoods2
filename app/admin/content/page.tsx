@@ -502,7 +502,7 @@ export default function ContentPage() {
   }, []);
   useEffect(() => { setEditLocale(locale); }, [locale]);
 
-  const counts = [s.products.length, s.productCategories.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
 
   // show base values for the language being edited, not the UI language
   const baseForEdit = useMemo(() => dict[editLocale] as unknown as Record<string, unknown>, [editLocale]);
@@ -552,7 +552,7 @@ export default function ContentPage() {
     <AdminShell counts={counts} labels={a.tabs as unknown as string[]}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[11] ?? "Content"}</p>
+          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {a.tabs[12] ?? "Content"}</p>
           <h1 className="mt-1 font-[var(--font-display)] text-[22px] font-light leading-none text-[#2D4A22] sm:text-[26px]">{a.contentTitle}</h1>
           <p className="mt-2 max-w-[60ch] text-[12px] leading-5 text-[#1a1a16]/60">{a.contentDesc}</p>
         </div>
