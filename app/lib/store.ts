@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_SOCIAL_MEDIA } from "./data";
 import type { Article, Edu, HomeBrand, Innovation, Job, OfficialPartner, Product, ProductCategory, Inquiry, SalesContact, SocialMedia } from "./data";
 import { apiFetch, buildQuery } from "./api";
@@ -220,53 +220,102 @@ export function sortOfficialPartners<T extends { order?: number; name?: string }
   return [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
-export function useStore() {
-  const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
-  const [articles, setArticles] = useState<Article[]>(SEED_ARTICLES);
-  const [edu, setEdu] = useState<Edu[]>(SEED_EDU);
-  const [innovation, setInnovation] = useState<Innovation[]>(SEED_INNOVATION);
-  const [jobs, setJobs] = useState<Job[]>(SEED_JOBS);
-  const [officialPartners, setOfficialPartners] = useState<OfficialPartner[]>(SEED_OFFICIAL_PARTNERS);
-  const [salesContacts, setSalesContacts] = useState<SalesContact[]>([]);
-  const [homeBrands, setHomeBrands] = useState<HomeBrand[]>(SEED_HOMEBRANDS);
-  const [productCategories, setProductCategories] = useState<ProductCategory[]>(SEED_PRODUCT_CATEGORIES);
-  const [socialMedia, setSocialMedia] = useState<SocialMedia[]>(SEED_SOCIAL_MEDIA);
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [ready, setReady] = useState(false);
-  const [apiReady, setApiReady] = useState(false);
+// ---------------------------------------------------------------------------
+// Singleton store — one fetch for the whole app, shared via useSyncExternalStore
+// ---------------------------------------------------------------------------
+type StoreState = {
+  ready: boolean;
+  apiReady: boolean;
+  products: Product[];
+  articles: Article[];
+  edu: Edu[];
+  innovation: Innovation[];
+  jobs: Job[];
+  officialPartners: OfficialPartner[];
+  salesContacts: SalesContact[];
+  homeBrands: HomeBrand[];
+  productCategories: ProductCategory[];
+  socialMedia: SocialMedia[];
+  inquiries: Inquiry[];
+};
 
-  useEffect(() => {
-    let cancelled = false;
-    // Load local first for instant paint (articles skipped — API is source of truth)
-    const localProducts = migrateProducts(load(KEYS.products, SEED_PRODUCTS));
-    const localArticles = SEED_ARTICLES;
-    const localEdu = load(KEYS.edu, SEED_EDU);
-    const localInnovation = load(KEYS.innovation, SEED_INNOVATION);
-    const localJobs = load(KEYS.jobs, SEED_JOBS);
-    const localPartners = migrateOfficialPartners(load(KEYS.officialPartners, SEED_OFFICIAL_PARTNERS));
-    const localSalesContacts = migrateSalesContacts(load(KEYS.salesContacts, [] as SalesContact[]));
-    const localHomeBrands = load(KEYS.homeBrands, SEED_HOMEBRANDS);
-    const localProductCategories = load(KEYS.productCategories, SEED_PRODUCT_CATEGORIES);
-    const localSocialMedia = migrateSocialMedia(load(KEYS.socialMedia, SEED_SOCIAL_MEDIA));
-    const localInquiries = load(KEYS.inquiries, [] as Inquiry[]);
+type StoreSetter = Partial<StoreState> | ((prev: StoreState) => Partial<StoreState>);
+type FieldUpdater<T> = T | ((prev: T) => T);
 
-    if (!cancelled) {
-      setProducts(localProducts);
-      setArticles(localArticles as Article[]);
-      setEdu(localEdu as Edu[]);
-      setInnovation(localInnovation as Innovation[]);
-      setJobs(localJobs as Job[]);
-      setOfficialPartners(localPartners as OfficialPartner[]);
-      setSalesContacts(localSalesContacts as SalesContact[]);
-      setHomeBrands(localHomeBrands as HomeBrand[]);
-      setProductCategories(localProductCategories as ProductCategory[]);
-      if (localSocialMedia.length) setSocialMedia(localSocialMedia);
-      setInquiries(localInquiries as Inquiry[]);
-    }
+let storeState: StoreState = {
+  ready: false,
+  apiReady: false,
+  products: SEED_PRODUCTS,
+  articles: SEED_ARTICLES,
+  edu: SEED_EDU,
+  innovation: SEED_INNOVATION,
+  jobs: SEED_JOBS,
+  officialPartners: SEED_OFFICIAL_PARTNERS,
+  salesContacts: [],
+  homeBrands: SEED_HOMEBRANDS,
+  productCategories: SEED_PRODUCT_CATEGORIES,
+  socialMedia: SEED_SOCIAL_MEDIA,
+  inquiries: [],
+};
 
-    // Then try API — overwrite if successful ( keeps localStorage as offline cache )
-    // Sales lives at GET /sales (backend src/routes/sales.js); keep legacy
-    // /sales-contacts as fallback for older backends.
+let initPromise: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+function emitChange() {
+  listeners.forEach((fn) => fn());
+}
+
+function subscribeStore(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
+}
+
+function getStoreSnapshot(): StoreState {
+  return storeState;
+}
+
+function patchStore(partial: StoreSetter) {
+  const next = typeof partial === "function" ? partial(storeState) : partial;
+  if (!Object.keys(next).length) return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Object.assign(storeState, next);
+  // Save updated values to localStorage
+  const s = storeState;
+  if (s.ready) {
+    save(KEYS.products, s.products);
+    save(KEYS.articles, s.articles);
+    save(KEYS.edu, s.edu);
+    save(KEYS.innovation, s.innovation);
+    save(KEYS.jobs, s.jobs);
+    save(KEYS.officialPartners, s.officialPartners);
+    save(KEYS.salesContacts, s.salesContacts);
+    save(KEYS.homeBrands, s.homeBrands);
+    save(KEYS.productCategories, s.productCategories);
+    save(KEYS.socialMedia, s.socialMedia);
+    save(KEYS.inquiries, s.inquiries);
+  }
+  emitChange();
+}
+
+function initStore() {
+  if (initPromise) return initPromise;
+  initPromise = (async () => {
+    // Load local first for instant paint
+    patchStore({
+      products: migrateProducts(load(KEYS.products, SEED_PRODUCTS)),
+      articles: SEED_ARTICLES as Article[],
+      edu: load(KEYS.edu, SEED_EDU) as Edu[],
+      innovation: load(KEYS.innovation, SEED_INNOVATION) as Innovation[],
+      jobs: load(KEYS.jobs, SEED_JOBS) as Job[],
+      officialPartners: migrateOfficialPartners(load(KEYS.officialPartners, SEED_OFFICIAL_PARTNERS)) as OfficialPartner[],
+      salesContacts: migrateSalesContacts(load(KEYS.salesContacts, [] as SalesContact[])) as SalesContact[],
+      homeBrands: load(KEYS.homeBrands, SEED_HOMEBRANDS) as HomeBrand[],
+      productCategories: load(KEYS.productCategories, SEED_PRODUCT_CATEGORIES) as ProductCategory[],
+      socialMedia: migrateSocialMedia(load(KEYS.socialMedia, SEED_SOCIAL_MEDIA)) as SocialMedia[],
+      inquiries: load(KEYS.inquiries, [] as Inquiry[]) as Inquiry[],
+    });
+
+    // Then try API — overwrite if successful
     const fetchSalesList = async (): Promise<unknown> => {
       try {
         const json = await apiFetch<unknown>("/sales?limit=50");
@@ -276,114 +325,111 @@ export function useStore() {
         const json = await apiFetch<unknown>("/sales-contacts?limit=50");
         if (json.success && json.data != null) return json.data as unknown;
       } catch {}
-      return null as unknown as unknown;
+      return null as unknown;
     };
-    (async () => {
-      const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia] = await Promise.all([
-        fetchFromApi<unknown>("/products?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/articles?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/official-partners?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/education?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/innovations?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/jobs?limit=50", null as unknown as unknown),
-        fetchSalesList(),
-        fetchFromApi<unknown>("/home-brands?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/categories?limit=50", null as unknown as unknown),
-        fetchFromApi<unknown>("/social-media?limit=50", null as unknown as unknown),
-      ]);
 
-      if (cancelled) return;
+    const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia] = await Promise.all([
+      fetchFromApi<unknown>("/products?limit=50", null as unknown),
+      fetchFromApi<unknown>("/articles?limit=50", null as unknown),
+      fetchFromApi<unknown>("/official-partners?limit=50", null as unknown),
+      fetchFromApi<unknown>("/education?limit=50", null as unknown),
+      fetchFromApi<unknown>("/innovations?limit=50", null as unknown),
+      fetchFromApi<unknown>("/jobs?limit=50", null as unknown),
+      fetchSalesList(),
+      fetchFromApi<unknown>("/home-brands?limit=50", null as unknown),
+      fetchFromApi<unknown>("/categories?limit=50", null as unknown),
+      fetchFromApi<unknown>("/social-media?limit=50", null as unknown),
+    ]);
 
-      if (apiProducts) {
-        const norm = normalizeProducts(apiProducts);
-        if (norm.length) setProducts(norm);
-      }
-      if (apiArticles) {
-        const norm = normalizeArticles(apiArticles);
-        if (norm.length) setArticles(norm as Article[]);
-      }
-      if (apiPartners) {
-        const norm = normalizeOfficialPartners(apiPartners);
-        if (norm.length) setOfficialPartners(norm as OfficialPartner[]);
-      }
-      if (apiEdu && Array.isArray(apiEdu) && apiEdu.length) setEdu(apiEdu as Edu[]);
-      if (apiInnov && Array.isArray(apiInnov) && apiInnov.length) setInnovation(apiInnov as Innovation[]);
-      if (apiJobs && Array.isArray(apiJobs) && apiJobs.length) setJobs(apiJobs as Job[]);
-      if (apiHomeBrands && Array.isArray(apiHomeBrands) && apiHomeBrands.length) {
-        const norm = normalizeHomeBrands(apiHomeBrands);
-        if (norm.length) setHomeBrands(norm);
-      }
-      if (apiProductCategories && Array.isArray(apiProductCategories) && apiProductCategories.length) {
-        const norm = apiProductCategories.map((c: Record<string, unknown>) => ({
-          id: String(c.id ?? ""),
-          slug: String(c.slug ?? c.id ?? ""),
-          name: String(c.name ?? ""),
-          description: String(c.description ?? c.desc ?? ""),
-          isActive: c.isActive !== false && c.is_active !== false,
-          isHighlight: Boolean(c.isHighlight ?? c.is_highlight ?? false),
-        })).filter((c: ProductCategory) => c.id && c.name);
-        if (norm.length) setProductCategories(norm);
-      }
-      if (apiSales && Array.isArray(apiSales) && apiSales.length) {
-        const norm = normalizeSalesContacts(apiSales);
-        if (norm.length) setSalesContacts(norm);
-      }
-      if (apiSocialMedia && Array.isArray(apiSocialMedia) && apiSocialMedia.length) {
-        const norm = normalizeSocialMedia(apiSocialMedia);
-        if (norm.length) setSocialMedia(norm);
-      }
+    const patch: Partial<StoreState> = { ready: true, apiReady: true };
+    if (apiProducts) { const norm = normalizeProducts(apiProducts); if (norm.length) patch.products = norm; }
+    if (apiArticles) { const norm = normalizeArticles(apiArticles); if (norm.length) patch.articles = norm as Article[]; }
+    if (apiPartners) { const norm = normalizeOfficialPartners(apiPartners); if (norm.length) patch.officialPartners = norm as OfficialPartner[]; }
+    if (apiEdu && Array.isArray(apiEdu) && apiEdu.length) patch.edu = apiEdu as Edu[];
+    if (apiInnov && Array.isArray(apiInnov) && apiInnov.length) patch.innovation = apiInnov as Innovation[];
+    if (apiJobs && Array.isArray(apiJobs) && apiJobs.length) patch.jobs = apiJobs as Job[];
+    if (apiHomeBrands && Array.isArray(apiHomeBrands) && apiHomeBrands.length) {
+      const norm = normalizeHomeBrands(apiHomeBrands);
+      if (norm.length) patch.homeBrands = norm;
+    }
+    if (apiProductCategories && Array.isArray(apiProductCategories) && apiProductCategories.length) {
+      const norm = apiProductCategories.map((c: Record<string, unknown>) => ({
+        id: String(c.id ?? ""),
+        slug: String(c.slug ?? c.id ?? ""),
+        name: String(c.name ?? ""),
+        description: String(c.description ?? c.desc ?? ""),
+        isActive: c.isActive !== false && c.is_active !== false,
+        isHighlight: Boolean(c.isHighlight ?? c.is_highlight ?? false),
+      })).filter((c: ProductCategory) => c.id && c.name);
+      if (norm.length) patch.productCategories = norm;
+    }
+    if (apiSales && Array.isArray(apiSales) && apiSales.length) {
+      const norm = normalizeSalesContacts(apiSales);
+      if (norm.length) patch.salesContacts = norm;
+    }
+    if (apiSocialMedia && Array.isArray(apiSocialMedia) && apiSocialMedia.length) {
+      const norm = normalizeSocialMedia(apiSocialMedia);
+      if (norm.length) patch.socialMedia = norm;
+    }
 
-      // inquiries is admin-only — try but ignore if unauthorized
-      try {
-        const q = buildQuery({ page: 1, limit: 50, sort: "createdAt:desc" });
-        const json = await apiFetch<Inquiry[]>(`/admin/inquiries${q}`);
-        if (json.success && Array.isArray(json.data) && json.data.length) {
-          // Map Inquiry shape: backend may use createdAt vs date
-          const mapped: Inquiry[] = (json.data as unknown as Record<string, unknown>[]).map((x) => ({
-            id: String(x.id ?? ""),
-            name: String(x.name ?? ""),
-            city: String(x.city ?? ""),
-            whatsapp: String(x.whatsapp ?? ""),
-            interest: String(x.interest ?? ""),
-            date: String((x.date as string) ?? (x.createdAt as string) ?? new Date().toISOString()),
-          }));
-          if (mapped.length) setInquiries(mapped);
-        }
-      } catch {}
-
-      if (!cancelled) {
-        setApiReady(true);
-        setReady(true);
+    // inquiries is admin-only — try but ignore if unauthorized
+    try {
+      const q = buildQuery({ page: 1, limit: 50, sort: "createdAt:desc" });
+      const json = await apiFetch<Inquiry[]>(`/admin/inquiries${q}`);
+      if (json.success && Array.isArray(json.data) && json.data.length) {
+        const mapped: Inquiry[] = (json.data as unknown as Record<string, unknown>[]).map((x) => ({
+          id: String(x.id ?? ""),
+          name: String(x.name ?? ""),
+          city: String(x.city ?? ""),
+          whatsapp: String(x.whatsapp ?? ""),
+          interest: String(x.interest ?? ""),
+          date: String((x.date as string) ?? (x.createdAt as string) ?? new Date().toISOString()),
+        }));
+        if (mapped.length) patch.inquiries = mapped;
       }
-    })();
+    } catch {}
 
-    // If API never responds, still mark ready after timeout
-    const t = setTimeout(() => {
-      if (!cancelled) setReady((v) => (v ? v : true));
+    patchStore(patch);
+
+    // Fallback: if API never responds, still mark ready after timeout
+    setTimeout(() => {
+      if (!storeState.ready) patchStore({ ready: true });
     }, 2500);
-    return () => {
-      cancelled = true;
-      clearTimeout(t);
-    };
-  }, []);
+  })();
+  return initPromise;
+}
 
-  useEffect(() => { if (ready) save(KEYS.products, products); }, [products, ready]);
-  useEffect(() => { if (ready) save(KEYS.articles, articles); }, [articles, ready]);
-  useEffect(() => { if (ready) save(KEYS.edu, edu); }, [edu, ready]);
-  useEffect(() => { if (ready) save(KEYS.innovation, innovation); }, [innovation, ready]);
-  useEffect(() => { if (ready) save(KEYS.jobs, jobs); }, [jobs, ready]);
-  useEffect(() => { if (ready) save(KEYS.officialPartners, officialPartners); }, [officialPartners, ready]);
-  useEffect(() => { if (ready) save(KEYS.salesContacts, salesContacts); }, [salesContacts, ready]);
-  useEffect(() => { if (ready) save(KEYS.homeBrands, homeBrands); }, [homeBrands, ready]);
-  useEffect(() => { if (ready) save(KEYS.productCategories, productCategories); }, [productCategories, ready]);
-  useEffect(() => { if (ready) save(KEYS.socialMedia, socialMedia); }, [socialMedia, ready]);
-  useEffect(() => { if (ready) save(KEYS.inquiries, inquiries); }, [inquiries, ready]);
+export function useStore() {
+  // Start init on first render (safe: idempotent)
+  useEffect(() => { initStore(); }, []);
+
+  const state = useSyncExternalStore(subscribeStore, getStoreSnapshot, getStoreSnapshot);
 
   const reset = () => {
-    setProducts(SEED_PRODUCTS); setArticles(SEED_ARTICLES); setEdu(SEED_EDU); setInnovation(SEED_INNOVATION); setJobs(SEED_JOBS); setOfficialPartners(SEED_OFFICIAL_PARTNERS); setSalesContacts([]); setHomeBrands(SEED_HOMEBRANDS); setProductCategories(SEED_PRODUCT_CATEGORIES); setSocialMedia(SEED_SOCIAL_MEDIA);
+    patchStore({
+      products: SEED_PRODUCTS, articles: SEED_ARTICLES, edu: SEED_EDU,
+      innovation: SEED_INNOVATION, jobs: SEED_JOBS, officialPartners: SEED_OFFICIAL_PARTNERS,
+      salesContacts: [], homeBrands: SEED_HOMEBRANDS, productCategories: SEED_PRODUCT_CATEGORIES,
+      socialMedia: SEED_SOCIAL_MEDIA,
+    });
     Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
   };
-  return { ready, apiReady, products, setProducts, articles, setArticles, edu, setEdu, innovation, setInnovation, jobs, setJobs, officialPartners, setOfficialPartners, salesContacts, setSalesContacts, homeBrands, setHomeBrands, productCategories, setProductCategories, inquiries, setInquiries, socialMedia, setSocialMedia, reset };
+
+  return {
+    ...state,
+    setProducts: (v: FieldUpdater<Product[]>) => patchStore((s) => ({ products: typeof v === "function" ? v(s.products) : v })),
+    setArticles: (v: FieldUpdater<Article[]>) => patchStore((s) => ({ articles: typeof v === "function" ? v(s.articles) : v })),
+    setEdu: (v: FieldUpdater<Edu[]>) => patchStore((s) => ({ edu: typeof v === "function" ? v(s.edu) : v })),
+    setInnovation: (v: FieldUpdater<Innovation[]>) => patchStore((s) => ({ innovation: typeof v === "function" ? v(s.innovation) : v })),
+    setJobs: (v: FieldUpdater<Job[]>) => patchStore((s) => ({ jobs: typeof v === "function" ? v(s.jobs) : v })),
+    setOfficialPartners: (v: FieldUpdater<OfficialPartner[]>) => patchStore((s) => ({ officialPartners: typeof v === "function" ? v(s.officialPartners) : v })),
+    setSalesContacts: (v: FieldUpdater<SalesContact[]>) => patchStore((s) => ({ salesContacts: typeof v === "function" ? v(s.salesContacts) : v })),
+    setHomeBrands: (v: FieldUpdater<HomeBrand[]>) => patchStore((s) => ({ homeBrands: typeof v === "function" ? v(s.homeBrands) : v })),
+    setProductCategories: (v: FieldUpdater<ProductCategory[]>) => patchStore((s) => ({ productCategories: typeof v === "function" ? v(s.productCategories) : v })),
+    setInquiries: (v: FieldUpdater<Inquiry[]>) => patchStore((s) => ({ inquiries: typeof v === "function" ? v(s.inquiries) : v })),
+    setSocialMedia: (v: FieldUpdater<SocialMedia[]>) => patchStore((s) => ({ socialMedia: typeof v === "function" ? v(s.socialMedia) : v })),
+    reset,
+  };
 }
 
 // for non-hook access (articles list / detail fallback to seed)
