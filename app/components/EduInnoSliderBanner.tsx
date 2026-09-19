@@ -14,13 +14,13 @@ type SlideItem = {
 function SkeletonBanner() {
   return (
     <div className="relative w-screen left-1/2 -ml-[50vw] overflow-hidden">
-      <div className="w-full min-h-[320px] sm:min-h-[400px] md:min-h-[480px] bg-[#F5EFE0] animate-pulse">
-        <div className="mx-auto max-w-[1280px] px-5 sm:px-6 md:px-8 h-full flex items-end sm:items-center pb-16 sm:pb-0">
-          <div className="max-w-[600px] space-y-4">
-            <div className="h-7 w-32 rounded-full bg-[#2D4A22]/10" />
-            <div className="h-10 sm:h-12 w-64 rounded-lg bg-[#2D4A22]/10" />
+      <div className="w-full aspect-video bg-[#F5EFE0] animate-pulse">
+        <div className="mx-auto max-w-[1280px] px-5 sm:px-6 md:px-8 h-full flex items-end sm:items-center pb-6 sm:pb-0">
+          <div className="max-w-[600px] space-y-2 sm:space-y-4">
+            <div className="h-5 sm:h-7 w-32 rounded-full bg-[#2D4A22]/10" />
+            <div className="h-7 sm:h-12 w-44 sm:w-64 rounded-lg bg-[#2D4A22]/10" />
             <div className="h-4 w-80 rounded bg-[#2D4A22]/8 max-sm:hidden" />
-            <div className="h-11 w-40 rounded-full bg-[#2D4A22]/10" />
+            <div className="h-11 w-40 rounded-full bg-[#2D4A22]/10 max-sm:hidden" />
           </div>
         </div>
       </div>
@@ -28,15 +28,7 @@ function SkeletonBanner() {
   );
 }
 
-function HeroSlider({
-  items,
-  accentColor,
-  ready,
-}: {
-  items: SlideItem[];
-  accentColor: string;
-  ready: boolean;
-}) {
+function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const len = items.length;
@@ -106,9 +98,9 @@ function HeroSlider({
                 );
               }
               return isVideo ? (
-                <video src={src} autoPlay muted loop playsInline preload="metadata" className="block h-auto w-full object-cover min-h-[320px] sm:min-h-[400px] md:min-h-[480px]" />
+                <video src={src} autoPlay muted loop playsInline preload="metadata" className="block h-auto w-full bg-white" />
               ) : (
-                <img src={src} alt={slide.title} className="block h-auto w-full object-cover min-h-[320px] sm:min-h-[400px] md:min-h-[480px]" />
+                <img src={src} alt={slide.title} className="block h-auto w-full bg-white" />
               );
             })()}
           </motion.div>
@@ -141,11 +133,11 @@ function HeroSlider({
                   key={idx}
                   aria-label={`Go to slide ${idx + 1}`}
                   onClick={(e) => { e.stopPropagation(); setCurrent(idx); }}
-                  className={`h-1.5 rounded-full transition-all ${idx === current ? `w-8 ${accentColor}` : "w-1.5 bg-white/40 hover:bg-white/60"}`}
+                  className={`h-1.5 rounded-full transition-all ${idx === current ? "w-8 bg-[#2D4A22]" : "w-1.5 bg-[#2D4A22]/25 hover:bg-[#2D4A22]/50"}`}
                 />
               ))}
             </div>
-            <span className="ml-2 text-[11px] tracking-[0.12em] text-white/60">
+            <span className="ml-2 text-[11px] tracking-[0.12em] text-[#2D4A22]/60">
               {String(current + 1).padStart(2, "0")} / {String(len).padStart(2, "0")}
             </span>
           </div>
@@ -179,21 +171,13 @@ export default function EduInnoSliderBanner() {
     <>
       {showEdu && (
         <div className="mb-10 sm:mb-14">
-          <HeroSlider
-            items={eduSlides}
-            accentColor="bg-white"
-            ready={ready}
-          />
+          <HeroSlider items={eduSlides} ready={ready} />
         </div>
       )}
 
       {showInno && (
         <div className="mb-10 sm:mb-14">
-          <HeroSlider
-            items={innoSlides}
-            accentColor="bg-white"
-            ready={ready}
-          />
+          <HeroSlider items={innoSlides} ready={ready} />
         </div>
       )}
     </>

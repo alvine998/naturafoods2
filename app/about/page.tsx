@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Eye, Compass } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
@@ -16,12 +16,6 @@ export default function AboutPage() {
   const L = t.aboutDetail;
   const vision = L.values[0];
   const mission = L.values[1];
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const { scrollYProgress } = useScroll({ target: mounted ? heroRef : undefined, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 180]);
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
 
   const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
   const [aboutVideoReady, setAboutVideoReady] = useState(false);
