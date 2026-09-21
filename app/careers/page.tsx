@@ -46,7 +46,7 @@ export default function CareersPage() {
       >
         {/* Full-bleed background image */}
         <img
-          src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Screenshot%202026-09-15%20at%2007.03.34.png"
+          src="https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png"
           alt="NaturaFoods careers"
           className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
         />

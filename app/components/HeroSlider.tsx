@@ -124,7 +124,7 @@ export default function HeroSlider({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/Logo%20Natura%20Outline.png"
+                  src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
                   alt="PT. Natura Inti Sukses Logo"
                   className="h-[60px] sm:h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain drop-shadow-lg"
                 />

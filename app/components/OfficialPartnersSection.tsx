@@ -233,7 +233,7 @@ function RetailBrandSection() {
             </h2>
             <div className="flex justify-center">
               <img
-                src="https://pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev/LOGO%20AVANTE%20FIX%20FINAL.png"
+                src="https://cdn-naturafoods.alvineitsolutions.com/LOGO%20AVANTE%20FIX%20FINAL.png"
                 alt="Avante Ingredients Series"
                 className="h-32 sm:h-40 object-contain"
               />
