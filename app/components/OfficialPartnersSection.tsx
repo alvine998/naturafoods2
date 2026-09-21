@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useStore } from "../lib/store";
+import { useLang } from "../i18n";
 import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
 import type { OfficialPartner } from "../lib/data";
 
@@ -214,6 +215,7 @@ type BrandTile = {
 };
 
 function RetailBrandSection() {
+  const { t } = useLang();
   const { homeBrands } = useStore();
 
   const tiles: BrandTile[] = (homeBrands ?? [])
@@ -236,9 +238,9 @@ function RetailBrandSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
           <div className="text-center mb-12">
-             <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl md:text-5xl text-[#2D4A22] mb-6">
-               Our Retail Home Brand
-             </h2>
+              <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl md:text-5xl text-[#2D4A22] mb-6">
+                {t.homeRetailTitle}
+              </h2>
              <div className="flex justify-center">
                <Image
                  src="https://cdn-naturafoods.alvineitsolutions.com/LOGO%20AVANTE%20FIX%20FINAL.png"
@@ -287,6 +289,7 @@ function RetailBrandSection() {
 type SmallPackTile = { slug: string; title: string; img: string };
 
 function SmallPackSection() {
+  const { t } = useLang();
   const { products } = useStore();
 
   const tiles: SmallPackTile[] = (products ?? [])
@@ -307,12 +310,12 @@ function SmallPackSection() {
         <Reveal>
           <div className="text-center mb-12">
             <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
-              Small Pack for Ingredients Store :
+              {t.homeSmallPackTitle}
             </h2>
             <div className="mx-auto max-w-xl aspect-video rounded-xl overflow-hidden">
               <iframe
                 src="https://www.youtube.com/embed/7NYnW0M_obg?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
-                title="Small Pack for Ingredients Store"
+                title={t.homeSmallPackTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full"
@@ -614,6 +617,7 @@ function CocoaPowderSeriesSection() {
 }
 
 function ContactInfoSection() {
+  const { t } = useLang();
   const { salesContacts } = useStore();
 
   const contacts: ContactPerson[] = (salesContacts ?? [])
@@ -633,7 +637,7 @@ function ContactInfoSection() {
   return (
     <div className="mt-8">
       <h4 className="text-center text-xl font-semibold text-[#2D4A22] mb-6">
-        Requirement / Contact Info
+        {t.homeContactInfoTitle}
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {contacts.map((contact, index) => (
@@ -667,6 +671,7 @@ function Reveal({
 }
 
 export default function OfficialPartnersSection() {
+  const { t } = useLang();
   const { officialPartners } = useStore();
   const sourcePartners = officialPartners ?? SEED_OFFICIAL_PARTNERS;
   const publishedPartners = sourcePartners
@@ -728,18 +733,17 @@ export default function OfficialPartnersSection() {
                   />
                </div>
               <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
-                Official Partner For Indonesia :
+                {t.homePartnersTitle}
               </h2>
               <p className="max-w-2xl mx-auto text-[#1a1a16]/60 text-sm sm:text-base leading-relaxed">
-                Temukan berbagai pilihan bahan berkualitas dari naturafoods
-                untuk mendukung setiap ide dan inovasi bisnis Anda.
+                {t.homePartnersDesc}
               </p>
             </div>
           </Reveal>
 
           {displayCards.length === 0 ? (
             <p className="text-center text-sm text-[#8B6F47]">
-              No official partners published.
+              {t.homeNoPartners}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

@@ -161,10 +161,10 @@ export default function Home() {
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1280px] gap-8 sm:gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-start">
-            <div><h3 className="font-[var(--font-display)] text-[26px] sm:text-[30px] font-light leading-none text-white md:text-[36px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-white/65">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex items-center gap-1 rounded-full bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">Go to contact page <ArrowRight className="h-3 w-3" /></Link></div></div>
+            <div><h3 className="font-[var(--font-display)] text-[26px] sm:text-[30px] font-light leading-none text-white md:text-[36px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-white/65">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex items-center gap-1 rounded-full bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">{t.homeContactCta} <ArrowRight className="h-3 w-3" /></Link></div></div>
             <div className="rounded-[20px] bg-white p-5 sm:p-6 md:p-7 text-center">
-              <p className="text-[13px] leading-6 text-[#1a1a16]/60">Full inquiry form moved to</p>
-              <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white">CONTACT US</Link>
+              <p className="text-[13px] leading-6 text-[#1a1a16]/60">{t.homeContactFormNote}</p>
+              <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white">{t.homeContactUs}</Link>
               <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-[12px]"><a href="mailto:hello@naturafoods.id" className="underline text-[#2D4A22] break-all">hello@naturafoods.id</a></div>
             </div>
           </div>

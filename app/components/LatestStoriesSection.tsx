@@ -60,7 +60,7 @@ export default function LatestStoriesSection() {
               {t.articlesPage.eyebrow}
             </p>
             <h2 className="mt-2 font-[var(--font-display)] text-[28px] font-light leading-none text-[#2D4A22] sm:text-[36px] md:text-[42px]">
-              Latest <span className="italic font-normal">story.</span>
+              {t.homeLatestA} <span className="italic font-normal">{t.homeLatestB}</span>
             </h2>
             <p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-[#1a1a16]/60">{t.articlesPage.desc}</p>
           </Reveal>
