@@ -39,17 +39,36 @@ export default function HomeBrandsPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
-  const openEdit = (i: number) => { const h = s.homeBrands[i]; setF({ ...h }); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const openEdit = (i: number) => {
+    const h = s.homeBrands[i];
+    const raw = h as unknown as Record<string, unknown>;
+    const fromSnake = Array.isArray(raw.brand_ids) ? (raw.brand_ids as unknown[]) : [];
+    const fromJoin = Array.isArray(raw.brands)
+      ? (raw.brands as unknown[]).map((b) =>
+          b && typeof b === "object" ? String((b as Record<string, unknown>).id ?? "") : String(b ?? ""),
+        )
+      : [];
+    const brandIds = [...(h.brandIds ?? []), ...fromSnake, ...fromJoin]
+      .map((v) => String(v ?? "").trim())
+      .filter(Boolean)
+      .flatMap((v) => v.split(",").map((s) => s.trim()).filter(Boolean))
+      .filter((v, idx, arr) => arr.indexOf(v) === idx);
+    setF({ ...h, brandIds });
+    setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true);
+  };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.id || !f.name) return;
+    const brandIds = Array.isArray(f.brandIds) ? f.brandIds.filter(Boolean).map(String) : [];
     const item: HomeBrand = {
       id: String(f.id),
       name: String(f.name),
       image: String(f.image ?? ""),
       desc: String(f.desc ?? ""),
-      brandIds: f.brandIds ?? [],
+      brandIds,
     };
+    // backend uses snake_case `brand_ids` — send both spellings
+    const payload = { ...item, brand_ids: brandIds };
     if (editIdx === null) {
       const exists = s.homeBrands.some((h) => h.id === item.id);
       if (exists) { setErr("ID already exists"); return; }
@@ -62,10 +81,10 @@ export default function HomeBrandsPage() {
     const originalId = isEdit ? s.homeBrands[editIdx!].id : null;
     try {
       if (isEdit) {
-        await apiFetch(`/admin/home-brands/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(item) });
+        await apiFetch(`/admin/home-brands/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(payload) });
         s.setHomeBrands((prev: HomeBrand[]) => prev.map((x, i) => i === editIdx ? item : x));
       } else {
-        await apiFetch("/admin/home-brands", { method: "POST", body: JSON.stringify(item) });
+        await apiFetch("/admin/home-brands", { method: "POST", body: JSON.stringify(payload) });
         s.setHomeBrands((prev: HomeBrand[]) => [...prev, item]);
       }
       closeForm();

@@ -137,7 +137,7 @@ function normalizeHomeBrands(raw: unknown): HomeBrand[] {
     name: String(h.name ?? ""),
     image: String(h.image ?? h.img ?? ""),
     desc: String(h.desc ?? h.description ?? ""),
-    brandIds: Array.isArray(h.brandIds) ? (h.brandIds as string[]) : [],
+    brandIds: parseBrandIds(h) ?? [],
     createdAt: h.createdAt as string | undefined,
     updatedAt: h.updatedAt as string | undefined,
   })).filter((h) => h.id && h.name);
@@ -177,7 +177,7 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
     const background = String(p.background ?? p.mainImage ?? "");
     const rawColor = typeof p.color === "string" ? p.color.trim() : "";
     const order = parseOrder(p.order ?? (p as Record<string, unknown>).sortOrder) ?? idx;
-    const brandIds = parseStringArray(p.brandIds);
+    const brandIds = parseBrandIds(p);
     const link = typeof p.link === "string" && p.link.trim() ? p.link.trim() : undefined;
     return {
       id: String(p.id ?? ""),
@@ -201,10 +201,40 @@ function isValidHexColor(v: unknown): v is string {
 
 function parseStringArray(v: unknown): string[] | undefined {
   if (Array.isArray(v)) {
-    const out = (v as unknown[]).map((x) => String(x ?? "")).filter(Boolean);
-    return out.length ? out : undefined;
+    // backend may return string ids or {id} objects (join table)
+    const out = (v as unknown[])
+      .map((x) => {
+        if (typeof x === "string") return x.trim();
+        if (x && typeof x === "object") {
+          const o = x as Record<string, unknown>;
+          const id = o.id ?? o.brandId ?? o.brand_id ?? o.value ?? o.slug;
+          return String(id ?? "").trim();
+        }
+        return String(x ?? "").trim();
+      })
+      .filter(Boolean);
+    // support comma-separated single entry e.g. ["a,b"] or "a,b"
+    const split = out.flatMap((s) => s.split(",").map((s2) => s2.trim()).filter(Boolean));
+    return split.length ? [...new Set(split)] : undefined;
+  }
+  if (typeof v === "string" && v.trim() !== "") {
+    const out = v.split(",").map((s) => s.trim()).filter(Boolean);
+    return out.length ? [...new Set(out)] : undefined;
   }
   return undefined;
+}
+
+// Backend uses snake_case `brand_ids`; frontend uses camelCase `brandIds`.
+// Also accept `brands: [{id}]` join shape.
+function parseBrandIds(raw: Record<string, unknown>): string[] | undefined {
+  return (
+    parseStringArray(raw.brandIds) ??
+    parseStringArray(raw.brand_ids) ??
+    parseStringArray(raw.brandIDs) ??
+    parseStringArray(raw.brands) ??
+    parseStringArray(raw.Brands) ??
+    undefined
+  );
 }
 
 function migrateOfficialPartners(list: OfficialPartner[]): OfficialPartner[] {
@@ -216,9 +246,13 @@ function migrateOfficialPartners(list: OfficialPartner[]): OfficialPartner[] {
     const merged = [...(fromImages ?? []), ...(fromLogos ?? [])].filter((v, i, a) => v && a.indexOf(v) === i);
     const images = merged.length ? merged : undefined;
     const image = String(p.image ?? images?.[0] ?? "");
-    const { logos: _drop, ...rest } = raw as Record<string, unknown> & { logos?: unknown };
+    // normalize snake_case brand_ids (backend) -> brandIds (frontend)
+    const brandIds = parseBrandIds(raw) ?? parseStringArray(p.brandIds);
+    const { logos: _drop, brand_ids: _drop2, brands: _drop3, ...rest } = raw as Record<string, unknown> & { logos?: unknown; brand_ids?: unknown; brands?: unknown };
     void _drop;
-    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: parseOrder(p.order) ?? idx } as OfficialPartner;
+    void _drop2;
+    void _drop3;
+    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: parseOrder(p.order) ?? idx, ...(brandIds ? { brandIds } : {}) } as OfficialPartner;
   });
 }
 

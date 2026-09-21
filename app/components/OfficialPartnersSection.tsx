@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ type PartnerCard = {
   color: string;
   background?: string;
   images?: string[];
+  brandIds?: string[];
 };
 
 function stringToColor(str: string): string {
@@ -101,6 +103,10 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   // Semantics: color = solid card background,
   // background = single right-side product visual,
   // images[] = bottom-bar logos (more than one)
+  // brandIds[] = Master Brand ids — card click goes to /products?brand=a,b
+  const brandIds = (card.brandIds ?? []).filter(Boolean);
+  const href =
+    brandIds.length > 0 ? `/products?brand=${brandIds.join(",")}` : card.link;
   const rightVisual =
     card.background && card.background.trim() !== "" ? card.background : "";
   const bottomLogos =
@@ -126,9 +132,9 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
       style={{ background: card.color }}
     >
       <Link
-        href={card.link}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={href}
+        // target="_blank"
+        // rel="noopener noreferrer"
         className="flex h-full min-h-[320px] flex-col p-5 pb-4 sm:p-6 sm:pb-4"
       >
         {/* header: title + arrow */}
@@ -679,6 +685,15 @@ export default function OfficialPartnersSection() {
   const publishedPartners = sourcePartners
     .filter((p) => p.isPublished !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  useEffect(() => {
+    // runs in browser — check browser DevTools console, not `next dev` terminal
+    console.log("[OfficialPartners] published:", publishedPartners.map((p) => ({
+      id: p.id,
+      brandIds: (p as unknown as Record<string, unknown>).brandIds,
+      brand_ids: (p as unknown as Record<string, unknown>).brand_ids,
+      link: p.link,
+    })));
+  }, [officialPartners]);
   // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
   // Click destination precedence:
   // 1. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
@@ -709,6 +724,7 @@ export default function OfficialPartnersSection() {
           brandLogo: bottomLogos[0] || p.image || "",
           brandName: p.name,
           link: partnerLink(p),
+          brandIds: (p.brandIds ?? []).filter(Boolean),
           color:
             typeof p.color === "string" &&
             /^#[0-9a-fA-F]{6}$/.test(p.color.trim())

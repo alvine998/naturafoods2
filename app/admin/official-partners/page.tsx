@@ -67,8 +67,23 @@ export default function OfficialPartnersPage() {
     const raw = p as unknown as Record<string, unknown>;
     const legacyLogos = Array.isArray(raw.logos) ? (raw.logos as unknown[]).map((v) => String(v ?? "")).filter(Boolean) : [];
     const baseImages = Array.isArray(p.images) && p.images.length ? [...p.images] : [];
+    // backend may return snake_case brand_ids or join `brands` — normalize to brandIds for the form
+    const rawBrandIds =
+      (Array.isArray(p.brandIds) ? p.brandIds : []) as unknown[];
+    const fromSnake = Array.isArray(raw.brand_ids) ? (raw.brand_ids as unknown[]) : [];
+    const fromJoin = Array.isArray(raw.brands)
+      ? (raw.brands as unknown[]).map((b) =>
+          b && typeof b === "object" ? String((b as Record<string, unknown>).id ?? "") : String(b ?? ""),
+        )
+      : [];
+    const brandIds = [...rawBrandIds, ...fromSnake, ...fromJoin]
+      .map((v) => String(v ?? "").trim())
+      .filter(Boolean)
+      .flatMap((v) => v.split(",").map((s) => s.trim()).filter(Boolean))
+      .filter((v, idx, arr) => arr.indexOf(v) === idx);
     setF({
       ...p,
+      brandIds,
       images: baseImages.length ? baseImages : legacyLogos.length ? legacyLogos : p.image ? [p.image] : [],
     });
     setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true);
@@ -99,6 +114,8 @@ export default function OfficialPartnersPage() {
       brandIds,
       link: String(f.link ?? ""),
     };
+    // backend uses snake_case `brand_ids` — send both spellings
+    const payload = { ...item, brand_ids: brandIds };
     // local duplicate check (optimistic)
     if (editIdx === null) {
       const exists = (s.officialPartners as OfficialPartner[]).some((p) => p.id === item.id);
@@ -113,10 +130,10 @@ export default function OfficialPartnersPage() {
     const originalId = isEdit ? s.officialPartners[editIdx!].id : null;
     try {
       if (isEdit) {
-        await apiFetch(`/admin/official-partners/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(item) });
+        await apiFetch(`/admin/official-partners/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(payload) });
         s.setOfficialPartners((prev: OfficialPartner[]) => prev.map((x, i) => i === editIdx ? item : x));
       } else {
-        await apiFetch("/admin/official-partners", { method: "POST", body: JSON.stringify(item) });
+        await apiFetch("/admin/official-partners", { method: "POST", body: JSON.stringify(payload) });
         s.setOfficialPartners((prev: OfficialPartner[]) => [...prev, item]);
       }
       closeForm();
