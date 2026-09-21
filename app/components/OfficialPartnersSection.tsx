@@ -149,16 +149,18 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
            {rightVisual !== "" && (
              <div className="w-full shrink-0 sm:w-[42%]">
                <div className="relative aspect-square w-full">
-                 <Image
-                   src={rightVisual}
-                   alt={card.title}
-                   className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
-                   fill
-                   onError={(e) => {
-                     (e.currentTarget as HTMLImageElement).style.display =
-                       "none";
-                   }}
-                 />
+                  <Image
+                    src={rightVisual}
+                    alt={card.title}
+                    className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
+                    fill
+                    sizes="(max-width: 640px) 90vw, 400px"
+                    unoptimized={rightVisual.includes("r2.dev")}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display =
+                        "none";
+                    }}
+                  />
                </div>
              </div>
            )}
@@ -168,23 +170,24 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
          <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
            {bottomLogos.length > 0 ? (
              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-               {bottomLogos.slice(0, 4).map((src, i) => (
-                 <Image
-                   key={src + i}
-                   src={src}
-                   alt={
-                     i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
-                   }
-                   width={150}
-                   height={48}
-                   style={{ width: "auto" }}
-                   className="h-12 w-auto max-w-[150px] object-contain"
-                   onError={(e) => {
-                     (e.currentTarget as HTMLImageElement).style.display =
-                       "none";
-                   }}
-                 />
-               ))}
+                {bottomLogos.slice(0, 4).map((src, i) => (
+                  <div key={src + i} className="relative h-12 w-[150px] max-w-full shrink-0">
+                    <Image
+                      src={src}
+                      alt={
+                        i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
+                      }
+                      fill
+                      sizes="150px"
+                      unoptimized={src.includes("r2.dev")}
+                      className="object-contain"
+                      onError={(e) => {
+                        const box = (e.currentTarget as HTMLImageElement).parentElement;
+                        if (box) box.style.display = "none";
+                      }}
+                    />
+                  </div>
+                ))}
                {bottomLogos.length > 4 && (
                  <span className="text-[11px] font-medium text-black/60">
                    +{bottomLogos.length - 4}
@@ -485,13 +488,17 @@ function ContactCard({
        transition={{ duration: 0.5, delay: index * 0.1 }}
        className="flex flex-col items-start gap-4 rounded-xl bg-white p-4 shadow-md min-[420px]:flex-row min-[420px]:items-center"
      >
-       <Image
-         src={contact.avatar}
-         alt={contact.name}
-         width={64}
-         height={64}
-         className="w-16 h-16 rounded-full object-cover"
-       />
+        <Image
+          src={contact.avatar}
+          alt={contact.name}
+          width={64}
+          height={64}
+          className="w-16 h-16 rounded-full object-cover"
+          unoptimized={contact.avatar.includes("r2.dev")}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
+        />
        <div className="min-w-0 flex-1">
         <p className="font-medium text-[#2D4A22]">{contact.region}</p>
         <p className="text-sm font-semibold text-gray-800">
@@ -710,14 +717,15 @@ export default function OfficialPartnersSection() {
           <Reveal>
              <div className="text-center mb-10 sm:mb-12">
                <div className="flex items-center justify-center gap-4 mb-6">
-                 <Image
-                   src="/logo.png"
-                   alt="NaturaFoods"
-                   width={335}
-                   height={102}
-                   style={{ width: "auto" }}
-                   className="h-12 w-auto object-contain sm:h-16"
-                 />
+                  <Image
+                    src="/logo.png"
+                    alt="NaturaFoods"
+                    width={335}
+                    height={102}
+                    style={{ width: "auto" }}
+                    className="h-12 w-auto object-contain sm:h-16"
+                    priority
+                  />
                </div>
               <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
                 Official Partner For Indonesia :

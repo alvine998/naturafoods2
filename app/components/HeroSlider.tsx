@@ -15,16 +15,22 @@ const CTA_ID = "contact";
 
 export default function HeroSlider({
   onCta,
-  welcome: _welcome,
+  welcome,
 }: {
   onCta?: (id: string) => void;
   welcome?: { title: string; sub: string };
 }) {
-  void _welcome;
   const { t } = useLang();
   const videoSrc = t.heroVideoSrc || FALLBACK_VIDEO_SRC;
   const videoPoster = t.heroVideoPoster || FALLBACK_VIDEO_POSTER;
   const title = `${t.bannerTitle1} ${t.bannerTitleItalic} ${t.bannerTitle3}`;
+  // Translated welcome heading (ID/EN/ZH via i18n `welcomeTitle`, overridable via
+  // welcome prop / site content). Split "greeting" from company name at "PT"
+  // so layout stays: greeting on line 1, "PT Natura Inti Sukses" on line 2.
+  const welcomeTitle = welcome?.title || t.welcomeTitle || "Welcome to PT Natura Inti Sukses";
+  const ptIndex = welcomeTitle.indexOf("PT");
+  const welcomeGreeting = (ptIndex > 0 ? welcomeTitle.slice(0, ptIndex).trim() : welcomeTitle.trim()) || welcomeTitle;
+  const welcomeCompany = ptIndex > 0 ? welcomeTitle.slice(ptIndex).trim() : "";
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [authed, setAuthed] = useState<boolean>(false);
@@ -115,26 +121,30 @@ export default function HeroSlider({
             transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 z-10 flex items-center"
           >
-            <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-10 md:px-12 lg:px-14">
-              <div className="max-w-[480px] sm:max-w-[540px] md:max-w-[600px]">
-                <h1 className="font-[var(--font-display)] text-[24px] sm:text-[32px] md:text-[42px] lg:text-[52px] font-light leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg">
-                  Welcome To<br className="hidden sm:block" />{" "}
-                  <span className="whitespace-nowrap">PT. Natura Inti Sukses</span>
+            <div className="w-full px-3 sm:px-5 md:px-6 lg:px-8">
+              <div className="max-w-[640px] sm:max-w-[720px] md:max-w-[860px]">
+                <h1 key={welcomeTitle} className="font-[var(--font-display)] text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] font-light leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg">
+                  {welcomeGreeting}<br className="hidden sm:block" />{" "}
+                  {welcomeCompany ? (
+                    <span className="sm:whitespace-nowrap">{welcomeCompany}</span>
+                  ) : null}
                 </h1>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-4 sm:mt-5 -ml-2 sm:-ml-3 md:-ml-4"
                 >
-                  <Image
-                    src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
-                    alt="PT. Natura Inti Sukses Logo"
-                    width={400}
-                    height={120}
-                    priority
-                    style={{ width: "auto" }}
-                    className="h-[60px] sm:h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain drop-shadow-lg"
-                  />
+                  <div className="relative h-[84px] sm:h-[112px] md:h-[140px] lg:h-[168px] w-full max-w-[560px]">
+                    <Image
+                      src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
+                      alt="PT. Natura Inti Sukses Logo"
+                      fill
+                      sizes="(max-width: 640px) 80vw, 560px"
+                      priority
+                      className="object-contain object-left drop-shadow-lg"
+                    />
+                  </div>
                 </motion.div>
               </div>
             </div>
