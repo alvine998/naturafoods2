@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -142,8 +143,8 @@ export default function MasterBrandsPage() {
                     const realIdx = s.masterBrands.indexOf(b);
                     const logo = b.logo?.trim() ? b.logo : null;
                     return (
-                      <tr key={b.id || b.slug} className="hover:bg-white/60">
-                        <td className="px-3 py-2">{logo ? <img src={logo} alt="" className="h-8 w-8 rounded-lg object-contain bg-[#F5EFE0]" /> : <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
+                       <tr key={b.id || b.slug} className="hover:bg-white/60">
+                         <td className="px-3 py-2">{logo ? <Image src={logo} alt="" className="h-8 w-8 rounded-lg object-contain bg-[#F5EFE0]" width={32} height={32} /> : <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{b.name}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{b.slug}</td>
                         <td className="px-3 py-2 text-[#1a1a16]/70 line-clamp-1">{b.description}</td>

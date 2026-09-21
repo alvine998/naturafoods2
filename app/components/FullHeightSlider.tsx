@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
@@ -91,8 +92,7 @@ export default function FullHeightSlider({ items, fallbackCta = "Learn more" }: 
                 // eslint-disable-next-line jsx-a11y/media-has-caption
                 <video src={src} autoPlay muted loop playsInline preload="metadata" className="block h-auto w-full bg-white" />
               ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={src} alt={s.title} className="block h-auto w-full bg-white" />
+                <Image src={src} alt={s.title} width={1600} height={900} sizes="100vw" priority={i === 0} className="block h-auto w-full bg-white" />
               );
             })()}
             {/* no dark overlay — clean image for education/innovation banners */}

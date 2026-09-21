@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { LayoutDashboard, Package, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Menu, X, ArrowLeft, Tag, Share2, Info, Bookmark } from "lucide-react";
@@ -81,9 +82,8 @@ export default function AdminShell({ counts, labels, children }: Props) {
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle menu" className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D4A22]/15 bg-white text-[#2D4A22] lg:hidden"><Menu className="h-4 w-4" /></button>
             <Link href="/" className="flex items-center gap-2.5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="NaturaFoods" className="h-7 w-auto" />
-              <span className="hidden sm:inline text-[11px] tracking-[0.16em] text-[#2D4A22]/70">CMS</span>
+               <Image src="/logo.png" alt="NaturaFoods" width={335} height={102} style={{ width: "auto" }} className="h-7 w-auto" />
+               <span className="hidden sm:inline text-[11px] tracking-[0.16em] text-[#2D4A22]/70">CMS</span>
             </Link>
             <span className="hidden sm:inline h-4 w-px bg-[#2D4A22]/15" />
             <span className="hidden sm:inline text-[11px] tracking-[0.14em] text-[#8B6F47]">ADMIN</span>

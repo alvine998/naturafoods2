@@ -1,5 +1,6 @@
 "use client";
 import { MessageCircle, Mail, Phone } from "lucide-react";
+import Image from "next/image";
 import { useLang } from "../i18n";
 import { salesInitials, sortSalesContacts, useStore } from "../lib/store";
 
@@ -37,7 +38,7 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
             <div key={c.id} className="flex gap-4 rounded-2xl border border-[#2D4A22]/10 bg-white p-4 sm:p-5">
               {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo} alt={c.name} className="h-11 w-11 shrink-0 rounded-full object-cover bg-[#F5EFE0]" />
+                <Image src={photo} alt={c.name} className="h-11 w-11 shrink-0 rounded-full object-cover bg-[#F5EFE0]" width={44} height={44} />
               ) : (
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2D4A22] text-[12px] font-medium tracking-[0.08em] text-white">{salesInitials(c.name)}</div>
               )}

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMemo } from "react";
@@ -55,7 +56,7 @@ export default function HighlightedProductsSection() {
                   <motion.div key={p.slug} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white">
                     <Link href={`/products/${p.slug}`} className="block aspect-[4/3] overflow-hidden bg-[#F5EFE0]">
                       {p.img?.trim() ? (
-                        <motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} src={p.img} alt={p.title} className="h-full w-full object-cover" />
+                        <Image src={p.img} alt={p.title} width={400} height={300} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]" />
                       ) : (
                         <div className="grid h-full w-full place-items-center text-[11px] tracking-[0.14em] text-[#8B6F47]">No image</div>
                       )}

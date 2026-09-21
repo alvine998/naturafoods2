@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useStore } from "../lib/store";
 import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
 import type { OfficialPartner } from "../lib/data";
@@ -43,7 +44,7 @@ const partnerCards: PartnerCard[] = [
     description:
       "Bubuk teh hijau premium dengan warna cerah dan rasa khas jepang.",
     image:
-      "https://images.unsplash.com/photo-1564890369478-c89ca64c94ea?w=600&q=80",
+      "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&q=80",
     brandLogo: "",
     brandName: "Afya",
     link: "/products?cat=tea",
@@ -145,53 +146,57 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
           <p className="min-w-0 flex-1 text-white/95 text-[15px] leading-relaxed">
             {card.description}
           </p>
-          {rightVisual !== "" && (
-            <div className="w-full shrink-0 sm:w-[42%]">
-              <div className="relative aspect-square w-full">
-                <img
-                  src={rightVisual}
-                  alt={card.title}
-                  className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display =
-                      "none";
-                  }}
-                />
-              </div>
-            </div>
-          )}
+           {rightVisual !== "" && (
+             <div className="w-full shrink-0 sm:w-[42%]">
+               <div className="relative aspect-square w-full">
+                 <Image
+                   src={rightVisual}
+                   alt={card.title}
+                   className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.35)]"
+                   fill
+                   onError={(e) => {
+                     (e.currentTarget as HTMLImageElement).style.display =
+                       "none";
+                   }}
+                 />
+               </div>
+             </div>
+           )}
         </div>
 
         {/* bottom logo bar */}
-        <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
-          {bottomLogos.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              {bottomLogos.slice(0, 4).map((src, i) => (
-                <img
-                  key={src + i}
-                  src={src}
-                  alt={
-                    i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
-                  }
-                  className="h-12 w-auto max-w-[150px] object-contain"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display =
-                      "none";
-                  }}
-                />
-              ))}
-              {bottomLogos.length > 4 && (
-                <span className="text-[11px] font-medium text-black/60">
-                  +{bottomLogos.length - 4}
-                </span>
-              )}
-            </div>
-          ) : (
-            <p className="text-center text-sm font-semibold text-black/70">
-              {card.brandName}
-            </p>
-          )}
-        </div>
+         <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
+           {bottomLogos.length > 0 ? (
+             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+               {bottomLogos.slice(0, 4).map((src, i) => (
+                 <Image
+                   key={src + i}
+                   src={src}
+                   alt={
+                     i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
+                   }
+                   width={150}
+                   height={48}
+                   style={{ width: "auto" }}
+                   className="h-12 w-auto max-w-[150px] object-contain"
+                   onError={(e) => {
+                     (e.currentTarget as HTMLImageElement).style.display =
+                       "none";
+                   }}
+                 />
+               ))}
+               {bottomLogos.length > 4 && (
+                 <span className="text-[11px] font-medium text-black/60">
+                   +{bottomLogos.length - 4}
+                 </span>
+               )}
+             </div>
+           ) : (
+             <p className="text-center text-sm font-semibold text-black/70">
+               {card.brandName}
+             </p>
+           )}
+         </div>
       </Link>
     </motion.div>
   );
@@ -228,17 +233,20 @@ function RetailBrandSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
           <div className="text-center mb-12">
-            <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl md:text-5xl text-[#2D4A22] mb-6">
-              Our Retail Home Brand
-            </h2>
-            <div className="flex justify-center">
-              <img
-                src="https://cdn-naturafoods.alvineitsolutions.com/LOGO%20AVANTE%20FIX%20FINAL.png"
-                alt="Avante Ingredients Series"
-                className="h-32 sm:h-40 object-contain"
-              />
-            </div>
-          </div>
+             <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl md:text-5xl text-[#2D4A22] mb-6">
+               Our Retail Home Brand
+             </h2>
+             <div className="flex justify-center">
+               <Image
+                 src="https://cdn-naturafoods.alvineitsolutions.com/LOGO%20AVANTE%20FIX%20FINAL.png"
+                 alt="Avante Ingredients Series"
+                 width={320}
+                 height={160}
+                 style={{ width: "auto" }}
+                 className="h-32 w-auto object-contain sm:h-40"
+               />
+             </div>
+           </div>
         </Reveal>
 
         <Reveal delay={0.2}>
@@ -252,16 +260,18 @@ function RetailBrandSection() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
               >
-                <Link
-                  href={brandLink(item.brandIds)}
-                  className="block w-full h-full"
-                >
-                  <img
-                    src={item.img}
-                    alt={item.title}
-                    className="w-full h-full object-cover hover:scale-150 transition-transform duration-300"
-                  />
-                </Link>
+                 <Link
+                   href={brandLink(item.brandIds)}
+                   className="block w-full h-full"
+                 >
+                   <Image
+                     src={item.img}
+                     alt={item.title}
+                     className="w-full h-full object-cover hover:scale-150 transition-transform duration-300"
+                     width={200}
+                     height={200}
+                   />
+                 </Link>
               </motion.div>
             ))}
           </div>
@@ -323,14 +333,16 @@ function SmallPackSection() {
                 key={item.slug + i}
                 className="w-[180px] shrink-0 rounded-2xl p-4"
               >
-                <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.img}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                 <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3">
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                   <Image
+                     src={item.img}
+                     alt={item.title}
+                     className="w-full h-full object-cover"
+                     width={180}
+                     height={240}
+                   />
+                 </div>
                 {/* <p className="text-sm text-center text-[#2D4A22] font-medium truncate">
                   {item.title}
                 </p> */}
@@ -415,24 +427,29 @@ function CocoaProductCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
     >
-      <div className="aspect-[4/3] overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.code}
-          className="w-full h-full object-cover"
-        />
-      </div>
+       <div className="aspect-[4/3] overflow-hidden">
+         <Image
+           src={product.image}
+           alt={product.code}
+           className="w-full h-full object-cover"
+           width={400}
+           height={300}
+         />
+       </div>
       <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="font-semibold text-[#2D4A22]">{product.code}</span>
-          {product.brandLogo ? (
-            <img
-              src={product.brandLogo}
-              alt={product.brand}
-              className="h-6 object-contain"
-            />
-          ) : null}
-        </div>
+         <div className="flex items-center justify-between mb-2">
+           <span className="font-semibold text-[#2D4A22]">{product.code}</span>
+           {product.brandLogo ? (
+             <Image
+               src={product.brandLogo}
+               alt={product.brand}
+               width={96}
+               height={24}
+               style={{ width: "auto" }}
+               className="h-6 w-auto object-contain"
+             />
+           ) : null}
+         </div>
         <p className="text-xs text-gray-600 leading-relaxed mb-3">
           {product.description}
         </p>
@@ -461,19 +478,21 @@ function ContactCard({
     .replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, "")
     .trim();
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="flex flex-col items-start gap-4 rounded-xl bg-white p-4 shadow-md min-[420px]:flex-row min-[420px]:items-center"
-    >
-      <img
-        src={contact.avatar}
-        alt={contact.name}
-        className="w-16 h-16 rounded-full object-cover"
-      />
-      <div className="min-w-0 flex-1">
+     <motion.div
+       initial={{ opacity: 0, y: 20 }}
+       whileInView={{ opacity: 1, y: 0 }}
+       viewport={{ once: true }}
+       transition={{ duration: 0.5, delay: index * 0.1 }}
+       className="flex flex-col items-start gap-4 rounded-xl bg-white p-4 shadow-md min-[420px]:flex-row min-[420px]:items-center"
+     >
+       <Image
+         src={contact.avatar}
+         alt={contact.name}
+         width={64}
+         height={64}
+         className="w-16 h-16 rounded-full object-cover"
+       />
+       <div className="min-w-0 flex-1">
         <p className="font-medium text-[#2D4A22]">{contact.region}</p>
         <p className="text-sm font-semibold text-gray-800">
           {prefix} {displayName}
@@ -538,13 +557,16 @@ function CocoaPowderSeriesSection() {
         {sections.map((section, sIdx) => (
           <Reveal key={section.category.id} delay={sIdx * 0.1}>
             <Reveal>
-              <div className="mb-2 flex flex-col items-center gap-4 text-center sm:mb-10 sm:flex-row sm:items-center sm:justify-between sm:text-left">
-                <img
-                  src="/logo.png"
-                  alt="NaturaFoods"
-                  className="h-10 object-contain sm:h-12"
-                />
-                <h2 className="text-center font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
+               <div className="mb-2 flex flex-col items-center gap-4 text-center sm:mb-10 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                 <Image
+                   src="/logo.png"
+                   alt="NaturaFoods"
+                   width={335}
+                   height={102}
+                   style={{ width: "auto" }}
+                   className="h-10 w-auto object-contain sm:h-12"
+                 />
+                 <h2 className="text-center font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
                   {section.category.name}
                   <br />
                   <span className="text-[20px] text-[#2D4A22]/80 font-normal">
@@ -686,14 +708,17 @@ export default function OfficialPartnersSection() {
       <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-[white] to-white">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
           <Reveal>
-            <div className="text-center mb-10 sm:mb-12">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <img
-                  src="/logo.png"
-                  alt="NaturaFoods"
-                  className="h-12 sm:h-16 object-contain"
-                />
-              </div>
+             <div className="text-center mb-10 sm:mb-12">
+               <div className="flex items-center justify-center gap-4 mb-6">
+                 <Image
+                   src="/logo.png"
+                   alt="NaturaFoods"
+                   width={335}
+                   height={102}
+                   style={{ width: "auto" }}
+                   className="h-12 w-auto object-contain sm:h-16"
+                 />
+               </div>
               <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
                 Official Partner For Indonesia :
               </h2>

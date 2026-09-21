@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
@@ -155,8 +156,7 @@ export default function HomeBrandsPage() {
                       <tr key={h.id + realIdx} className="hover:bg-white/60">
                         <td className="px-3 py-2">
                           {h.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={h.image} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                            <Image src={h.image} alt="" className="h-10 w-10 rounded-lg object-cover" width={40} height={40} />
                           ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}
                         </td>
                         <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{h.name}</div><div className="text-[11px] text-[#8B6F47]">{h.id}</div></td>

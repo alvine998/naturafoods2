@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Input as UiInput } from "@/components/ui/input";
 import { Textarea as UiTextarea } from "@/components/ui/textarea";
@@ -135,10 +136,9 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
               <span className="font-medium">PDF uploaded</span>
             </div>
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={src} alt="preview" className="h-28 w-full object-cover" />
-          )}
+           ) : (
+             <Image src={src} alt="preview" className="h-28 w-full object-cover" width={300} height={112} />
+           )}
         </div>
       ) : (
         <div className="grid place-items-center rounded-xl border border-dashed border-[#2D4A22]/15 bg-white px-4 py-6 text-center text-[11px] text-[#8B6F47]">No file selected</div>
@@ -219,11 +219,10 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
         <div className="grid place-items-center rounded-xl border border-dashed border-[#2D4A22]/15 bg-white px-4 py-6 text-center text-[11px] text-[#8B6F47]">No images yet — upload up to {max}</div>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {list.map((src, i) => (
-            <div key={src + i} className="group relative overflow-hidden rounded-xl border border-[#2D4A22]/15 bg-[#F5EFE0]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`image ${i + 1}`} className="h-20 w-full object-cover" />
-              <span className={`absolute left-1 top-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${i === 0 ? "bg-[#2D4A22] text-white" : "bg-white/90 text-[#2D4A22]"}`}>{i === 0 ? "★ Main" : `#${i + 1}`}</span>
+           {list.map((src, i) => (
+             <div key={src + i} className="group relative overflow-hidden rounded-xl border border-[#2D4A22]/15 bg-[#F5EFE0]">
+               <Image src={src} alt={`image ${i + 1}`} className="h-20 w-full object-cover" width={100} height={80} />
+               <span className={`absolute left-1 top-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${i === 0 ? "bg-[#2D4A22] text-white" : "bg-white/90 text-[#2D4A22]"}`}>{i === 0 ? "★ Main" : `#${i + 1}`}</span>
               <div className="absolute inset-x-1 bottom-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
                 <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="flex-1 rounded-md bg-white/95 px-1 py-0.5 text-[10px] disabled:opacity-40">◀</button>
                 <button type="button" onClick={() => move(i, 1)} disabled={i === list.length - 1} className="flex-1 rounded-md bg-white/95 px-1 py-0.5 text-[10px] disabled:opacity-40">▶</button>

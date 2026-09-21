@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "../lib/store";
@@ -100,7 +101,7 @@ function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
               return isVideo ? (
                 <video src={src} autoPlay muted loop playsInline preload="metadata" className="block h-auto w-full bg-white" />
               ) : (
-                <img src={src} alt={slide.title} className="block h-auto w-full bg-white" />
+                <Image src={src} alt={slide.title} width={1600} height={900} sizes="100vw" className="block h-auto w-full bg-white" />
               );
             })()}
           </motion.div>

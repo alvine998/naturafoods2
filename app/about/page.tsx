@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Eye, Compass } from "lucide-react";
@@ -39,10 +40,12 @@ export default function AboutPage() {
         <div className="relative min-h-[70vh] overflow-hidden bg-[#1a1a16]">
           <div className="relative h-[70vh] min-h-[520px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={aboutVideoPoster}
               alt=""
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${aboutVideoReady ? "opacity-0" : "opacity-100"}`}
+              fill
+              priority
             />
             <iframe
               src="https://www.youtube.com/embed/FT558Ad3rfY?autoplay=1&mute=1&loop=1&playlist=FT558Ad3rfY&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
@@ -82,7 +85,7 @@ export default function AboutPage() {
             </div>
             <motion.div style={{ y: heroY }} className="relative">
               <div className="relative aspect-[4/4.6] overflow-hidden rounded-[28px] bg-[#F5EFE0] shadow-[0_24px_60px_rgba(45,74,34,0.12)]">
-                <motion.img style={{ scale: heroScale }} src={L.heroImage} alt="NaturaFoods" className="h-full w-full object-cover" />
+                <motion.div style={{ scale: heroScale }} className="h-full w-full"><Image src={L.heroImage} alt="NaturaFoods" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" /></motion.div>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-white/95 px-4 py-3 backdrop-blur">
                   <div><div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">{L.heroCardKicker}</div><div className="text-[12px] font-medium text-[#2D4A22]">{L.heroCardTitle}</div></div>
@@ -112,7 +115,7 @@ export default function AboutPage() {
           </div>
           <div className="grid gap-4">
             <Reveal y={24} className="overflow-hidden rounded-[24px] bg-[#FFF7E8]">
-              <img src={L.storyImage} alt="Baking" className="aspect-[4/3] w-full object-cover" />
+              <Image src={L.storyImage} alt="Baking" className="aspect-[4/3] w-full object-cover" width={600} height={450} />
               <div className="p-5">
                 <div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">{L.storyCardLabel}</div>
                 <div className="mt-1 text-[13px] leading-6 text-[#1a1a16]/70">{L.storyCardDesc}</div>

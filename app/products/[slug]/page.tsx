@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import SalesContactCard from "../../components/SalesContactCard";
 import { ArrowLeft, Download } from "lucide-react";
@@ -62,7 +63,7 @@ export default function ProductDetailPage() {
       <Link href="/products" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.productsPage.title}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
         {img ? (
-          <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{isVideo ? <video src={img} controls className="h-full w-full object-cover" /> : <img src={img} alt={product.title} className="h-full w-full object-cover" />}</div>
+          <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{isVideo ? <video src={img} controls className="h-full w-full object-cover" /> : <Image src={img} alt={product.title} className="h-full w-full object-cover" width={1000} height={500} />}</div>
         ) : null}
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2">

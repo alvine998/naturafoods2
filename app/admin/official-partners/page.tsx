@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -269,15 +270,15 @@ export default function OfficialPartnersPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-2 rounded-xl p-1.5" style={{ background: cardColor }} title={`card bg ${cardColor} · ${bottomLogos.length} logo(s)`}>
-                            {rightVisual ? (
-                              <img src={rightVisual} alt="" className="h-10 w-10 rounded-lg object-contain" />
-                            ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-white/20 text-[10px] text-white">—</span>}
-                            <div className="flex -space-x-1.5 rounded-md bg-[#CFC6B8] px-1.5 py-1">
-                              {bottomLogos.length ? bottomLogos.slice(0, 2).map((src: string, i: number) => (
-                                <img key={src + i} src={src} alt="" className="h-6 w-auto max-w-[48px] rounded object-contain" />
-                              )) : <span className="text-[10px] text-black/50">no logo</span>}
+                         <td className="px-3 py-2">
+                           <div className="flex items-center gap-2 rounded-xl p-1.5" style={{ background: cardColor }} title={`card bg ${cardColor} · ${bottomLogos.length} logo(s)`}>
+                             {rightVisual ? (
+                               <Image src={rightVisual} alt="" className="h-10 w-10 rounded-lg object-contain" width={40} height={40} />
+                             ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-white/20 text-[10px] text-white">—</span>}
+                             <div className="flex -space-x-1.5 rounded-md bg-[#CFC6B8] px-1.5 py-1">
+                               {bottomLogos.length ? bottomLogos.slice(0, 2).map((src: string, i: number) => (
+                                 <Image key={src + i} src={src} alt="" width={48} height={24} style={{ width: "auto" }} className="h-6 w-auto max-w-[48px] rounded object-contain" />
+                               )) : <span className="text-[10px] text-black/50">no logo</span>}
                               {bottomLogos.length > 2 && <span className="text-[10px] text-black/60">+{bottomLogos.length - 2}</span>}
                             </div>
                             {bottomLogos.length > 1 && <span className="rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-medium">×{bottomLogos.length}</span>}

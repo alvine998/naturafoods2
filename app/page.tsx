@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Minus } from "lucide-react";
 import LenisProvider from "./components/LenisProvider";
@@ -68,13 +69,13 @@ export default function Home() {
             </motion.div>
             <div className="relative grid grid-cols-[1.15fr_0.85fr] gap-3 sm:gap-4">
               <div className="relative aspect-[4/5.4] overflow-hidden rounded-[20px] sm:rounded-[28px] bg-[#F5EFE0]">
-                <motion.img style={{ scale: heroScale }} src="https://images.unsplash.com/photo-1610611424854-5e07032143d8?w=900&q=80" alt="Chocolate" className="h-full w-full object-cover" />
+                <motion.div style={{ scale: heroScale }} className="h-full w-full"><Image src="https://images.unsplash.com/photo-1610611424854-5e07032143d8?w=900&q=80" alt="Chocolate" fill sizes="(max-width: 640px) 60vw, 40vw" priority className="object-cover" /></motion.div>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
                 <span className="absolute left-3 sm:left-4 top-3 sm:top-4 rounded-full bg-white/90 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.16em] text-[#2D4A22] backdrop-blur">{t.cardChocoLabel}</span>
               </div>
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div className="relative flex-1 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-[#E8F0E2]">
-                  <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=700&q=80" alt="Matcha" className="h-full w-full object-cover" />
+                  <Image src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=700&q=80" alt="Matcha" className="h-full w-full object-cover" width={700} height={700} />
                   <span className="absolute left-2 sm:left-3 top-2 sm:top-3 rounded-full bg-white/90 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] tracking-[0.16em] text-[#2D4A22] backdrop-blur">{t.cardMatchaLabel}</span>
                 </div>
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={entered ? { y: 0, opacity: 1 } : {}} transition={{ delay: 1.0, duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="rounded-2xl bg-white p-3 sm:p-4 shadow-[0_12px_40px_rgba(0,0,0,0.1)]">
@@ -99,7 +100,7 @@ export default function Home() {
 
         {/* <section id="about" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-24">
           <div className="grid items-center gap-8 sm:gap-10 md:grid-cols-2 md:gap-16">
-            <Parallax offset={60} className="order-2 md:order-1"><div className="relative aspect-[4/3.1] overflow-hidden rounded-[20px] sm:rounded-[24px] bg-[#FFF7E8]"><img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80" alt="Warehouse" className="h-full w-full object-cover" /></div></Parallax>
+            <Parallax offset={60} className="order-2 md:order-1"><div className="relative aspect-[4/3.1] overflow-hidden rounded-[20px] sm:rounded-[24px] bg-[#FFF7E8]"><Image src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80" alt="Warehouse" width={900} height={700} className="h-full w-full object-cover" /></div></Parallax>
             <div className="order-1 md:order-2">
               <Reveal><p className="text-[10px] tracking-[0.2em] sm:text-[11px] sm:tracking-[0.24em] text-[#8B6F47]">{t.aboutEyebrow}</p></Reveal>
               <Reveal delay={0.08}><h2 className="mt-2 sm:mt-3 font-[var(--font-display)] text-[28px] sm:text-[34px] font-light leading-none tracking-tight text-[#2D4A22] md:text-[44px]">{t.aboutTitle1}<br /><span className="italic font-normal">{t.aboutTitle2}</span></h2></Reveal>
@@ -118,7 +119,7 @@ export default function Home() {
               const slugs = ["belgian-dark-72", "milk-couverture-33", "white-chocolate-28"];
               return (
               <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white">
-                <Link href={`/products/${slugs[i]}`} className="block aspect-[4/3] overflow-hidden bg-[#F5EFE0]"><motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} src={p.img} alt={p.title} className="h-full w-full object-cover" /></Link>
+                <Link href={`/products/${slugs[i]}`} className="block aspect-[4/3] overflow-hidden bg-[#F5EFE0]"><Image src={p.img} alt={p.title} width={400} height={300} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]" /></Link>
                 <div className="p-4 sm:p-5"><Link href={`/products/${slugs[i]}`} className="flex items-start justify-between gap-3 group/link"><div className="min-w-0"><h3 className="font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{p.note}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-white">{p.tag}</span></Link><Link href={`/products/${slugs[i]}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">{t.homeCommon.viewDetail}</Link></div>
               </motion.div>);})}
             </div>
@@ -133,7 +134,7 @@ export default function Home() {
               const slugs = ["uji-ceremonial-yame", "culinary-matcha-nishio", "hojicha-roasted"];
               return (
               <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white">
-                <Link href={`/products/${slugs[i]}`} className="block aspect-[4/3] overflow-hidden bg-[#E8F0E2]"><motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} src={p.img} alt={p.title} className="h-full w-full object-cover" /></Link>
+                <Link href={`/products/${slugs[i]}`} className="block aspect-[4/3] overflow-hidden bg-[#E8F0E2]"><Image src={p.img} alt={p.title} width={400} height={300} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]" /></Link>
                 <div className="p-4 sm:p-5"><Link href={`/products/${slugs[i]}`} className="flex items-start justify-between gap-3 group/link"><div className="min-w-0"><h3 className="font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{p.note}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-white">{p.tag}</span></Link><Link href={`/products/${slugs[i]}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">{t.homeCommon.viewDetail}</Link></div>
               </motion.div>);})}
             </div>
@@ -141,7 +142,7 @@ export default function Home() {
         </section>
 
         <section className="relative h-[52vh] min-h-[340px] sm:h-[56vh] sm:min-h-[380px] overflow-hidden">
-          <Parallax offset={110} className="absolute inset-0"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80" alt="Café" className="h-[140%] w-full object-cover" /></Parallax>
+          <Parallax offset={110} className="absolute inset-0"><Image src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80" alt="Café" className="h-[140%] w-full object-cover" width={1600} height={2240} /></Parallax>
           <div className="absolute inset-0 bg-[#1a1a16]/45" />
           <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 sm:px-6 text-center">
             <Reveal><p className="text-[10px] sm:text-[11px] tracking-[0.28em] text-white/80">{t.bannerEyebrow}</p></Reveal>

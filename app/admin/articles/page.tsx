@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -194,8 +195,8 @@ export default function ArticlesPage() {
                     const img = ar.img?.trim() ? ar.img : null;
                     const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
                     return (
-                      <tr key={ar.slug + realIdx} className="hover:bg-white/60">
-                        <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <img src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
+                       <tr key={ar.slug + realIdx} className="hover:bg-white/60">
+                         <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <Image src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" width={40} height={40} />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1">{ar.title}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.slug}</td>
                         <td className="px-3 py-2">{ar.category}</td>

@@ -1,5 +1,6 @@
 "use client";
 import { ArrowUpRight, Briefcase } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
@@ -45,10 +46,13 @@ export default function CareersPage() {
         className="group relative block min-h-[100svh] overflow-hidden"
       >
         {/* Full-bleed background image */}
-        <img
+        <Image
           src="https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png"
           alt="NaturaFoods careers"
-          className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+          fill
+          priority
+          sizes="100vw"
+          className="object-contain transition-transform duration-700 group-hover:scale-[1.02]"
         />
 
 

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLang } from "../i18n";
@@ -93,12 +94,12 @@ export default function LatestStoriesSection() {
                     isVideo ? (
                       <video src={src} muted playsInline className="h-full w-full object-cover" />
                     ) : (
-                      <motion.img
-                        whileHover={{ scale: 1.06 }}
-                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                      <Image
                         src={src}
                         alt={a.title}
-                        className="h-full w-full object-cover"
+                        width={640}
+                        height={400}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]"
                       />
                     )
                   ) : (

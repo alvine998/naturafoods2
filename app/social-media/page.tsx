@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SocialMedia } from "../lib/data";
@@ -63,10 +64,12 @@ export default function SocialMediaPage() {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 md:px-8 text-center">
           <Reveal>
             <div className="flex justify-center mb-6">
-              <img
+              <Image
                 src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
                 alt="NaturaFoods"
                 className="h-24 object-contain"
+                width={96}
+                height={96}
               />
             </div>
           </Reveal>
@@ -143,9 +146,12 @@ export default function SocialMediaPage() {
                   >
                     <div className="h-20 flex items-center justify-center mb-4">
                       {brand.image ? (
-                        <img
+                        <Image
                           src={brand.image}
                           alt={brand.name}
+                          width={64}
+                          height={64}
+                          style={{ width: "auto" }}
                           className="max-h-16 w-auto object-contain"
                         />
                       ) : (

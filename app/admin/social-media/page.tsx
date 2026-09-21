@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -146,12 +147,11 @@ export default function SocialMediaAdminPage() {
                     const links = (["instagram", "facebook", "tiktok"] as Platform[]).filter((p) => m[p]);
                     return (
                     <tr key={m.id} className="hover:bg-white/60">
-                      <td className="px-3 py-2">
-                        {m.image ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={m.image} alt={m.name} className="h-10 w-10 rounded-lg object-contain bg-white" />
-                        ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}
-                      </td>
+                       <td className="px-3 py-2">
+                         {m.image ? (
+                           <Image src={m.image} alt={m.name} className="h-10 w-10 rounded-lg object-contain bg-white" width={40} height={40} />
+                         ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}
+                       </td>
                       <td className="px-3 py-2 max-w-[220px]"><div className="truncate font-medium text-[#2D4A22]">{m.name}</div><div className="truncate text-[11px] text-[#8B6F47]">{m.id}</div></td>
                       <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={m.description}>{m.description || "—"}</div></td>
                       <td className="px-3 py-2">

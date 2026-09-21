@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useLang } from "../i18n";
@@ -83,13 +84,13 @@ export default function HeroSlider({
         <div className="relative min-h-[520px] h-[calc(100svh-64px)] max-h-[760px] supports-[height:100dvh]:h-[calc(100dvh-64px)] sm:h-[90vh] sm:min-h-[640px] sm:max-h-[860px] lg:min-h-[680px] [@media(max-height:500px)]:min-h-[440px] [@media(max-height:500px)]:h-[calc(100dvh-56px)] [@media(max-height:500px)]:max-h-none">
           {/* video background */}
           {/* poster — visible until video starts playing */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={videoPoster}
             alt=""
             aria-hidden="true"
-            decoding="async"
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoReady ? "opacity-0" : "opacity-100"}`}
+            fill
+            priority
           />
           <video
             key={videoSrc}
@@ -120,14 +121,21 @@ export default function HeroSlider({
                   Welcome To<br className="hidden sm:block" />{" "}
                   <span className="whitespace-nowrap">PT. Natura Inti Sukses</span>
                 </h1>
-                <motion.img
+                <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
-                  alt="PT. Natura Inti Sukses Logo"
-                  className="h-[60px] sm:h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain drop-shadow-lg"
-                />
+                >
+                  <Image
+                    src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
+                    alt="PT. Natura Inti Sukses Logo"
+                    width={400}
+                    height={120}
+                    priority
+                    style={{ width: "auto" }}
+                    className="h-[60px] sm:h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain drop-shadow-lg"
+                  />
+                </motion.div>
               </div>
             </div>
           </motion.div>

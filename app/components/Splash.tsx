@@ -1,6 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?: string; foot?: string }) {
   const [show, setShow] = useState(true);
@@ -38,12 +39,15 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
               transition={{ delay: 0.45, duration: 0.6 }}
               className="flex flex-col items-center w-full"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/logo.png"
-                alt="NaturaFoods"
-                className="h-12 w-auto max-w-[72vw] object-contain sm:h-14 sm:max-w-none md:h-[80px] lg:h-[100px] [@media(max-height:500px)]:h-10"
-              />
+               {/* eslint-disable-next-line @next/next/no-img-element */}
+               <Image
+                 src="/logo.png"
+                 alt="NaturaFoods"
+                 width={335}
+                 height={102}
+                 style={{ width: "auto" }}
+                 className="h-12 w-auto max-w-[72vw] object-contain sm:h-14 sm:max-w-none md:h-[80px] lg:h-[100px] [@media(max-height:500px)]:h-10"
+               />
             </motion.div>
             <motion.p
               initial={{ opacity: 0 }}

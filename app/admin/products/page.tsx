@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -527,13 +528,15 @@ export default function ProductsPage() {
                                 className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]"
                                 muted
                               />
-                            ) : (
-                              <img
-                                src={img}
-                                alt=""
-                                className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]"
-                              />
-                            )
+                             ) : (
+                               <Image
+                                 src={img}
+                                 alt=""
+                                 className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]"
+                                 width={40}
+                                 height={40}
+                               />
+                             )
                           ) : (
                             <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">
                               —

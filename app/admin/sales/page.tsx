@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLang } from "../../i18n";
 import { normalizeSalesContacts, sortSalesContacts, useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
@@ -201,11 +202,10 @@ export default function SalesPage() {
                     return (
                       <tr key={c.id} className="hover:bg-white/60">
                         <td className="px-3 py-2">
-                          <div className="flex items-center gap-2.5">
-                            {photo ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={photo} alt={c.name} className="h-10 w-10 rounded-full object-cover bg-[#F5EFE0]" />
-                            ) : (
+                           <div className="flex items-center gap-2.5">
+                             {photo ? (
+                               <Image src={photo} alt={c.name} className="h-10 w-10 rounded-full object-cover bg-[#F5EFE0]" width={40} height={40} />
+                             ) : (
                               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#2D4A22] text-[11px] font-medium tracking-[0.08em] text-white">{initials(c.name)}</span>
                             )}
                             <div className="min-w-0"><p className="truncate font-medium text-[#2D4A22]">{c.name}</p><p className="truncate text-[11px] text-[#8B6F47]">{c.id}{c.gender ? ` · ${c.gender}` : ""}</p></div>

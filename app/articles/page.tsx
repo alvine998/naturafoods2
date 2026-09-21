@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import { useLang } from "../i18n";
@@ -56,7 +57,7 @@ export default function ArticlesPage() {
             const isVideo = !!src && (src.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(src));
             return (
             <Link key={a.slug} href={`/articles/${a.slug}`} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white hover:shadow-lg transition">
-              <div className="aspect-[16/10] overflow-hidden bg-[#F5EFE0]">{src ? (isVideo ? <video src={src} muted className="h-full w-full object-cover" /> : <img src={src} alt={a.title} className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-500" />) : <div className="grid h-full w-full place-items-center bg-[#F5EFE0] text-[11px] tracking-[0.14em] text-[#8B6F47]">No image</div>}</div>
+              <div className="aspect-[16/10] overflow-hidden bg-[#F5EFE0]">{src ? (isVideo ? <video src={src} muted className="h-full w-full object-cover" /> : <Image src={src} alt={a.title} className="h-full w-full object-cover group-hover:scale-[1.03] transition duration-500" width={640} height={400} />) : <div className="grid h-full w-full place-items-center bg-[#F5EFE0] text-[11px] tracking-[0.14em] text-[#8B6F47]">No image</div>}</div>
               <div className="p-4 sm:p-5">
                 <div className="flex flex-wrap items-center gap-2 text-[11px] tracking-[0.12em] text-[#8B6F47]"><span className="rounded-full bg-white border border-[#2D4A22]/10 px-2.5 py-1">{a.category}</span><span>{a.date}</span></div>
                 <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] break-words">{a.title}</h3>

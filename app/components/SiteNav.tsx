@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -92,14 +93,18 @@ export default function SiteNav() {
       >
         <nav className="mx-auto flex h-[64px] max-w-[1440px] items-center justify-between gap-4 px-6 md:px-8">
           {/* left */}
-          <Link href="/" className="flex items-center gap-3 shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="NaturaFoods"
-              className="h-7 w-auto object-contain md:h-14"
-            />
-          </Link>
+           <Link href="/" className="flex items-center gap-3 shrink-0">
+             {/* eslint-disable-next-line @next/next/no-img-element */}
+             <Image
+               src="/logo.png"
+               alt="NaturaFoods"
+               width={335}
+               height={102}
+               priority
+               style={{ width: "auto" }}
+               className="h-7 w-auto object-contain md:h-14"
+             />
+           </Link>
 
           {/* center — desktop */}
           <div className="hidden items-center gap-1 lg:flex">
@@ -155,21 +160,24 @@ export default function SiteNav() {
               className="fixed inset-y-0 right-0 z-50 flex h-[100svh] max-h-[100dvh] w-[min(88vw,380px)] max-w-[380px] flex-col bg-white shadow-2xl supports-[height:100dvh]:h-[100dvh] lg:hidden"
             >
               <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-[#2D4A22]/10 px-5 sm:px-6 pt-[env(safe-area-inset-top)]">
-                <Link
-                  href="/"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/logo.png"
-                    alt="NaturaFoods"
-                    className="h-7 w-auto"
-                  />
-                  <span className="text-[10px] tracking-[0.18em] text-[#8B6F47]">
-                    MENU
-                  </span>
-                </Link>
+                 <Link
+                   href="/"
+                   onClick={() => setOpen(false)}
+                   className="flex items-center gap-2"
+                 >
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                   <Image
+                     src="/logo.png"
+                     alt="NaturaFoods"
+                     width={335}
+                     height={102}
+                     style={{ width: "auto" }}
+                     className="h-7 w-auto"
+                   />
+                   <span className="text-[10px] tracking-[0.18em] text-[#8B6F47]">
+                     MENU
+                   </span>
+                 </Link>
                 <button
                   onClick={() => setOpen(false)}
                   aria-label="Close menu"
