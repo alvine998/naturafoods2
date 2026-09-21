@@ -127,6 +127,8 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
     >
       <Link
         href={card.link}
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex h-full min-h-[320px] flex-col p-5 pb-4 sm:p-6 sm:pb-4"
       >
         {/* header: title + arrow */}
@@ -170,7 +172,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
         {/* bottom logo bar */}
          <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
            {bottomLogos.length > 0 ? (
-             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+             <div className="flex flex-row items-center justify-center gap-x-6 gap-y-2">
                 {bottomLogos.slice(0, 4).map((src, i) => (
                   <div key={src + i} className="relative h-12 w-[150px] max-w-full shrink-0">
                     <Image
@@ -179,7 +181,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                         i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
                       }
                       fill
-                      sizes="150px"
+                      sizes="120px"
                       unoptimized={src.includes("r2.dev")}
                       className="object-contain"
                       onError={(e) => {
@@ -678,6 +680,16 @@ export default function OfficialPartnersSection() {
     .filter((p) => p.isPublished !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
+  // Click destination precedence:
+  // 1. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
+  // 2. internal link override (e.g. "/products?brand=<uuid>" or "/products?cat=cocoa")
+  // 3. "/products" (external links ignored — card stays in-site)
+  const partnerLink = (p: { brandIds?: string[]; link?: string }) => {
+    const ids = (p.brandIds ?? []).filter(Boolean);
+    if (ids.length > 0) return `/products?brand=${ids.join(",")}`;
+    if (typeof p.link === "string" && p.link.startsWith("/")) return p.link;
+    return "/products";
+  };
   const cards: PartnerCard[] = publishedPartners.length
     ? publishedPartners.map((p) => {
         const rightVisual = p.background || "";
@@ -696,7 +708,7 @@ export default function OfficialPartnersSection() {
             `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
           brandLogo: bottomLogos[0] || p.image || "",
           brandName: p.name,
-          link: "/products",
+          link: partnerLink(p),
           color:
             typeof p.color === "string" &&
             /^#[0-9a-fA-F]{6}$/.test(p.color.trim())

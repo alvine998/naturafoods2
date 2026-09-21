@@ -363,6 +363,7 @@ type OfficialPartner = {
   link?: string;     // optional CTA link (default "/products")
   color?: string;    // optional hex for gradient (frontend stringToColor fallback)
   order?: number;    // optional sort order for Home grid
+  brandIds?: string[]; // optional Master Brand ids – card click goes to /products?brand=a,b (API ?brandId=a,b)
   createdAt: string;
   updatedAt: string;
 }
@@ -371,7 +372,7 @@ type OfficialPartner = {
 ### 9.2 Endpoints
 - `GET /official-partners?isPublished=true&q=&page&limit` – public Home uses `?isPublished=true`
 - `GET /official-partners/:id`
-- `POST /admin/official-partners` Body `{id,name,description,image,background,isPublished}` → `201` Err `409 id exists`
+- `POST /admin/official-partners` Body `{id,name,description,image,background,isPublished,brandIds?}` → `201` Err `409 id exists`
 - `PUT /admin/official-partners/:id` (id change validates uniqueness)
 - `PATCH /admin/official-partners/:id/publish` `{isPublished:boolean}` – for table toggle
 - `DELETE /admin/official-partners/:id` → `204`

@@ -177,6 +177,8 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
     const background = String(p.background ?? p.mainImage ?? "");
     const rawColor = typeof p.color === "string" ? p.color.trim() : "";
     const order = parseOrder(p.order ?? (p as Record<string, unknown>).sortOrder) ?? idx;
+    const brandIds = parseStringArray(p.brandIds);
+    const link = typeof p.link === "string" && p.link.trim() ? p.link.trim() : undefined;
     return {
       id: String(p.id ?? ""),
       name: String(p.name ?? ""),
@@ -187,6 +189,8 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
       ...(rawColor ? { color: rawColor } : {}),
       order,
       isPublished: p.isPublished ?? p.is_published ?? true ? true : false,
+      ...(brandIds ? { brandIds } : {}),
+      ...(link ? { link } : {}),
     };
   }).filter((p) => p.id && p.name);
 }

@@ -85,6 +85,7 @@ export default function OfficialPartnersPage() {
     const color = /^#[0-9a-fA-F]{6}$/.test(rawColor) ? rawColor : undefined;
     const orderRaw = (f as { order?: unknown }).order;
     const order = typeof orderRaw === "number" && Number.isFinite(orderRaw) ? orderRaw : orderRaw != null && String(orderRaw).trim() !== "" && Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : editIdx !== null ? (s.officialPartners[editIdx!].order ?? editIdx) : (s.officialPartners as OfficialPartner[]).length;
+    const brandIds = (Array.isArray(f.brandIds) ? f.brandIds : []).map((v) => String(v ?? "")).filter(Boolean);
     const item: OfficialPartner = {
       id: String(f.id),
       name: String(f.name),
@@ -95,6 +96,8 @@ export default function OfficialPartnersPage() {
       ...(color ? { color } : {}),
       order,
       isPublished: Boolean(f.isPublished),
+      brandIds,
+      link: String(f.link ?? ""),
     };
     // local duplicate check (optimistic)
     if (editIdx === null) {
@@ -176,6 +179,7 @@ export default function OfficialPartnersPage() {
             <Field label="id *"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="bensdorp" /></Field>
             <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Bens Dorp" /></Field>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Short description for the partner card" /></Field></div>
+            <div className="sm:col-span-2"><Field label="link — internal override (e.g. /products?brand=<id>). Empty = use Brands above, else /products"><Input value={f.link ?? ""} onChange={(e) => setF({ ...f, link: e.target.value })} placeholder="/products?brand=…" /></Field></div>
             <Field label="card background color"><div className="flex flex-wrap items-center gap-2">
                 <input
                   type="color"
@@ -211,6 +215,31 @@ export default function OfficialPartnersPage() {
             <div className="sm:col-span-2"><Field label="right-side image — single (background)"><FileUpload value={f.background ?? ""} onChange={(v) => setF({ ...f, background: v })} accept="image/*" folder="partners" /></Field></div>
             <div className="sm:col-span-2"><Field label="bottom-bar logo — single (image)"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="partners" /></Field></div>
             <div className="sm:col-span-2"><Field label="bottom-bar logos — more than one (images[], first = main)"><MultiFileUpload value={Array.isArray(f.images) ? f.images : []} onChange={(v) => setF((prev) => ({ ...prev, images: v, image: prev.image || v[0] || "" }))} accept="image/*" folder="partners" max={4} /></Field></div>
+            {s.masterBrands.filter((b) => b.isActive).length > 0 && (
+              <div className="sm:col-span-2">
+                <Field label="Brands — card click filters products by these Master Brands">
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {s.masterBrands.filter((b) => b.isActive).map((b) => {
+                      const checked = (f.brandIds ?? []).includes(b.id);
+                      return (
+                        <label key={b.id} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] cursor-pointer transition-all ${checked ? "bg-[#8B6F47] text-white border-[#8B6F47]" : "bg-white text-[#8B6F47] border-[#8B6F47]/20 hover:border-[#8B6F47]/40"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              const prev = f.brandIds ?? [];
+                              setF({ ...f, brandIds: checked ? prev.filter((id) => id !== b.id) : [...prev, b.id] });
+                            }}
+                            className="sr-only"
+                          />
+                          {b.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </Field>
+              </div>
+            )}
             <Field label="order (sort number — lower shows first)">
               <Input
                 type="number"
@@ -236,7 +265,7 @@ export default function OfficialPartnersPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[940px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Order</th><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Color</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Published</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Order</th><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Color</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Brands</th><th className="px-3 py-3 text-left font-medium">Published</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
                   {paged.map((p: OfficialPartner) => {
                     const realIdx = (s.officialPartners as OfficialPartner[]).indexOf(p);
@@ -294,6 +323,16 @@ export default function OfficialPartnersPage() {
                         </td>
                         <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{p.name}</div><div className="text-[11px] text-[#8B6F47]">{p.id}</div></td>
                         <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={p.description}>{p.description || "—"}</div></td>
+                        <td className="px-3 py-2">
+                          {(p.brandIds ?? []).length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {(p.brandIds ?? []).map((bid) => {
+                                const mb = s.masterBrands.find((b) => b.id === bid);
+                                return <span key={bid} className="inline-block rounded-full bg-[#8B6F47]/10 px-2 py-0.5 text-[10px] text-[#8B6F47]">{mb?.name ?? bid}</span>;
+                              })}
+                            </div>
+                          ) : <span className="text-[#8B6F47]/40">—</span>}
+                        </td>
                         <td className="px-3 py-2">
                           <button
                             onClick={() => togglePublish(realIdx)}
