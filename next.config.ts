@@ -12,10 +12,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdn.naturafoods.co.id" },
       { protocol: "https", hostname: "cdn.alvineitsolutions.com" },
       { protocol: "https", hostname: "api-naturafoods.alvineitsolutions.com" },
+      { protocol: "https", hostname: "cdn-naturafoods.alvineitsolutions.com" },
+      { protocol: "https", hostname: "pub-d6914c78edb04a0e8448bb9ba55d71f8.r2.dev" },
       { protocol: "http", hostname: "localhost" },
     ],
   },
-  allowedDevOrigins: ["e87c-118-99-107-253.ngrok-free.app",'192.168.83.154'],
+  allowedDevOrigins: ["e87c-118-99-107-253.ngrok-free.app", "192.168.83.154"],
   async rewrites() {
     return [
       {
