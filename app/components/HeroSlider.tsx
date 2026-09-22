@@ -27,9 +27,13 @@ export default function HeroSlider({
   // Translated welcome heading (ID/EN/ZH via i18n `welcomeTitle`, overridable via
   // welcome prop / site content). Split "greeting" from company name at "PT"
   // so layout stays: greeting on line 1, "PT Natura Inti Sukses" on line 2.
-  const welcomeTitle = welcome?.title || t.welcomeTitle || "Welcome to PT Natura Inti Sukses";
+  const welcomeTitle =
+    welcome?.title || t.welcomeTitle || "Welcome to PT Natura Inti Sukses";
   const ptIndex = welcomeTitle.indexOf("PT");
-  const welcomeGreeting = (ptIndex > 0 ? welcomeTitle.slice(0, ptIndex).trim() : welcomeTitle.trim()) || welcomeTitle;
+  const welcomeGreeting =
+    (ptIndex > 0
+      ? welcomeTitle.slice(0, ptIndex).trim()
+      : welcomeTitle.trim()) || welcomeTitle;
   const welcomeCompany = ptIndex > 0 ? welcomeTitle.slice(ptIndex).trim() : "";
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
@@ -123,16 +127,36 @@ export default function HeroSlider({
           >
             <div className="w-full px-3 sm:px-5 md:px-6 lg:px-8">
               <div className="max-w-[640px] sm:max-w-[720px] md:max-w-[860px]">
-                <h1 key={welcomeTitle} className="font-[var(--font-display)] text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] font-light leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg">
-                  {welcomeGreeting}<br className="hidden sm:block" />{" "}
+                <div className="overflow-hidden pb-3 -mb-3">
+                  <motion.h1
+                    key={welcomeTitle}
+                    initial={{ y: "110%", opacity: 0 }}
+                    animate={{ y: ["110%", "0%", "0%", "110%"], opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      duration: 4.5,
+                      times: [0, 0.28, 0.68, 1],
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  className="font-bold text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
+                >
+                  {welcomeGreeting}
+                  <br className="hidden sm:block" />{" "}
                   {welcomeCompany ? (
-                    <span className="sm:whitespace-nowrap">{welcomeCompany}</span>
+                    <span className="sm:whitespace-nowrap">
+                      {welcomeCompany}
+                    </span>
                   ) : null}
-                </h1>
+                </motion.h1>
+                </div>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.6,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   className="mt-4 sm:mt-5 -ml-2 sm:-ml-3 md:-ml-4"
                 >
                   <div className="relative h-[84px] sm:h-[112px] md:h-[140px] lg:h-[168px] w-full max-w-[560px]">
