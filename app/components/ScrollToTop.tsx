@@ -15,8 +15,9 @@ export default function ScrollToTop() {
       (c) => c.published !== false && c.whatsapp?.trim()
     );
     if (!active.length) return FALLBACK_WA;
-    const pick = active[Math.floor(Math.random() * active.length)];
-    return pick.whatsapp.replace(/[^0-9]/g, "");
+    // ponytail: deterministic first-contact pick. Random pick needs
+    // useState+useEffect (impure in render); add when rotation wanted.
+    return active[0].whatsapp.replace(/[^0-9]/g, "");
   }, [salesContacts]);
 
   useEffect(() => {
