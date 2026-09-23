@@ -3,3 +3,8 @@
 [   24826ms] [WARNING] Image with src "https://cdn-naturafoods.alvineitsolutions.com/articles/1789425830000-j65j7x.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
 [   24838ms] [WARNING] Image with src "https://cdn-naturafoods.alvineitsolutions.com/articles/1789425830000-j65j7x.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
 Read more: https://nextjs.org/docs/app/api-reference/components/image#loading @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[  810644ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[  811791ms] [LOG] [Fast Refresh] done in 1205ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[  811934ms] [LOG] [Fast Refresh] done in 1205ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[  812136ms] [LOG] [Fast Refresh] done in 1205ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[  812520ms] [LOG] [Fast Refresh] done in 1205ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776

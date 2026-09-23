@@ -39,7 +39,7 @@ const partnerCards: PartnerCard[] = [
       "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80",
     brandLogo: "",
     brandName: "Bens Dorp",
-    link: "/products?cat=cocoa",
+    link: "/products?cat=cocoa-powder-series",
     color: "#5D4037",
   },
   {
@@ -50,7 +50,7 @@ const partnerCards: PartnerCard[] = [
       "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&q=80",
     brandLogo: "",
     brandName: "Afya",
-    link: "/products?cat=tea",
+    link: "/products?cat=japanese-tea-series",
     color: "#2E7D32",
   },
   {
@@ -61,7 +61,7 @@ const partnerCards: PartnerCard[] = [
       "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80",
     brandLogo: "",
     brandName: "Trang Nghi",
-    link: "/products?cat=filling",
+    link: "/products?cat=specialty-filling",
     color: "#1565C0",
   },
   {
@@ -83,7 +83,7 @@ const partnerCards: PartnerCard[] = [
       "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",
     brandLogo: "",
     brandName: "Le Bourne",
-    link: "/products?cat=chocolate",
+    link: "/products?cat=choco",
     color: "#3E2723",
   },
   {
@@ -103,10 +103,9 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   // Semantics: color = solid card background,
   // background = single right-side product visual,
   // images[] = bottom-bar logos (more than one)
-  // brandIds[] = Master Brand ids — card click goes to /products?brand=a,b
-  const brandIds = (card.brandIds ?? []).filter(Boolean);
-  const href =
-    brandIds.length > 0 ? `/products?brand=${brandIds.join(",")}` : card.link;
+  // brandIds[] is informational only — destination comes from card.link
+  // (partnerLink already prefers category over brandIds).
+  const href = card.link;
   const rightVisual =
     card.background && card.background.trim() !== "" ? card.background : "";
   const bottomLogos =
@@ -699,28 +698,53 @@ export default function OfficialPartnersSection() {
   }, [officialPartners]);
   // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
   // Click destination precedence:
-  // 1. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
-  // 2. internal link override (e.g. "/products?brand=<uuid>" or "/products?cat=cocoa")
-  // 3. resolve partner id/name against Master Brands, categories, home brands —
-  //    live partners often have empty brandIds (backend PUT used to drop them)
-  // 4. "/products" (external links ignored — card stays in-site)
+  // 1. internal link override (e.g. "/products?cat=…" or "/products?brand=<uuid>")
+  // 2. product category match by partner id/name — partner cards are titled by
+  //    category ("Cocoa Powder"), so category must beat brand fuzzy-match
+  // 3. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
+  // 4. master brand / home brand id-name match (live partners often have empty brandIds)
+  // 5. "/products" (external links ignored — card stays in-site)
   const partnerLink = (p: OfficialPartner) => {
-    const ids = (p.brandIds ?? []).filter(Boolean);
-    if (ids.length > 0) return `/products?brand=${ids.join(",")}`;
     if (typeof p.link === "string" && p.link.startsWith("/")) return p.link;
 
     const keys = [p.id, p.name].map(normKey).filter(Boolean);
+    // bidirectional match: "Cocoa Powder" ↔ "cocoa-powder-series" / "super-premium-cocoa-powder"
+    // exact > prefix > substring; ties prefer the shorter slug (more direct title match)
+    const matchScore = (candidate?: string): number => {
+      const n = normKey(candidate ?? "");
+      if (!n) return 0;
+      let best = 0;
+      for (const k of keys) {
+        if (k === n) best = Math.max(best, 3);
+        else if (k.startsWith(n) || n.startsWith(k)) best = Math.max(best, 2);
+        else if (k.includes(n) || n.includes(k)) best = Math.max(best, 1);
+      }
+      return best;
+    };
+
+    let cat: { slug: string; score: number } | null = null;
+    for (const c of productCategories) {
+      if (!c.isActive) continue;
+      const score = Math.max(matchScore(c.id), matchScore(c.slug), matchScore(c.name));
+      if (score <= 0) continue;
+      if (
+        !cat ||
+        score > cat.score ||
+        (score === cat.score && c.slug.length < cat.slug.length)
+      ) {
+        cat = { slug: c.slug, score };
+      }
+    }
+    if (cat) return `/products?cat=${cat.slug}`;
+
+    const ids = (p.brandIds ?? []).filter(Boolean);
+    if (ids.length > 0) return `/products?brand=${ids.join(",")}`;
+
     const matches = (candidates: (string | undefined)[]) =>
-      candidates.some((c) => {
-        const n = normKey(c ?? "");
-        return !!n && keys.some((k) => k === n || k.includes(n));
-      });
+      candidates.some((c) => matchScore(c) > 0);
 
     const mb = masterBrands.find((b) => matches([b.id, b.slug, b.name]));
     if (mb) return `/products?brand=${mb.id}`;
-
-    const cat = productCategories.find((c) => matches([c.id, c.slug, c.name]));
-    if (cat) return `/products?cat=${cat.slug}`;
 
     const hb = homeBrands.find((h) => matches([h.id, h.name]) && (h.brandIds ?? []).length > 0);
     if (hb) return `/products?brand=${(hb.brandIds ?? []).join(",")}`;
@@ -746,7 +770,7 @@ export default function OfficialPartnersSection() {
           brandLogo: bottomLogos[0] || p.image || "",
           brandName: p.name,
           link: partnerLink(p),
-          brandIds: (p.brandIds ?? []).filter(Boolean),
+          brandIds: (p.brandIds ?? []).filter(Boolean), // kept for admin/debug; href uses link
           color:
             typeof p.color === "string" &&
             /^#[0-9a-fA-F]{6}$/.test(p.color.trim())

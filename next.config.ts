@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost" },
     ],
   },
-  allowedDevOrigins: ["e87c-118-99-107-253.ngrok-free.app", "192.168.83.154"],
+  allowedDevOrigins: ["127.0.0.1", "e87c-118-99-107-253.ngrok-free.app", "192.168.83.154"],
   async rewrites() {
     return [
       {
