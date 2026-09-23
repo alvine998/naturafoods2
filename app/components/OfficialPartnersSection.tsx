@@ -21,6 +21,7 @@ type PartnerCard = {
   background?: string;
   images?: string[];
   brandIds?: string[];
+  sortIndex: number;
 };
 
 function stringToColor(str: string): string {
@@ -42,6 +43,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "Bens Dorp",
     link: "/products?cat=cocoa-powder-series",
     color: "#5D4037",
+    sortIndex: 1,
   },
   {
     title: "Japanese Tea Series",
@@ -53,6 +55,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "Afya",
     link: "/products?cat=japanese-tea-series",
     color: "#2E7D32",
+    sortIndex: 2,
   },
   {
     title: "Specialty Filling",
@@ -64,6 +67,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "Trang Nghi",
     link: "/products?cat=specialty-filling",
     color: "#1565C0",
+    sortIndex: 3,
   },
   {
     title: "Nuts",
@@ -75,6 +79,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "OFI",
     link: "/products?cat=nuts",
     color: "#795548",
+    sortIndex: 4,
   },
   {
     title: "Chocolate",
@@ -86,6 +91,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "Le Bourne",
     link: "/products?cat=choco",
     color: "#3E2723",
+    sortIndex: 5,
   },
   {
     title: "Raisin",
@@ -97,6 +103,7 @@ const partnerCards: PartnerCard[] = [
     brandName: "KingLand",
     link: "/products?cat=raisin",
     color: "#827717",
+    sortIndex: 6,
   },
 ];
 
@@ -636,9 +643,10 @@ export default function OfficialPartnersSection() {
               : stringToColor(p.id),
           background: rightVisual,
           images: bottomLogos.length ? bottomLogos : undefined,
+          sortIndex: p.sortIndex ?? p.order ?? 0,
         };
       })
-    : partnerCards.map((c) => ({
+    : [...partnerCards].sort((a, b) => a.sortIndex - b.sortIndex).map((c) => ({
         ...c,
         background: undefined,
       }));
