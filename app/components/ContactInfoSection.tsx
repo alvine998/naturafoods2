@@ -12,6 +12,7 @@ export type ContactPerson = {
   email: string;
   avatar: string;
   gender?: string;
+  sortIndex: number;
 };
 
 function ContactCard({
@@ -98,6 +99,7 @@ export default function ContactInfoSection() {
       email: String(s.email ?? ""),
       avatar: String(s.photo ?? ""),
       gender: String(s.gender ?? ""),
+      sortIndex: Number(s.sortIndex ?? 0),
     }))
     .filter((c) => c.name && (c.whatsapp || c.email));
 
@@ -108,8 +110,8 @@ export default function ContactInfoSection() {
         {t.homeContactInfoTitle}
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {contacts.map((contact, index) => (
-          <ContactCard key={contact.name} contact={contact} index={index} />
+        {contacts.sort((a, b) => a.sortIndex - b.sortIndex).map((contact, index) => (
+          <ContactCard key={contact.sortIndex} contact={contact} index={index} />
         ))}
       </div>
     </div>
