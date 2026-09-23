@@ -3,7 +3,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Package, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Menu, X, ArrowLeft, Tag, Share2, Info, Bookmark } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Store,
+  Handshake,
+  Newspaper,
+  GraduationCap,
+  Lightbulb,
+  Briefcase,
+  Mail,
+  Users,
+  Bot,
+  Type,
+  Phone,
+  Menu,
+  X,
+  ArrowLeft,
+  Tag,
+  Share2,
+  Info,
+  Bookmark,
+} from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
 
@@ -33,14 +54,44 @@ const ROUTES = [
   "/admin/about",
 ] as const;
 
-const ICONS = [LayoutDashboard, Package, Tag, Bookmark, Store, Handshake, Newspaper, GraduationCap, Lightbulb, Briefcase, Mail, Users, Bot, Type, Phone, Share2, Info] as const;
+const ICONS = [
+  LayoutDashboard,
+  Package,
+  Tag,
+  Bookmark,
+  Store,
+  Handshake,
+  Newspaper,
+  GraduationCap,
+  Lightbulb,
+  Briefcase,
+  Mail,
+  Users,
+  Bot,
+  Type,
+  Phone,
+  Share2,
+  Info,
+] as const;
 
 // Sections hidden from the sidebar — pages stay reachable by direct URL
 const HIDDEN_NAV = new Set<string>(["/admin/assistant", "/admin/content"]);
 
-type NavItem = { label: string; href: string; Icon: (typeof ICONS)[number]; count?: number; active: boolean };
+type NavItem = {
+  label: string;
+  href: string;
+  Icon: (typeof ICONS)[number];
+  count?: number;
+  active: boolean;
+};
 
-function SidebarNav({ nav, onNavigate }: { nav: NavItem[]; onNavigate: () => void }) {
+function SidebarNav({
+  nav,
+  onNavigate,
+}: {
+  nav: NavItem[];
+  onNavigate: () => void;
+}) {
   return (
     <nav className="grid gap-1">
       {nav.map((n) => (
@@ -50,9 +101,19 @@ function SidebarNav({ nav, onNavigate }: { nav: NavItem[]; onNavigate: () => voi
           onClick={onNavigate}
           className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-[12px] tracking-[0.02em] transition ${n.active ? "bg-[#2D4A22] text-white shadow-[0_4px_16px_rgba(45,74,34,0.25)]" : "text-[#2D4A22]/70 hover:bg-[#2D4A22]/[0.06] hover:text-[#2D4A22]"}`}
         >
-          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${n.active ? "bg-white/15 text-white" : "bg-white border border-[#2D4A22]/10"}`}><n.Icon className="h-3.5 w-3.5" /></span>
+          <span
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${n.active ? "bg-white/15 text-white" : "bg-white border border-[#2D4A22]/10"}`}
+          >
+            <n.Icon className="h-3.5 w-3.5" />
+          </span>
           <span className="flex-1 truncate font-medium">{n.label}</span>
-          {typeof n.count === "number" && <span className={`rounded-full px-2 py-0.5 text-[10px] ${n.active ? "bg-white/15 text-white" : "bg-[#2D4A22]/[0.06] text-[#2D4A22]/60"}`}>{n.count}</span>}
+          {typeof n.count === "number" && (
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] ${n.active ? "bg-white/15 text-white" : "bg-[#2D4A22]/[0.06] text-[#2D4A22]/60"}`}
+            >
+              {n.count}
+            </span>
+          )}
         </Link>
       ))}
     </nav>
@@ -68,10 +129,22 @@ export default function AdminShell({ counts, labels, children }: Props) {
 
   // first item is Dashboard, rest map to labels
   const nav: NavItem[] = [
-    { label: "Dashboard", href: ROUTES[0], Icon: ICONS[0], count: undefined, active: pathname === ROUTES[0] },
+    {
+      label: "Dashboard",
+      href: ROUTES[0],
+      Icon: ICONS[0],
+      count: undefined,
+      active: pathname === ROUTES[0],
+    },
     ...labels.map((l, i) => {
       const href = ROUTES[i + 1];
-      return { label: l, href, Icon: ICONS[i + 1] ?? Package, count: counts[i] ?? 0, active: pathname === href || pathname.startsWith(href + "/") };
+      return {
+        label: l,
+        href,
+        Icon: ICONS[i + 1] ?? Package,
+        count: counts[i] ?? 0,
+        active: pathname === href || pathname.startsWith(href + "/"),
+      };
     }),
   ].filter((n) => !HIDDEN_NAV.has(n.href));
 
@@ -80,17 +153,47 @@ export default function AdminShell({ counts, labels, children }: Props) {
       <header className="shrink-0 z-30 border-b border-[#2D4A22]/10 bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle menu" className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D4A22]/15 bg-white text-[#2D4A22] lg:hidden"><Menu className="h-4 w-4" /></button>
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Toggle menu"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D4A22]/15 bg-white text-[#2D4A22] lg:hidden"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
             <Link href="/" className="flex items-center gap-2.5">
-               <Image src="/logo.png" alt="NaturaFoods" width={335} height={102} style={{ width: "auto" }} className="h-7 w-auto" />
-               <span className="hidden sm:inline text-[11px] tracking-[0.16em] text-[#2D4A22]/70">CMS</span>
+              <Image
+                src="/logo.png"
+                alt="NaturaFoods"
+                width={335}
+                height={102}
+                style={{ width: "auto" }}
+                className="h-7 w-auto"
+              />
+              <span className="hidden sm:inline text-[11px] tracking-[0.16em] text-[#2D4A22]/70">
+                CMS
+              </span>
             </Link>
             <span className="hidden sm:inline h-4 w-px bg-[#2D4A22]/15" />
-            <span className="hidden sm:inline text-[11px] tracking-[0.14em] text-[#8B6F47]">ADMIN</span>
+            <span className="hidden sm:inline text-[11px] tracking-[0.14em] text-[#8B6F47]">
+              ADMIN
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
-            <button onClick={async () => { await logout(); router.push("/admin/login"); }} className="rounded-full bg-[#2D4A22] px-4 sm:px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]">{a.logout}</button>
+            <Link
+              href="/"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Home
+            </Link>
+            <button
+              onClick={async () => {
+                await logout();
+                router.push("/admin/login");
+              }}
+              className="rounded-full bg-[#2D4A22] px-4 sm:px-5 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]"
+            >
+              {a.logout}
+            </button>
           </div>
         </div>
       </header>
@@ -98,30 +201,65 @@ export default function AdminShell({ counts, labels, children }: Props) {
       <div className="mx-auto flex w-full max-w-[1440px] flex-1 min-h-0 gap-0 overflow-hidden px-0 sm:px-6 lg:gap-6">
         <aside className="hidden w-[260px] shrink-0 flex-col gap-4 overflow-y-auto overscroll-contain py-6 lg:flex">
           <div className="rounded-2xl bg-white border border-[#2D4A22]/10 p-4 shadow-[0_2px_12px_rgba(26,26,22,0.04)]">
-            <p className="text-[10px] tracking-[0.16em] text-[#8B6F47]">NAVIGATION</p>
-            <div className="mt-3"><SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} /></div>
+            <p className="text-[10px] tracking-[0.16em] text-[#8B6F47]">
+              NAVIGATION
+            </p>
+            <div className="mt-3">
+              <SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} />
+            </div>
             <div className="mt-4 rounded-xl bg-white border border-[#2D4A22]/10 p-3">
-              <p className="text-[11px] font-medium text-[#2D4A22]">{a.dashTitle}</p>
+              <p className="text-[11px] font-medium text-[#2D4A22]">
+                {a.dashTitle}
+              </p>
             </div>
           </div>
-          <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">Env: <code className="rounded bg-white px-1 py-0.5">NEXT_PUBLIC_API_URL</code> — defaults to <code className="rounded bg-white px-1 py-0.5">http://localhost:4000/api/v1</code></div>
+          <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">
+            Env:{" "}
+            <code className="rounded bg-white px-1 py-0.5">
+              NEXT_PUBLIC_API_URL
+            </code>{" "}
+            — defaults to{" "}
+            <code className="rounded bg-white px-1 py-0.5">
+              http://localhost:4000/api/v1
+            </code>
+          </div>
         </aside>
 
         {mobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
-            <div onClick={() => setMobileOpen(false)} className="absolute inset-0 bg-[#1a1a16]/30 backdrop-blur-sm" />
+            <div
+              onClick={() => setMobileOpen(false)}
+              className="absolute inset-0 bg-[#1a1a16]/30 backdrop-blur-sm"
+            />
             <div className="absolute inset-y-0 left-0 w-[84%] max-w-[320px] bg-white border-r border-[#2D4A22]/10 p-4 overflow-y-auto">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">MENU</span>
-                <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white"><X className="h-4 w-4" /></button>
+                <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">
+                  MENU
+                </span>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2D4A22] text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
-              <div className="mt-4"><SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} /></div>
-              <Link href="/" onClick={() => setMobileOpen(false)} className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white py-2.5 text-[11px] tracking-[0.12em] text-[#2D4A22]"><ArrowLeft className="h-3.5 w-3.5" /> Home</Link>
+              <div className="mt-4">
+                <SidebarNav nav={nav} onNavigate={() => setMobileOpen(false)} />
+              </div>
+              <Link
+                href="/"
+                onClick={() => setMobileOpen(false)}
+                className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white py-2.5 text-[11px] tracking-[0.12em] text-[#2D4A22]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Home
+              </Link>
             </div>
           </div>
         )}
 
-        <main className="min-w-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-0 sm:py-6">{children}</main>
+        <main className="min-w-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-0 sm:py-6">
+          {children}
+        </main>
       </div>
     </div>
   );

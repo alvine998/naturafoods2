@@ -49,7 +49,7 @@ export default function SalesPage() {
   const [saving, setSaving] = useState(false);
   const [idTouched, setIdTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
-  const tabLabel = (a.tabs as unknown as string[])[12] ?? "Sales";
+  const tabLabel = (a.tabs as unknown as string[])[13] ?? "Sales";
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const ordered = useMemo(() => sortBySortIndex(s.salesContacts as SalesContact[]), [s.salesContacts]);
   const filtered = useMemo(() => {
