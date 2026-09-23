@@ -105,7 +105,7 @@ export default function ContactInfoSection() {
 
   if (!contacts.length) return null;
   return (
-    <div className="mt-8">
+    <div className="mt-8 px-20">
       <h4 className="text-center text-xl font-semibold text-[#2D4A22] mb-6">
         {t.homeContactInfoTitle}
       </h4>
