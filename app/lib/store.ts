@@ -545,6 +545,21 @@ export async function fetchPublicArticles(limit = 50): Promise<Article[] | null>
   }
 }
 
+// Public article detail (GET /articles/:slug) — the list endpoint strips
+// contentID/contentEN/contentZN, so the detail page must fetch this directly.
+export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
+  try {
+    const json = await apiFetch<unknown>(`/articles/${encodeURIComponent(slug)}`);
+    if (!json.success || !json.data || typeof json.data !== "object") return null;
+    const raw = json.data as Record<string, unknown>;
+    if (!isPublishedArticle(raw)) return null;
+    const list = normalizeArticles([raw]);
+    return list[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function getArticleContent(a: Article, locale: string): string {
   if (locale === "id") return a.contentId ?? a.contentEn ?? a.content ?? "";
   if (locale === "zh") return a.contentZh ?? a.contentEn ?? a.content ?? "";

@@ -1,0 +1,44 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - navigation [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e6]
+        - generic [ref=e7]:
+          - link "ABOUT" [ref=e8] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e9] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e10] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e11] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e12] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e13] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e14] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e15] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e17]:
+          - button "Switch to id" [ref=e18]: ID
+          - button "Switch to en" [ref=e19]: EN
+          - button "Switch to zh" [ref=e20]: 中文
+    - main [ref=e21]:
+      - paragraph [ref=e22]: …
+    - contentinfo [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e26]:
+          - link "CATALOG PDF" [ref=e27] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e28] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e29] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e30] [cursor=pointer]:
+            - /url: /admin/login
+  - button "Open Next.js Dev Tools" [ref=e36] [cursor=pointer]
+  - alert [ref=e40]

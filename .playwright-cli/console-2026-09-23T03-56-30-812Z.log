@@ -5,3 +5,21 @@
 [    2349ms] [WARNING] Image with src "https://cdn-naturafoods.alvineitsolutions.com/articles/1789425830000-j65j7x.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
 [    2566ms] [WARNING] Image with src "https://cdn-naturafoods.alvineitsolutions.com/articles/1789425830000-j65j7x.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
 Read more: https://nextjs.org/docs/app/api-reference/components/image#loading @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1265999ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266203ms] [LOG] getArticleContent {slug: baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan, title: Baking Demo di Bandung tembus 80+ Peserta,  Bawakan 7 Menu Andalan di Ny Liem!, excerpt: Bandung, 5 September 2026 – Antusiasme luar biasa …husiast, home baker, hingga pelaku usaha kuliner., content: , contentId: } en @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266214ms] [LOG] getArticleContent {slug: baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan, title: Baking Demo di Bandung tembus 80+ Peserta,  Bawakan 7 Menu Andalan di Ny Liem!, excerpt: Bandung, 5 September 2026 – Antusiasme luar biasa …husiast, home baker, hingga pelaku usaha kuliner., content: , contentId: } en @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266340ms] [LOG] [Fast Refresh] done in 420ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266441ms] [LOG] [Fast Refresh] done in 420ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266450ms] [LOG] getArticleContent {slug: baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan, title: Baking Demo di Bandung tembus 80+ Peserta,  Bawakan 7 Menu Andalan di Ny Liem!, excerpt: Bandung, 5 September 2026 – Antusiasme luar biasa …husiast, home baker, hingga pelaku usaha kuliner., content: , contentId: } en @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266451ms] [LOG] getArticleContent {slug: baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan, title: Baking Demo di Bandung tembus 80+ Peserta,  Bawakan 7 Menu Andalan di Ny Liem!, excerpt: Bandung, 5 September 2026 – Antusiasme luar biasa …husiast, home baker, hingga pelaku usaha kuliner., content: , contentId: } en @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1266491ms] [LOG] [Fast Refresh] done in 420ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1284502ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1284653ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1284753ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1284817ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1288714ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1521615ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1522728ms] [LOG] [Fast Refresh] done in 1200ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1522830ms] [LOG] [Fast Refresh] done in 1200ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1523245ms] [LOG] [Fast Refresh] done in 1200ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
+[ 1523313ms] [LOG] [Fast Refresh] done in 1200ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js:776
