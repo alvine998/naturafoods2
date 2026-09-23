@@ -2,13 +2,13 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "../components/SafeImage";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import SalesContactCard from "../components/SalesContactCard";
 import { useLang } from "../i18n";
 import type { Product } from "../lib/data";
 import { apiFetch, buildQuery } from "../lib/api";
-import { useStore } from "../lib/store";
+import { sortByLandingOrder, useStore } from "../lib/store";
 
 function ProductCardSkeleton() {
   return (
@@ -87,12 +87,14 @@ function ProductsInner() {
     const brandParam = selectedBrands.length > 0 ? selectedBrands.join(",") : undefined;
     // server ignores ?cat= — it filters on categoryId only (verified against live API)
     const catId = cat !== "all" ? productCategories.find((c) => c.slug === cat)?.id : undefined;
-    const q = buildQuery({ categoryId: catId, brandId: brandParam, limit: 50, sort: "createdAt:desc" });
+    // Default sort = backend sortIndex ASC, createdAt DESC (no explicit ?sort=)
+    const q = buildQuery({ categoryId: catId, brandId: brandParam, limit: 50 });
     apiFetch<Product[]>(`/products${q}`)
       .then((json) => {
         if (!cancelled && json.success && Array.isArray(json.data)) {
           const norm = (json.data as unknown as Record<string, unknown>[]).map((raw) => {
             const catObj = raw.category as { slug?: unknown } | undefined;
+            const sortRaw = raw.sortIndex ?? raw.sort_index ?? raw.order ?? raw.sortOrder;
             return {
               slug: String(raw.slug ?? raw.id ?? ""),
               // API returns category.slug — top-level `cat` no longer exists
@@ -105,6 +107,11 @@ function ProductsInner() {
               type: (raw.type as Product["type"]) ?? "general",
               isHighlight: Boolean(raw.isHighlight ?? false),
               brandId: (raw.brandId as string) ?? ((raw.brand as Record<string, unknown>)?.id as string) ?? null,
+              sortIndex: typeof sortRaw === "number" && Number.isFinite(sortRaw)
+                ? Math.trunc(sortRaw)
+                : typeof sortRaw === "string" && sortRaw.trim() !== "" && Number.isFinite(Number(sortRaw))
+                  ? Math.trunc(Number(sortRaw))
+                  : 0,
             } as Product;
           });
           setApiItems(norm.filter((x) => x.slug));
@@ -116,7 +123,8 @@ function ProductsInner() {
   }, [cat, selectedBrands.join(","), productCategories]);
 
   const source = apiItems ?? items;
-  const filtered = source.filter((x) => (cat === "all" || x.cat === cat) && (selectedBrands.length === 0 || selectedBrands.includes(x.brandId ?? "")));
+  // Landing + admin share sortIndex: lower shows first (backend default sortIndex ASC).
+  const filtered = sortByLandingOrder(source.filter((x) => (cat === "all" || x.cat === cat) && (selectedBrands.length === 0 || selectedBrands.includes(x.brandId ?? ""))));
   const cats = [
     ["all", p.all],
     ...productCategories.filter((c) => c.isActive).map((c) => [c.slug, c.name] as const),

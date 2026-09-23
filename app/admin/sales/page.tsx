@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useLang } from "../../i18n";
-import { normalizeSalesContacts, sortSalesContacts, useStore } from "../../lib/store";
+import { normalizeSalesContacts, useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { SalesContact } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, FileUpload, Input, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
 
 function slugify(input: string): string {
@@ -51,7 +51,7 @@ export default function SalesPage() {
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const tabLabel = (a.tabs as unknown as string[])[12] ?? "Sales";
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
-  const ordered = useMemo(() => sortSalesContacts(s.salesContacts as SalesContact[]), [s.salesContacts]);
+  const ordered = useMemo(() => sortBySortIndex(s.salesContacts as SalesContact[]), [s.salesContacts]);
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return ordered;
@@ -60,6 +60,24 @@ export default function SalesPage() {
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (id: string) => `/admin/sales/${encodeURIComponent(id)}`;
+  const commitSort = (item: SalesContact, sortIndex: number) => {
+    s.setSalesContacts((prev: SalesContact[]) => prev.map((x) => (x.id === item.id ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.id), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(ordered, from, to);
+    s.setSalesContacts(next);
+    void persistSortIndexDiff(ordered, next, (x) => pathFor(x.id));
+  };
+  const moveItem = (item: SalesContact, dir: -1 | 1) => {
+    const from = ordered.findIndex((x) => x.id === item.id);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({ gender: "", published: true }); setEditIdx(null); setFormOpen(true); setErr(null); setIdTouched(false); };
   const openEdit = (c: SalesContact) => {
     const realIdx = (s.salesContacts as SalesContact[]).indexOf(c);
@@ -92,6 +110,7 @@ export default function SalesPage() {
       location: String(f.location ?? ""),
       published,
       isPublished: published,
+      sortIndex: toSortIndex(f.sortIndex),
     };
     // Backend contract: POST/PUT /admin/sales (src/routes/sales.js) accepts
     // isPublished or published alias; send both. Sync local state from the
@@ -184,6 +203,7 @@ export default function SalesPage() {
             <Field label="email"><Input type="email" value={f.email ?? ""} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="sales@naturafoods.id" /></Field>
             <div className="sm:col-span-2"><Field label="location"><Input value={f.location ?? ""} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Jakarta" /></Field></div>
             <div className="sm:col-span-2"><Field label="photo"><FileUpload value={f.photo ?? ""} onChange={(v) => setF({ ...f, photo: v })} accept="image/*" folder="sales" /></Field></div>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <label className="flex items-center gap-2 text-[12px] text-[#2D4A22]"><input type="checkbox" checked={f.published !== false} onChange={(e) => setF({ ...f, published: e.target.checked })} className="h-4 w-4 accent-[#2D4A22]" /> Published (shown on site)</label>
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.name?.trim() || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
@@ -195,12 +215,22 @@ export default function SalesPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[820px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Contact</th><th className="px-3 py-3 text-left font-medium">Position</th><th className="px-3 py-3 text-left font-medium">WhatsApp</th><th className="px-3 py-3 text-left font-medium">Email</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Status</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Contact</th><th className="px-3 py-3 text-left font-medium">Position</th><th className="px-3 py-3 text-left font-medium">WhatsApp</th><th className="px-3 py-3 text-left font-medium">Email</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Status</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((c: SalesContact) => {
+                  {paged.map((c: SalesContact, i: number) => {
                     const photo = c.photo?.trim() ? c.photo : null;
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     return (
-                      <tr key={c.id} className="hover:bg-white/60">
+                      <tr key={c.id} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                        <td className="px-3 py-2">
+                          <SortIndexCell
+                            value={c.sortIndex}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitSort(c, v)}
+                            onMove={(dir) => moveItem(c, dir)}
+                            title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                          />
+                        </td>
                         <td className="px-3 py-2">
                            <div className="flex items-center gap-2.5">
                              {photo ? (

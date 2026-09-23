@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "../components/SafeImage";
 import { ArrowRight } from "lucide-react";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import { useLang } from "../i18n";

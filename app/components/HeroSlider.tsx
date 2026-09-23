@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "./SafeImage";
 import { motion } from "framer-motion";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useLang } from "../i18n";

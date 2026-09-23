@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { HomeBrand } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
 
 function slugify(input: string): string {
@@ -30,14 +30,33 @@ export default function HomeBrandsPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const sortedAll = useMemo(() => sortBySortIndex(s.homeBrands), [s.homeBrands]);
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
-    if (!n) return s.homeBrands;
-    return s.homeBrands.filter((h) => `${h.id} ${h.name} ${h.desc}`.toLowerCase().includes(n));
-  }, [s.homeBrands, q]);
+    if (!n) return sortedAll;
+    return sortedAll.filter((h) => `${h.id} ${h.name} ${h.desc}`.toLowerCase().includes(n));
+  }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (id: string) => `/admin/home-brands/${encodeURIComponent(id)}`;
+  const commitSort = (item: HomeBrand, sortIndex: number) => {
+    s.setHomeBrands((prev: HomeBrand[]) => prev.map((x) => (x.id === item.id ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.id), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setHomeBrands(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.id));
+  };
+  const moveItem = (item: HomeBrand, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.id === item.id);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
   const openEdit = (i: number) => {
     const h = s.homeBrands[i];
@@ -66,6 +85,7 @@ export default function HomeBrandsPage() {
       image: String(f.image ?? ""),
       desc: String(f.desc ?? ""),
       brandIds,
+      sortIndex: toSortIndex(f.sortIndex),
     };
     // backend uses snake_case `brand_ids` — send both spellings
     const payload = { ...item, brand_ids: brandIds };
@@ -132,6 +152,7 @@ export default function HomeBrandsPage() {
             <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Brand Name" /></Field>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={3} placeholder="Short description for this home brand" /></Field></div>
             <div className="sm:col-span-2"><Field label="image"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="home-brands" /></Field></div>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             {s.masterBrands.length > 0 && (
               <div className="sm:col-span-2">
                 <Field label="Brands">
@@ -167,12 +188,22 @@ export default function HomeBrandsPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Brands</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Brands</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((h: HomeBrand) => {
+                  {paged.map((h: HomeBrand, i: number) => {
                     const realIdx = s.homeBrands.indexOf(h);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     return (
-                      <tr key={h.id + realIdx} className="hover:bg-white/60">
+                      <tr key={h.id + realIdx} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                        <td className="px-3 py-2">
+                          <SortIndexCell
+                            value={h.sortIndex}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitSort(h, v)}
+                            onMove={(dir) => moveItem(h, dir)}
+                            title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                          />
+                        </td>
                         <td className="px-3 py-2">
                           {h.image ? (
                             <Image src={h.image} alt="" className="h-10 w-10 rounded-lg object-cover" width={40} height={40} />

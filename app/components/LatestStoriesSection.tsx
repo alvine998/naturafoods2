@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "./SafeImage";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLang } from "../i18n";
@@ -9,7 +9,11 @@ import type { Article } from "../lib/data";
 import EduInnoSliderBanner from "./EduInnoSliderBanner";
 
 function sortByDateDesc(list: Article[]): Article[] {
+  // Lower sortIndex first (admin landing order); ties fall back to newest date.
   return [...list].sort((x, y) => {
+    const sx = x.sortIndex ?? 0;
+    const sy = y.sortIndex ?? 0;
+    if (sx !== sy) return sx - sy;
     const tx = Date.parse(x.date ?? "");
     const ty = Date.parse(y.date ?? "");
     const vx = Number.isFinite(tx) ? tx : 0;

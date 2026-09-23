@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import Image from "./SafeImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useStore } from "../lib/store";
+import { sortByLandingOrder, useStore } from "../lib/store";
 
 type SlideItem = {
   id: string;
@@ -151,14 +151,14 @@ function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
 export default function EduInnoSliderBanner() {
   const { ready, edu, innovation } = useStore();
 
-  const eduSlides: SlideItem[] = edu.map((e) => ({
+  const eduSlides: SlideItem[] = sortByLandingOrder(edu).map((e) => ({
     id: `edu-${e.id}`,
     title: e.title,
     img: e.img,
     link: e.link,
   }));
 
-  const innoSlides: SlideItem[] = innovation.map((i) => ({
+  const innoSlides: SlideItem[] = sortByLandingOrder(innovation).map((i) => ({
     id: `inno-${i.id}`,
     title: i.title,
     img: i.img,

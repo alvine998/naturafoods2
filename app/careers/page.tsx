@@ -1,6 +1,6 @@
 "use client";
 import { ArrowUpRight, Briefcase } from "lucide-react";
-import Image from "next/image";
+import Image from "../components/SafeImage";
 import Link from "next/link";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";

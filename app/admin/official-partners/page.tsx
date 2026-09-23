@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -7,7 +7,7 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { OfficialPartner } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, MultiFileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, FileUpload, MultiFileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
 
 function slugify(input: string): string {
@@ -58,6 +58,23 @@ export default function OfficialPartnersPage() {
     s.setOfficialPartners(renumbered);
     persistOrder(renumbered);
   };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const sorted = [...sortedAll];
+    if (from < 0 || from >= sorted.length) return;
+    const [item] = sorted.splice(from, 1);
+    const target = Math.max(0, Math.min(to, sorted.length));
+    sorted.splice(target, 0, item);
+    const renumbered = sorted.map((p, i) => ({ ...p, order: i }));
+    s.setOfficialPartners(renumbered);
+    persistOrder(renumbered);
+  };
+  const commitOrder = (item: OfficialPartner, order: number) => {
+    const next = sortedAll.map((p) => (p.id === item.id ? { ...p, order } : p));
+    s.setOfficialPartners(next);
+    persistOrder(next);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => {
     const maxOrder = (s.officialPartners as OfficialPartner[]).reduce((m, p) => Math.max(m, p.order ?? 0), -1);
     setF({ isPublished: true, images: [], color: "#4A2A1F", order: maxOrder + 1 }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false);
@@ -284,37 +301,22 @@ export default function OfficialPartnersPage() {
               <table className="w-full min-w-[940px] text-[12px]">
                 <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Order</th><th className="px-3 py-3 text-left font-medium">Preview</th><th className="px-3 py-3 text-left font-medium">Color</th><th className="px-3 py-3 text-left font-medium">Name / ID</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Brands</th><th className="px-3 py-3 text-left font-medium">Published</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((p: OfficialPartner) => {
+                  {paged.map((p: OfficialPartner, i: number) => {
                     const realIdx = (s.officialPartners as OfficialPartner[]).indexOf(p);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     const rightVisual = p.background || "";
                     const bottomLogos = Array.isArray(p.images) && p.images.length ? p.images.filter(Boolean) : p.image ? [p.image] : [];
                     const cardColor = p.color && /^#[0-9a-fA-F]{6}$/.test(p.color) ? p.color : "#4A2A1F";
                     return (
-                      <tr key={p.id + realIdx} className="hover:bg-white/60">
+                      <tr key={p.id + realIdx} {...rowProps(absIdx)} className={rowClass(absIdx)}>
                         <td className="px-3 py-2">
-                          <div className="flex items-center gap-1" title={isFiltering ? "Clear search to reorder" : `Order ${p.order ?? 0} — lower shows first`}>
-                            <span className="min-w-[28px] rounded-full bg-[#2D4A22]/10 px-2 py-1 text-center text-[11px] font-medium text-[#2D4A22]">{p.order ?? 0}</span>
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={isFiltering}
-                                onClick={() => move(p.id, -1)}
-                                className="rounded border bg-white px-1.5 text-[10px] leading-tight disabled:opacity-30"
-                                title="Move up"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={isFiltering}
-                                onClick={() => move(p.id, 1)}
-                                className="rounded border bg-white px-1.5 text-[10px] leading-tight disabled:opacity-30"
-                                title="Move down"
-                              >
-                                ▼
-                              </button>
-                            </div>
-                          </div>
+                          <SortIndexCell
+                            value={p.order ?? 0}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitOrder(p, v)}
+                            onMove={(dir) => move(p.id, dir)}
+                            title={isFiltering ? "Clear search to reorder" : "Edit order or drag row — lower shows first"}
+                          />
                         </td>
                          <td className="px-3 py-2">
                            <div className="flex items-center gap-2 rounded-xl p-1.5" style={{ background: cardColor }} title={`card bg ${cardColor} · ${bottomLogos.length} logo(s)`}>

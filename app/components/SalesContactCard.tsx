@@ -1,6 +1,6 @@
 "use client";
 import { MessageCircle, Mail, Phone } from "lucide-react";
-import Image from "next/image";
+import Image from "./SafeImage";
 import { useLang } from "../i18n";
 import { salesInitials, sortSalesContacts, useStore } from "../lib/store";
 

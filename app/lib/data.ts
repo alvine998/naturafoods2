@@ -1,16 +1,16 @@
 export type ProductType = "home-brand" | "small-pack" | "general";
-export type ProductCategory = { id: string; slug: string; name: string; description?: string; isActive: boolean; isHighlight?: boolean };
-export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; brandId?: string | null; brand?: { id: string; slug: string; name: string }; title: string; note: string; tag: string; img: string; desc: string; type?: ProductType; isHighlight?: boolean; file?: string | null };
-export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string };
-export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; link?: string; cta?: string; eyebrow?: string };
-export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string };
-export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string };
+export type ProductCategory = { id: string; slug: string; name: string; description?: string; isActive: boolean; isHighlight?: boolean; sortIndex?: number };
+export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; brandId?: string | null; brand?: { id: string; slug: string; name: string }; title: string; note: string; tag: string; img: string; desc: string; type?: ProductType; isHighlight?: boolean; file?: string | null; sortIndex?: number };
+export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string; sortIndex?: number };
+export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
+export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
+export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string; sortIndex?: number };
 export type Inquiry = { id: string; name: string; city: string; whatsapp: string; interest: string; date: string };
-export type OfficialPartner = { id: string; name: string; description: string; image: string; background: string; images?: string[]; color?: string; order?: number; isPublished: boolean; brandIds?: string[]; link?: string };
-export type SalesContact = { id: string; name: string; gender: string; position: string; whatsapp: string; email: string; photo: string; location: string; published: boolean; isPublished?: boolean };
-export type HomeBrand = { id: string; name: string; image: string; desc: string; brandIds?: string[]; createdAt?: string; updatedAt?: string };
-export type SocialMedia = { id: string; name: string; description: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string };
-export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean };
+export type OfficialPartner = { id: string; name: string; description: string; image: string; background: string; images?: string[]; color?: string; order?: number; sortIndex?: number; isPublished: boolean; brandIds?: string[]; link?: string };
+export type SalesContact = { id: string; name: string; gender: string; position: string; whatsapp: string; email: string; photo: string; location: string; published: boolean; isPublished?: boolean; sortIndex?: number };
+export type HomeBrand = { id: string; name: string; image: string; desc: string; brandIds?: string[]; createdAt?: string; updatedAt?: string; sortIndex?: number };
+export type SocialMedia = { id: string; name: string; description: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string; sortIndex?: number };
+export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean; sortIndex?: number };
 
 export const SEED_PRODUCTS: Product[] = [];
 

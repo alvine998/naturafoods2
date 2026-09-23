@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import SalesContactCard from "../../components/SalesContactCard";
 import { ArrowLeft, Download } from "lucide-react";

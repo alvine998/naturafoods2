@@ -113,14 +113,27 @@ export async function login(user: string, pass: string): Promise<boolean> {
   return ok;
 }
 
+function isJwtExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1] ?? "")) as { exp?: number };
+    if (typeof payload.exp !== "number") return false;
+    // 5s skew so we don't race an about-to-expire token into a 401
+    return payload.exp * 1000 <= Date.now() + 5000;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Logout — calls POST /auth/logout with refreshToken, then clears all tokens.
+ * Logout — calls POST /auth/logout with refreshToken (only when the access
+ * token is still valid), then always clears local tokens. Expired tokens are
+ * skipped so the browser doesn't log a 401 on every sign-out.
  */
 export async function logout(): Promise<void> {
+  const token = getAccessToken();
+  const refreshToken = getRefreshToken();
   try {
-    const token = getAccessToken();
-    const refreshToken = getRefreshToken();
-    if (token && refreshToken) {
+    if (token && refreshToken && !isJwtExpired(token)) {
       await fetch(`${API_BASE}/auth/logout`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -8,7 +8,7 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { Article } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
 const QuillEditor = dynamic(() => import("@/components/ui/quill-editor"), { ssr: false });
 
@@ -49,14 +49,33 @@ export default function ArticlesPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const sortedAll = useMemo(() => sortBySortIndex(s.articles as Article[]), [s.articles]);
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
-    if (!n) return s.articles as Article[];
-    return (s.articles as Article[]).filter((x) => `${x.title} ${x.slug} ${x.category}`.toLowerCase().includes(n));
-  }, [s.articles, q]);
+    if (!n) return sortedAll;
+    return sortedAll.filter((x) => `${x.title} ${x.slug} ${x.category}`.toLowerCase().includes(n));
+  }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (slug: string) => `/admin/articles/${encodeURIComponent(slug)}`;
+  const commitSort = (item: Article, sortIndex: number) => {
+    s.setArticles((prev: Article[]) => prev.map((x) => (x.slug === item.slug ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.slug), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setArticles(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.slug));
+  };
+  const moveItem = (item: Article, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.slug === item.slug);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
   const openEdit = (i: number) => { setF(s.articles[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
@@ -79,7 +98,7 @@ export default function ArticlesPage() {
     const isEdit = editIdx !== null;
     const originalSlug = isEdit ? s.articles[editIdx!].slug : null;
     const slug = ensureUniqueSlug(baseSlug, (s.articles as Article[]).map((x) => x.slug), originalSlug);
-    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? "") };
+    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? ""), sortIndex: toSortIndex(f.sortIndex) };
     // API expects also contentID/contentEN/contentZN aliases + isPublished etc — send both shapes for compat
     const payload: Record<string, unknown> = {
       slug: item.slug,
@@ -96,6 +115,7 @@ export default function ArticlesPage() {
       category: item.category,
       img: item.img,
       thumbnail: item.img,
+      sortIndex: item.sortIndex,
       status: "published",
       isPublished: true,
     };
@@ -152,6 +172,7 @@ export default function ArticlesPage() {
             <Field label="slug (auto from title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
             <Field label="category"><Input value={f.category ?? ""} onChange={(e) => setF({ ...f, category: e.target.value })} placeholder="Guide" /></Field>
             <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="articles" /></Field></div>
             <div className="sm:col-span-2"><Field label="excerpt"><TextArea value={f.excerpt ?? ""} onChange={(e) => setF({ ...f, excerpt: e.target.value })} rows={2} placeholder="Short summary" /></Field></div>
             <div className="sm:col-span-2 grid gap-2">
@@ -188,14 +209,24 @@ export default function ArticlesPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[720px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Date</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Image</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Category</th><th className="px-3 py-3 text-left font-medium">Date</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((ar: Article) => {
+                  {paged.map((ar: Article, i: number) => {
                     const realIdx = (s.articles as Article[]).indexOf(ar);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     const img = ar.img?.trim() ? ar.img : null;
                     const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
                     return (
-                       <tr key={ar.slug + realIdx} className="hover:bg-white/60">
+                       <tr key={ar.slug + realIdx} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                         <td className="px-3 py-2">
+                           <SortIndexCell
+                             value={ar.sortIndex}
+                             disabled={isFiltering}
+                             onCommit={(v) => commitSort(ar, v)}
+                             onMove={(dir) => moveItem(ar, dir)}
+                             title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                           />
+                         </td>
                          <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <Image src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" width={40} height={40} />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1">{ar.title}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.slug}</td>

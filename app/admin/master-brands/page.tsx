@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -7,7 +7,7 @@ import { useStore, apiCreateMasterBrand, apiUpdateMasterBrand, apiToggleMasterBr
 import { isAuthed } from "../../lib/auth";
 import type { MasterBrand } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 
 function slugify(input: string): string {
   return (input ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "").slice(0, 64).replace(/-+$/g, "");
@@ -29,20 +29,39 @@ export default function MasterBrandsPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const sortedAll = useMemo(() => sortBySortIndex(s.masterBrands), [s.masterBrands]);
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return s.masterBrands;
-    return s.masterBrands.filter((b) => `${b.name} ${b.slug} ${b.description ?? ""}`.toLowerCase().includes(needle));
-  }, [s.masterBrands, q]);
+    if (!needle) return sortedAll;
+    return sortedAll.filter((b) => `${b.name} ${b.slug} ${b.description ?? ""}`.toLowerCase().includes(needle));
+  }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (slug: string) => `/admin/brands/${encodeURIComponent(slug)}`;
+  const commitSort = (item: MasterBrand, sortIndex: number) => {
+    s.setMasterBrands((prev) => prev.map((x) => (x.slug === item.slug ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.slug), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setMasterBrands(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.slug));
+  };
+  const moveItem = (item: MasterBrand, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.slug === item.slug);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({ isActive: true }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
   const openEdit = (i: number) => { setF(s.masterBrands[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.name || !f.slug) return;
-    const payload = { slug: slugify(f.slug!), name: String(f.name), description: String(f.description ?? ""), logo: String(f.logo ?? ""), isActive: f.isActive !== false };
+    const payload = { slug: slugify(f.slug!), name: String(f.name), description: String(f.description ?? ""), logo: String(f.logo ?? ""), isActive: f.isActive !== false, sortIndex: toSortIndex(f.sortIndex) };
     setSaving(true);
     setErr(null);
     const isEdit = editIdx !== null;
@@ -53,7 +72,7 @@ export default function MasterBrandsPage() {
         s.setMasterBrands((prev) => prev.map((x, i) => i === editIdx ? { ...x, ...updated, slug: updated.slug || x.slug } : x));
       } else {
         const created = await apiCreateMasterBrand(payload);
-        s.setMasterBrands((prev) => [...prev, { id: created.id || slugify(f.name!), slug: created.slug || payload.slug, name: created.name || payload.name, description: created.description ?? payload.description, logo: created.logo ?? payload.logo, isActive: created.isActive ?? payload.isActive }]);
+        s.setMasterBrands((prev) => [...prev, { id: created.id || slugify(f.name!), slug: created.slug || payload.slug, name: created.name || payload.name, description: created.description ?? payload.description, logo: created.logo ?? payload.logo, isActive: created.isActive ?? payload.isActive, sortIndex: created.sortIndex ?? payload.sortIndex }]);
       }
       closeForm();
     } catch (e) {
@@ -127,6 +146,7 @@ export default function MasterBrandsPage() {
                 <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${f.isActive !== false ? "bg-[#2D4A22] text-white" : "bg-[#8B6F47]/10 text-[#8B6F47]"}`}>{f.isActive !== false ? "Active" : "Inactive"}</span>
               </label>
             </Field>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.name || !f.slug || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
           {(!f.name || !f.slug) && <p className="mt-2 text-[11px] text-[#8B6F47]">Name & slug required.</p>}
@@ -137,13 +157,23 @@ export default function MasterBrandsPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[600px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Logo</th><th className="px-3 py-3 text-left font-medium">Name</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Active</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Logo</th><th className="px-3 py-3 text-left font-medium">Name</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Active</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((b: MasterBrand) => {
+                  {paged.map((b: MasterBrand, i: number) => {
                     const realIdx = s.masterBrands.indexOf(b);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     const logo = b.logo?.trim() ? b.logo : null;
                     return (
-                       <tr key={b.id || b.slug} className="hover:bg-white/60">
+                       <tr key={b.id || b.slug} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                         <td className="px-3 py-2">
+                           <SortIndexCell
+                             value={b.sortIndex}
+                             disabled={isFiltering}
+                             onCommit={(v) => commitSort(b, v)}
+                             onMove={(dir) => moveItem(b, dir)}
+                             title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                           />
+                         </td>
                          <td className="px-3 py-2">{logo ? <Image src={logo} alt="" className="h-8 w-8 rounded-lg object-contain bg-[#F5EFE0]" width={32} height={32} /> : <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{b.name}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{b.slug}</td>

@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "./SafeImage";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMemo } from "react";
-import { useStore } from "../lib/store";
+import { sortByLandingOrder, useStore } from "../lib/store";
 import type { Product, ProductCategory } from "../lib/data";
 
 function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -21,10 +21,10 @@ export default function HighlightedProductsSection() {
   const { products, productCategories } = useStore();
 
   const sections = useMemo(() => {
-    const highlighted = productCategories.filter((c) => c.isHighlight && c.isActive);
+    const highlighted = sortByLandingOrder(productCategories.filter((c) => c.isHighlight && c.isActive));
     return highlighted.map((cat) => ({
       category: cat,
-      products: products.filter((p) => p.cat === cat.slug).slice(0, MAX_PRODUCTS),
+      products: sortByLandingOrder(products.filter((p) => p.cat === cat.slug)).slice(0, MAX_PRODUCTS),
     })).filter((s) => s.products.length > 0);
   }, [products, productCategories]);
 

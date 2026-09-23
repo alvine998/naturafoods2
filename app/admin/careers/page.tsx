@@ -6,7 +6,7 @@ import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { Job } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
 
 function slugify(input: string): string {
@@ -29,20 +29,39 @@ export default function CareersPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const sortedAll = useMemo(() => sortBySortIndex(s.jobs as Job[]), [s.jobs]);
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
-    if (!n) return s.jobs as Job[];
-    return (s.jobs as Job[]).filter((j) => `${j.title} ${j.dept} ${j.loc}`.toLowerCase().includes(n));
-  }, [s.jobs, q]);
+    if (!n) return sortedAll;
+    return sortedAll.filter((j) => `${j.title} ${j.dept} ${j.loc}`.toLowerCase().includes(n));
+  }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (id: string) => `/admin/jobs/${encodeURIComponent(id)}`;
+  const commitSort = (item: Job, sortIndex: number) => {
+    s.setJobs((prev: Job[]) => prev.map((x) => (x.id === item.id ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.id), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setJobs(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.id));
+  };
+  const moveItem = (item: Job, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.id === item.id);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
   const openEdit = (i: number) => { setF(s.jobs[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.title) return;
-    const item: Job = { id: String(f.id ?? Date.now().toString()), title: String(f.title), dept: String(f.dept ?? ""), loc: String(f.loc ?? ""), type: String(f.type ?? "Full-time"), desc: String(f.desc ?? "") };
+    const item: Job = { id: String(f.id ?? Date.now().toString()), title: String(f.title), dept: String(f.dept ?? ""), loc: String(f.loc ?? ""), type: String(f.type ?? "Full-time"), desc: String(f.desc ?? ""), sortIndex: toSortIndex(f.sortIndex) };
     setSaving(true); setErr(null);
     const isEdit = editIdx !== null;
     const originalId = isEdit ? s.jobs[editIdx!]?.id : null;
@@ -101,6 +120,7 @@ export default function CareersPage() {
             <Field label="dept"><Input value={f.dept ?? ""} onChange={(e) => setF({ ...f, dept: e.target.value })} placeholder="Sales" /></Field>
             <Field label="location"><Input value={f.loc ?? ""} onChange={(e) => setF({ ...f, loc: e.target.value })} placeholder="Jakarta" /></Field>
             <Field label="type"><Input value={f.type ?? ""} onChange={(e) => setF({ ...f, type: e.target.value })} placeholder="Full-time" /></Field>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <div className="sm:col-span-2"><Field label="desc"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={3} /></Field></div>
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
@@ -111,12 +131,22 @@ export default function CareersPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[640px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Dept</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Type</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Title</th><th className="px-3 py-3 text-left font-medium">Dept</th><th className="px-3 py-3 text-left font-medium">Location</th><th className="px-3 py-3 text-left font-medium">Type</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((j: Job) => {
+                  {paged.map((j: Job, i: number) => {
                     const realIdx = (s.jobs as Job[]).indexOf(j);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     return (
-                      <tr key={j.id + realIdx} className="hover:bg-white/60">
+                      <tr key={j.id + realIdx} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                        <td className="px-3 py-2">
+                          <SortIndexCell
+                            value={j.sortIndex}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitSort(j, v)}
+                            onMove={(dir) => moveItem(j, dir)}
+                            title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                          />
+                        </td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{j.title}</td>
                         <td className="px-3 py-2">{j.dept}</td>
                         <td className="px-3 py-2">{j.loc}</td>

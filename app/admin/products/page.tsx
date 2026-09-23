@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
@@ -19,6 +19,14 @@ import {
   Empty,
   PAGE_SIZE,
   confirmAdminDelete,
+  SortIndexField,
+  toSortIndex,
+  sortBySortIndex,
+  renumberByMove,
+  persistSortIndexDiff,
+  patchSortIndex,
+  SortIndexCell,
+  useDragSort,
 } from "../_components";
 import {
   Select,
@@ -79,7 +87,7 @@ export default function ProductsPage() {
   ];
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    let list = s.products as Product[];
+    let list = sortBySortIndex(s.products as Product[]);
     if (catFilter !== "all") list = list.filter((p) => p.cat === catFilter);
     if (needle)
       list = list.filter((p) =>
@@ -92,6 +100,25 @@ export default function ProductsPage() {
   useEffect(() => setPage(1), [q, catFilter]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const sortedAll = useMemo(() => sortBySortIndex(s.products as Product[]), [s.products]);
+  const isFiltering = q.trim() !== "" || catFilter !== "all";
+  const pathFor = (slug: string) => `/admin/products/${encodeURIComponent(slug)}`;
+  const commitSort = (item: Product, sortIndex: number) => {
+    s.setProducts((prev: Product[]) => prev.map((x) => (x.slug === item.slug ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.slug), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setProducts(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.slug));
+  };
+  const moveItem = (item: Product, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.slug === item.slug);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => {
     setF({
       type: "general",
@@ -134,6 +161,7 @@ export default function ProductsPage() {
       type: (f.type as Product["type"]) ?? "general",
       isHighlight: Boolean(f.isHighlight),
       file: f.file ?? null,
+      sortIndex: toSortIndex(f.sortIndex),
     };
     setSaving(true);
     setErr(null);
@@ -152,6 +180,7 @@ export default function ProductsPage() {
         desc: item.desc,
         isHighlight: item.isHighlight,
         file: item.file,
+        sortIndex: item.sortIndex,
       };
       if (isEdit) {
         await apiFetch(`/admin/products/${encodeURIComponent(originalSlug!)}`, {
@@ -392,6 +421,10 @@ export default function ProductsPage() {
                 </span>
               </label>
             </Field>
+            <SortIndexField
+              value={f.sortIndex}
+              onChange={(v) => setF({ ...f, sortIndex: v })}
+            />
             <div className="sm:col-span-2">
               <Field label="image / video">
                 <FileUpload
@@ -484,6 +517,7 @@ export default function ProductsPage() {
               <table className="w-full min-w-[860px] text-[12px]">
                 <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]">
                   <tr>
+                    <th className="px-3 py-3 text-left font-medium">Sort</th>
                     <th className="px-3 py-3 text-left font-medium">Image</th>
                     <th className="px-3 py-3 text-left font-medium">Title</th>
                     <th className="px-3 py-3 text-left font-medium">Slug</th>
@@ -499,8 +533,9 @@ export default function ProductsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((p: Product) => {
+                  {paged.map((p: Product, i: number) => {
                     const realIdx = (s.products as Product[]).indexOf(p);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     const img = p.img?.trim() ? p.img : null;
                     const isVideo =
                       !!img &&
@@ -519,7 +554,16 @@ export default function ProductsPage() {
                           ? "bg-[#EAF2FF] border-[#2D4A22]/15 text-[#2D4A22]"
                           : "bg-white border-[#2D4A22]/15 text-[#8B6F47]";
                     return (
-                      <tr key={p.slug + realIdx} className="hover:bg-white/60">
+                      <tr key={p.slug + realIdx} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                        <td className="px-3 py-2">
+                          <SortIndexCell
+                            value={p.sortIndex}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitSort(p, v)}
+                            onMove={(dir) => moveItem(p, dir)}
+                            title={isFiltering ? "Clear search/filters to reorder" : "Edit number or drag row — lower shows first"}
+                          />
+                        </td>
                         <td className="px-3 py-2">
                           {img ? (
                             isVideo ? (

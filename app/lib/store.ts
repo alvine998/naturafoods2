@@ -55,6 +55,7 @@ function normalizeProducts(raw: unknown): Product[] {
       type: (p.type as Product["type"]) ?? "general",
       isHighlight: Boolean(p.isHighlight ?? p.is_highlight ?? false),
       file: String(p.file ?? p.file ?? "") || null,
+      sortIndex: toSortIndex(p.sortIndex ?? p.sort_index),
     };
   }).filter((p) => p.slug && p.title);
 }
@@ -72,7 +73,14 @@ function normalizeArticles(raw: unknown): Article[] {
     date: String(a.date ?? a.published_date ?? new Date().toISOString().slice(0, 10)),
     category: String(a.category ?? "General"),
     img: String(a.img ?? a.thumbnail ?? ""),
+    sortIndex: toSortIndex(a.sortIndex ?? a.sort_index),
   })).filter((a) => a.slug && a.title);
+}
+
+function toSortIndex(v: unknown): number {
+  if (typeof v === "number" && Number.isFinite(v)) return Math.trunc(v);
+  if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) return Math.trunc(Number(v));
+  return 0;
 }
 
 function parseOrder(v: unknown): number | undefined {
@@ -96,6 +104,7 @@ export function normalizeSalesContacts(raw: unknown): SalesContact[] {
       location: String(c.location ?? c.city ?? ""),
       published,
       isPublished: published,
+      sortIndex: toSortIndex(c.sortIndex ?? c.sort_index),
     };
   }).filter((c) => c.id && c.name);
 }
@@ -110,6 +119,7 @@ export function normalizeSocialMedia(raw: unknown): SocialMedia[] {
     instagram: String(s.instagram ?? ""),
     facebook: String(s.facebook ?? ""),
     tiktok: String(s.tiktok ?? ""),
+    sortIndex: toSortIndex(s.sortIndex ?? s.sort_index),
     createdAt: s.createdAt as string | undefined,
     updatedAt: s.updatedAt as string | undefined,
   })).filter((s) => s.id && s.name);
@@ -130,6 +140,37 @@ function migrateSocialMedia(raw: unknown): SocialMedia[] {
   return normalizeSocialMedia(raw).filter((m) => !REMOVED_DUMMY_SOCIAL_IDS.has(m.id));
 }
 
+function normalizeEdu(raw: unknown): Edu[] {
+  if (!Array.isArray(raw)) return SEED_EDU;
+  return (raw as Record<string, unknown>[]).map((e) => ({
+    id: String(e.id ?? ""),
+    title: String(e.title ?? ""),
+    desc: String(e.desc ?? e.description ?? ""),
+    duration: e.duration != null ? String(e.duration) : undefined,
+    level: e.level != null ? String(e.level) : undefined,
+    img: String(e.img ?? e.image ?? ""),
+    link: e.link != null ? String(e.link) : undefined,
+    cta: e.cta != null ? String(e.cta) : undefined,
+    eyebrow: e.eyebrow != null ? String(e.eyebrow) : undefined,
+    sortIndex: toSortIndex(e.sortIndex ?? e.sort_index),
+  })).filter((e) => e.id && e.title);
+}
+
+function normalizeInnovation(raw: unknown): Innovation[] {
+  if (!Array.isArray(raw)) return SEED_INNOVATION;
+  return (raw as Record<string, unknown>[]).map((x) => ({
+    id: String(x.id ?? ""),
+    title: String(x.title ?? ""),
+    desc: String(x.desc ?? x.description ?? ""),
+    tag: String(x.tag ?? ""),
+    img: String(x.img ?? x.image ?? ""),
+    link: x.link != null ? String(x.link) : undefined,
+    cta: x.cta != null ? String(x.cta) : undefined,
+    eyebrow: x.eyebrow != null ? String(x.eyebrow) : undefined,
+    sortIndex: toSortIndex(x.sortIndex ?? x.sort_index),
+  })).filter((x) => x.id && x.title);
+}
+
 function normalizeHomeBrands(raw: unknown): HomeBrand[] {
   if (!Array.isArray(raw)) return SEED_HOMEBRANDS;
   return raw.map((h: Record<string, unknown>) => ({
@@ -138,6 +179,7 @@ function normalizeHomeBrands(raw: unknown): HomeBrand[] {
     image: String(h.image ?? h.img ?? ""),
     desc: String(h.desc ?? h.description ?? ""),
     brandIds: parseBrandIds(h) ?? [],
+    sortIndex: toSortIndex(h.sortIndex ?? h.sort_index),
     createdAt: h.createdAt as string | undefined,
     updatedAt: h.updatedAt as string | undefined,
   })).filter((h) => h.id && h.name);
@@ -162,6 +204,7 @@ function migrateSalesContacts(list: SalesContact[]): SalesContact[] {
       location: String(c.location ?? raw.city ?? ""),
       published,
       isPublished: published,
+      sortIndex: toSortIndex(raw.sortIndex ?? raw.sort_index),
     } as SalesContact;
   }).filter((c) => c.id && c.name && !REMOVED_DUMMY_SALES_IDS.has(c.id));
 }
@@ -176,7 +219,8 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
     const image = String((p.image as unknown) ?? (Array.isArray(p.image) ? (p.image as unknown[])[0] : "") ?? p.brandLogo ?? images?.[0] ?? "");
     const background = String(p.background ?? p.mainImage ?? "");
     const rawColor = typeof p.color === "string" ? p.color.trim() : "";
-    const order = parseOrder(p.order ?? (p as Record<string, unknown>).sortOrder) ?? idx;
+    // Admin uses sortIndex; legacy rows use `order`. Keep both in sync.
+    const sortVal = parseOrder(p.sortIndex ?? p.sort_index ?? p.sortOrder ?? p.order) ?? idx;
     const brandIds = parseBrandIds(p);
     const link = typeof p.link === "string" && p.link.trim() ? p.link.trim() : undefined;
     return {
@@ -187,7 +231,8 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
       background,
       ...(images && images.length ? { images } : {}),
       ...(rawColor ? { color: rawColor } : {}),
-      order,
+      order: sortVal,
+      sortIndex: sortVal,
       isPublished: p.isPublished ?? p.is_published ?? true ? true : false,
       ...(brandIds ? { brandIds } : {}),
       ...(link ? { link } : {}),
@@ -248,16 +293,31 @@ function migrateOfficialPartners(list: OfficialPartner[]): OfficialPartner[] {
     const image = String(p.image ?? images?.[0] ?? "");
     // normalize snake_case brand_ids (backend) -> brandIds (frontend)
     const brandIds = parseBrandIds(raw) ?? parseStringArray(p.brandIds);
+    // Admin sortIndex wins; legacy `order` kept in sync.
+    const sortVal = parseOrder(p.sortIndex ?? raw.sort_index ?? raw.sortOrder ?? p.order) ?? idx;
     const { logos: _drop, brand_ids: _drop2, brands: _drop3, ...rest } = raw as Record<string, unknown> & { logos?: unknown; brand_ids?: unknown; brands?: unknown };
     void _drop;
     void _drop2;
     void _drop3;
-    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: parseOrder(p.order) ?? idx, ...(brandIds ? { brandIds } : {}) } as OfficialPartner;
+    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: sortVal, sortIndex: sortVal, ...(brandIds ? { brandIds } : {}) } as OfficialPartner;
   });
 }
 
-export function sortOfficialPartners<T extends { order?: number; name?: string }>(list: T[]): T[] {
-  return [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+export function sortOfficialPartners<T extends { order?: number; sortIndex?: number; name?: string }>(list: T[]): T[] {
+  return [...list].sort((a, b) => ((a.sortIndex ?? a.order) ?? 0) - ((b.sortIndex ?? b.order) ?? 0));
+}
+
+/** Shared landing sort: lower sortIndex first (stable for equal values). */
+export function sortByLandingOrder<T extends { sortIndex?: number }>(list: T[]): T[] {
+  return list
+    .map((item, i) => ({ item, i }))
+    .sort((a, b) => {
+      const sa = a.item.sortIndex ?? 0;
+      const sb = b.item.sortIndex ?? 0;
+      if (sa !== sb) return sa - sb;
+      return a.i - b.i;
+    })
+    .map((x) => x.item);
 }
 
 // ---------------------------------------------------------------------------
@@ -354,8 +414,8 @@ function initStore() {
       // hardcoded to the empty seed, so LatestStoriesSection always nulled on
       // first paint until the API round-trip finished.
       articles: getSeedArticles(),
-      edu: load(KEYS.edu, SEED_EDU) as Edu[],
-      innovation: load(KEYS.innovation, SEED_INNOVATION) as Innovation[],
+      edu: normalizeEdu(load(KEYS.edu, SEED_EDU)),
+      innovation: normalizeInnovation(load(KEYS.innovation, SEED_INNOVATION)),
       jobs: load(KEYS.jobs, SEED_JOBS) as Job[],
       officialPartners: migrateOfficialPartners(load(KEYS.officialPartners, SEED_OFFICIAL_PARTNERS)) as OfficialPartner[],
       salesContacts: migrateSalesContacts(load(KEYS.salesContacts, [] as SalesContact[])) as SalesContact[],
@@ -401,8 +461,8 @@ function initStore() {
     if (apiProducts) { const norm = normalizeProducts(apiProducts); if (norm.length) patch.products = norm; }
     if (apiArticles) { const norm = normalizeArticles(apiArticles); if (norm.length) patch.articles = norm as Article[]; }
     if (apiPartners) { const norm = normalizeOfficialPartners(apiPartners); if (norm.length) patch.officialPartners = norm as OfficialPartner[]; }
-    if (apiEdu && Array.isArray(apiEdu) && apiEdu.length) patch.edu = apiEdu as Edu[];
-    if (apiInnov && Array.isArray(apiInnov) && apiInnov.length) patch.innovation = apiInnov as Innovation[];
+    if (apiEdu && Array.isArray(apiEdu) && apiEdu.length) patch.edu = normalizeEdu(apiEdu);
+    if (apiInnov && Array.isArray(apiInnov) && apiInnov.length) patch.innovation = normalizeInnovation(apiInnov);
     if (apiJobs && Array.isArray(apiJobs) && apiJobs.length) patch.jobs = apiJobs as Job[];
     if (apiHomeBrands && Array.isArray(apiHomeBrands) && apiHomeBrands.length) {
       const norm = normalizeHomeBrands(apiHomeBrands);
@@ -416,6 +476,7 @@ function initStore() {
         description: String(c.description ?? c.desc ?? ""),
         isActive: c.isActive !== false && c.is_active !== false,
         isHighlight: Boolean(c.isHighlight ?? c.is_highlight ?? false),
+        sortIndex: toSortIndex(c.sortIndex ?? c.sort_index),
       })).filter((c: ProductCategory) => c.id && c.name);
       if (norm.length) patch.productCategories = norm;
     }
@@ -435,6 +496,7 @@ function initStore() {
         description: String(b.description ?? b.desc ?? ""),
         logo: String(b.logo ?? b.image ?? ""),
         isActive: b.isActive !== false && b.is_active !== false,
+        sortIndex: toSortIndex(b.sortIndex ?? b.sort_index),
       })).filter((b: MasterBrand) => b.id && b.name);
       if (norm.length) patch.masterBrands = norm;
     }
@@ -526,7 +588,11 @@ function isPublishedArticle(raw: Record<string, unknown>): boolean {
 }
 
 function sortArticlesByDateDesc(list: Article[]): Article[] {
+  // Admin sortIndex wins when set; ties fall back to recency.
   return [...list].sort((a, b) => {
+    const sa = a.sortIndex ?? 0;
+    const sb = b.sortIndex ?? 0;
+    if (sa !== sb) return sa - sb;
     const ta = Date.parse(a.date ?? "");
     const tb = Date.parse(b.date ?? "");
     return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0);
@@ -536,7 +602,8 @@ function sortArticlesByDateDesc(list: Article[]): Article[] {
 // Public articles list (GET /articles) — returns null so callers fall back to local cache / seed
 export async function fetchPublicArticles(limit = 50): Promise<Article[] | null> {
   try {
-    const json = await apiFetch<unknown>(`/articles${buildQuery({ page: 1, limit, sort: "date:desc" })}`);
+    // No explicit sort — backend default is sortIndex ASC, createdAt DESC.
+    const json = await apiFetch<unknown>(`/articles${buildQuery({ page: 1, limit })}`);
     if (!json.success || !Array.isArray(json.data)) return null;
     const list = normalizeArticles((json.data as Record<string, unknown>[]).filter(isPublishedArticle));
     return list.length ? sortArticlesByDateDesc(list) : null;
@@ -570,6 +637,7 @@ function migrateProducts(list: Product[]): Product[] {
     ...p,
     type: (p.type as Product["type"]) ?? "general",
     isHighlight: p.isHighlight ?? false,
+    sortIndex: toSortIndex(p.sortIndex),
   }));
 }
 export function getSeedProducts(): Product[] {
@@ -592,8 +660,13 @@ export function getSeedOfficialPartners(): OfficialPartner[] {
   return getSeedOfficialPartners().filter((p) => p.isPublished);
 }
 
-export function sortSalesContacts<T extends { name?: string }>(list: T[]): T[] {
-  return [...list].sort((a, b) => String(a.name ?? "").localeCompare(String(b.name ?? "")));
+export function sortSalesContacts<T extends { name?: string; sortIndex?: number }>(list: T[]): T[] {
+  return [...list].sort((a, b) => {
+    const sa = a.sortIndex ?? 0;
+    const sb = b.sortIndex ?? 0;
+    if (sa !== sb) return sa - sb;
+    return String(a.name ?? "").localeCompare(String(b.name ?? ""));
+  });
 }
 export function getSeedSalesContacts(): SalesContact[] {
   try {

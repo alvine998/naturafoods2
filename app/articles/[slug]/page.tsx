@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "../../components/SafeImage";
 import { ArrowLeft } from "lucide-react";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "../../components/JsonLd";

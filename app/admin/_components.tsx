@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import Image from "../components/SafeImage";
 import { Label } from "@/components/ui/label";
 import { Input as UiInput } from "@/components/ui/input";
 import { Textarea as UiTextarea } from "@/components/ui/textarea";
 import { Card as UiCard } from "@/components/ui/card";
-import { uploadFile as apiUploadFile } from "../lib/api";
+import { apiFetch, uploadFile as apiUploadFile } from "../lib/api";
 
 export function confirmAdminDelete(label = "this item"): boolean {
   return typeof window === "undefined" || window.confirm(`Are you sure you want to delete ${label}? This action cannot be undone.`);
@@ -13,6 +13,201 @@ export function confirmAdminDelete(label = "this item"): boolean {
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="grid gap-1.5"><Label>{label}</Label><span className="normal-case tracking-normal">{children}</span></div>;
+}
+
+/** Parse form/API sortIndex into a finite integer (default 0). */
+export function toSortIndex(v: unknown): number {
+  if (typeof v === "number" && Number.isFinite(v)) return Math.trunc(v);
+  if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) return Math.trunc(Number(v));
+  return 0;
+}
+
+/** Shared "sort index" number field — lower shows first on public lists. */
+export function SortIndexField({ value, onChange }: { value?: number; onChange: (v: number) => void }) {
+  return (
+    <Field label="sort index (lower shows first)">
+      <Input
+        type="number"
+        value={value ?? 0}
+        onChange={(e) => onChange(toSortIndex(e.target.value))}
+        min={0}
+        step={1}
+        placeholder="0"
+      />
+    </Field>
+  );
+}
+
+/** Display order: lower sortIndex first (stable for equal values). */
+export function sortBySortIndex<T extends { sortIndex?: number }>(list: T[]): T[] {
+  return list
+    .map((item, i) => ({ item, i }))
+    .sort((a, b) => {
+      const sa = a.item.sortIndex ?? 0;
+      const sb = b.item.sortIndex ?? 0;
+      if (sa !== sb) return sa - sb;
+      return a.i - b.i;
+    })
+    .map((x) => x.item);
+}
+
+/** Move row from → to and renumber sortIndex 0..n-1. */
+export function renumberByMove<T extends { sortIndex?: number }>(list: T[], from: number, to: number): T[] {
+  if (from < 0 || from >= list.length) return list;
+  const next = [...list];
+  const [item] = next.splice(from, 1);
+  const target = Math.max(0, Math.min(to, next.length));
+  next.splice(target, 0, item);
+  return next.map((x, i) => ({ ...x, sortIndex: i }));
+}
+
+/** Persist a single row's sortIndex. Offline failures keep the local optimistic value. */
+export async function patchSortIndex(path: string, sortIndex: number): Promise<void> {
+  try {
+    await apiFetch(path, { method: "PUT", body: JSON.stringify({ sortIndex, index: sortIndex }) });
+  } catch {
+    // network/offline — local store already updated
+  }
+}
+
+/** Persist every row whose sortIndex differs from the previous list. */
+export async function persistSortIndexDiff<T extends { sortIndex?: number }>(
+  prev: T[],
+  next: T[],
+  pathFor: (item: T) => string,
+): Promise<void> {
+  const jobs: Promise<void>[] = [];
+  for (const item of next) {
+    const before = prev.find((x) => pathFor(x) === pathFor(item));
+    const after = item.sortIndex ?? 0;
+    if (before && (before.sortIndex ?? 0) === after) continue;
+    jobs.push(patchSortIndex(pathFor(item), after));
+  }
+  if (jobs.length) await Promise.all(jobs);
+}
+
+/** Inline table cell: editable number + optional ▲/▼. Drag is on the row. */
+export function SortIndexCell({
+  value,
+  onCommit,
+  onMove,
+  disabled = false,
+  title,
+}: {
+  value?: number;
+  onCommit: (v: number) => void;
+  onMove?: (dir: -1 | 1) => void;
+  disabled?: boolean;
+  title?: string;
+}) {
+  const [draft, setDraft] = useState(String(value ?? 0));
+  useEffect(() => {
+    setDraft(String(value ?? 0));
+  }, [value]);
+  const commit = () => {
+    const v = toSortIndex(draft);
+    setDraft(String(v));
+    if (v !== (value ?? 0)) onCommit(v);
+  };
+  return (
+    <div
+      className="flex items-center gap-1"
+      title={title ?? "Edit sort index, or drag the row · lower shows first"}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <input
+        type="number"
+        value={draft}
+        min={0}
+        step={1}
+        disabled={disabled}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+        className="h-7 w-12 rounded-lg border border-[#2D4A22]/15 bg-white px-1.5 text-center text-[11px] font-medium text-[#2D4A22] outline-none focus:border-[#2D4A22]/40 disabled:opacity-50"
+        aria-label="Sort index"
+      />
+      {onMove && (
+        <div className="flex flex-col gap-0.5">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onMove(-1)}
+            className="rounded border bg-white px-1.5 text-[10px] leading-tight disabled:opacity-30"
+            title="Move up"
+          >
+            ▲
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onMove(1)}
+            className="rounded border bg-white px-1.5 text-[10px] leading-tight disabled:opacity-30"
+            title="Move down"
+          >
+            ▼
+          </button>
+        </div>
+      )}
+      <span className="cursor-grab select-none text-[11px] text-[#8B6F47]/70" title="Drag row to reorder" aria-hidden>
+        ⠿
+      </span>
+    </div>
+  );
+}
+
+/** HTML5 row drag for admin tables (indices into the full sorted list). */
+export function useDragSort({
+  disabled,
+  onReorder,
+}: {
+  disabled?: boolean;
+  onReorder: (from: number, to: number) => void;
+}) {
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+
+  const rowProps = (absIdx: number): React.HTMLAttributes<HTMLTableRowElement> => ({
+    draggable: !disabled,
+    onDragStart: (e: React.DragEvent) => {
+      if (disabled) return;
+      setDragFrom(absIdx);
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", String(absIdx));
+    },
+    onDragOver: (e: React.DragEvent) => {
+      if (disabled || dragFrom === null) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      if (overIdx !== absIdx) setOverIdx(absIdx);
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (disabled) return;
+      e.preventDefault();
+      const raw = e.dataTransfer.getData("text/plain");
+      const from = dragFrom ?? (raw ? Number(raw) : NaN);
+      setDragFrom(null);
+      setOverIdx(null);
+      if (Number.isFinite(from) && from !== absIdx) onReorder(from, absIdx);
+    },
+    onDragEnd: () => {
+      setDragFrom(null);
+      setOverIdx(null);
+    },
+  });
+
+  const rowClass = (absIdx: number): string => {
+    if (dragFrom === absIdx) return "opacity-40 bg-white/60";
+    if (overIdx === absIdx && dragFrom !== null && dragFrom !== absIdx) return "bg-[#2D4A22]/10";
+    return "hover:bg-white/60";
+  };
+
+  return { rowProps, rowClass, dragFrom, overIdx };
 }
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <UiInput {...props} />;

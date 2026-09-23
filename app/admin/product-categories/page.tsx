@@ -6,7 +6,7 @@ import { useStore, apiCreateProductCategory, apiUpdateProductCategory, apiToggle
 import { isAuthed } from "../../lib/auth";
 import type { ProductCategory } from "../../lib/data";
 import AdminShell from "../AdminShell";
-import { Card, Field, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete } from "../_components";
+import { Card, Field, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 
 function slugify(input: string): string {
   return (input ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "").slice(0, 64).replace(/-+$/g, "");
@@ -28,20 +28,39 @@ export default function ProductCategoriesPage() {
   const [slugTouched, setSlugTouched] = useState(false);
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
+  const sortedAll = useMemo(() => sortBySortIndex(s.productCategories), [s.productCategories]);
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return s.productCategories;
-    return s.productCategories.filter((c) => `${c.name} ${c.slug} ${c.description ?? ""}`.toLowerCase().includes(needle));
-  }, [s.productCategories, q]);
+    if (!needle) return sortedAll;
+    return sortedAll.filter((c) => `${c.name} ${c.slug} ${c.description ?? ""}`.toLowerCase().includes(needle));
+  }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFiltering = q.trim() !== "";
+  const pathFor = (slug: string) => `/admin/categories/${encodeURIComponent(slug)}`;
+  const commitSort = (item: ProductCategory, sortIndex: number) => {
+    s.setProductCategories((prev) => prev.map((x) => (x.slug === item.slug ? { ...x, sortIndex } : x)));
+    void patchSortIndex(pathFor(item.slug), sortIndex);
+  };
+  const reorder = (from: number, to: number) => {
+    if (isFiltering) return;
+    const next = renumberByMove(sortedAll, from, to);
+    s.setProductCategories(next);
+    void persistSortIndexDiff(sortedAll, next, (x) => pathFor(x.slug));
+  };
+  const moveItem = (item: ProductCategory, dir: -1 | 1) => {
+    const from = sortedAll.findIndex((x) => x.slug === item.slug);
+    if (from < 0) return;
+    reorder(from, from + dir);
+  };
+  const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({ isActive: true }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
   const openEdit = (i: number) => { setF(s.productCategories[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.name || !f.slug) return;
-    const payload = { slug: slugify(f.slug!), name: String(f.name), description: String(f.description ?? ""), isActive: f.isActive !== false, isHighlight: !!f.isHighlight };
+    const payload = { slug: slugify(f.slug!), name: String(f.name), description: String(f.description ?? ""), isActive: f.isActive !== false, isHighlight: !!f.isHighlight, sortIndex: toSortIndex(f.sortIndex) };
     setSaving(true);
     setErr(null);
     const isEdit = editIdx !== null;
@@ -52,7 +71,7 @@ export default function ProductCategoriesPage() {
         s.setProductCategories((prev) => prev.map((x, i) => i === editIdx ? { ...x, ...updated, slug: updated.slug || x.slug } : x));
       } else {
         const created = await apiCreateProductCategory(payload);
-        s.setProductCategories((prev) => [...prev, { id: created.id || slugify(f.name!), slug: created.slug || payload.slug, name: created.name || payload.name, description: created.description ?? payload.description, isActive: created.isActive ?? payload.isActive, isHighlight: created.isHighlight ?? payload.isHighlight }]);
+        s.setProductCategories((prev) => [...prev, { id: created.id || slugify(f.name!), slug: created.slug || payload.slug, name: created.name || payload.name, description: created.description ?? payload.description, isActive: created.isActive ?? payload.isActive, isHighlight: created.isHighlight ?? payload.isHighlight, sortIndex: created.sortIndex ?? payload.sortIndex }]);
       }
       closeForm();
     } catch (e) {
@@ -147,6 +166,7 @@ export default function ProductCategoriesPage() {
                 <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${f.isHighlight ? "bg-[#2D4A22] text-white" : "bg-[#8B6F47]/10 text-[#8B6F47]"}`}>{f.isHighlight ? "Highlighted — shows on Home" : "Not highlighted"}</span>
               </label>
             </Field>
+            <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.name || !f.slug || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
           {(!f.name || !f.slug) && <p className="mt-2 text-[11px] text-[#8B6F47]">Name & slug required.</p>}
@@ -157,12 +177,22 @@ export default function ProductCategoriesPage() {
           {filtered.length === 0 ? <Empty msg={a.noData} /> : (
             <TableWrap>
               <table className="w-full min-w-[600px] text-[12px]">
-                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Name</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Active</th><th className="px-3 py-3 text-left font-medium">Home</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
+                <thead className="bg-white text-[10px] tracking-[0.12em] text-[#8B6F47]"><tr><th className="px-3 py-3 text-left font-medium">Sort</th><th className="px-3 py-3 text-left font-medium">Name</th><th className="px-3 py-3 text-left font-medium">Slug</th><th className="px-3 py-3 text-left font-medium">Description</th><th className="px-3 py-3 text-left font-medium">Active</th><th className="px-3 py-3 text-left font-medium">Home</th><th className="px-3 py-3 text-right font-medium">Actions</th></tr></thead>
                 <tbody className="divide-y divide-[#2D4A22]/10">
-                  {paged.map((c: ProductCategory) => {
+                  {paged.map((c: ProductCategory, i: number) => {
                     const realIdx = s.productCategories.indexOf(c);
+                    const absIdx = (page - 1) * PAGE_SIZE + i;
                     return (
-                      <tr key={c.id || c.slug} className="hover:bg-white/60">
+                      <tr key={c.id || c.slug} {...rowProps(absIdx)} className={rowClass(absIdx)}>
+                        <td className="px-3 py-2">
+                          <SortIndexCell
+                            value={c.sortIndex}
+                            disabled={isFiltering}
+                            onCommit={(v) => commitSort(c, v)}
+                            onMove={(dir) => moveItem(c, dir)}
+                            title={isFiltering ? "Clear search to reorder" : "Edit number or drag row — lower shows first"}
+                          />
+                        </td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">{c.name}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{c.slug}</td>
                         <td className="px-3 py-2 text-[#1a1a16]/70 line-clamp-1">{c.description}</td>
