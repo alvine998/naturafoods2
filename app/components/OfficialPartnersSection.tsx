@@ -1,7 +1,7 @@
 "use client";
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, X } from "lucide-react";
 import Link from "next/link";
 import Image from "./SafeImage";
 import ContactInfoSection from "./ContactInfoSection";
@@ -9,6 +9,8 @@ import { sortByLandingOrder, sortOfficialPartners, useStore } from "../lib/store
 import { useLang } from "../i18n";
 import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
 import type { OfficialPartner } from "../lib/data";
+
+type PartnerBrand = { id: string; name: string; logo: string };
 
 type PartnerCard = {
   title: string;
@@ -21,6 +23,7 @@ type PartnerCard = {
   background?: string;
   images?: string[];
   brandIds?: string[];
+  brands?: PartnerBrand[];
   sortIndex: number;
 };
 
@@ -107,13 +110,80 @@ const partnerCards: PartnerCard[] = [
   },
 ];
 
+function BrandChoiceModal({ card, onClose }: { card: PartnerCard; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-[100] grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label={card.title}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md overflow-hidden rounded-[22px] bg-white shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-4 p-5 pb-0 sm:p-6 sm:pb-0">
+          <div>
+            <h3 className="text-[18px] font-bold leading-tight text-[#2D4A22]">{card.title}</h3>
+            <p className="mt-1 text-[12px] tracking-[0.08em] text-[#8B6F47]">Choose a brand to view products</p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#2D4A22]/5 text-[#2D4A22] transition hover:bg-[#2D4A22]/10"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="grid gap-2 p-5 sm:p-6">
+          {(card.brands ?? []).map((b) => (
+            <Link
+              key={b.id}
+              href={`/products?brand=${b.id}`}
+              className="group flex items-center gap-3 rounded-[16px] border border-[#2D4A22]/10 p-3 transition hover:border-[#2D4A22]/30 hover:bg-[#2D4A22]/[0.03]"
+            >
+              {b.logo ? (
+                <span className="relative h-10 w-24 shrink-0 overflow-hidden rounded-lg bg-[#F5EFE0]">
+                  <Image src={b.logo} alt={b.name} fill sizes="96px" className="object-contain p-1" />
+                </span>
+              ) : null}
+              <span className="min-w-0 flex-1 truncate text-[14px] font-medium text-[#2D4A22]">{b.name}</span>
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#2D4A22] text-white transition group-hover:translate-x-0.5">
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   // Semantics: color = solid card background,
   // background = single right-side product visual,
   // images[] = bottom-bar logos (more than one)
-  // brandIds[] is informational only — destination comes from card.link
-  // (partnerLink already prefers category over brandIds).
+  // 2+ brands -> click opens brand-choice modal instead of direct navigation.
+  const [open, setOpen] = useState(false);
   const href = card.link;
+  const multi = (card.brands ?? []).length > 1;
   const rightVisual =
     card.background && card.background.trim() !== "" ? card.background : "";
   const bottomLogos =
@@ -124,26 +194,8 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
         : card.image
           ? [card.image]
           : [];
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      whileHover={{ y: -8, transition: { duration: 0.25 } }}
-      className="group relative overflow-hidden rounded-[22px] shadow-lg"
-      style={{ background: card.color }}
-    >
-      <Link
-        href={href}
-        // target="_blank"
-        // rel="noopener noreferrer"
-        className="flex h-full min-h-[320px] flex-col p-5 pb-4 sm:p-6 sm:pb-4"
-      >
+  const body = (
+    <>
         {/* header: title + arrow */}
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -216,7 +268,41 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
              </p>
            )}
          </div>
-      </Link>
+    </>
+  );
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{
+        duration: 0.6,
+        delay: index * 0.1,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={{ y: -8, transition: { duration: 0.25 } }}
+      className="group relative overflow-hidden rounded-[22px] shadow-lg"
+      style={{ background: card.color }}
+    >
+      {multi ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex h-full min-h-[320px] w-full flex-col p-5 pb-4 text-left sm:p-6 sm:pb-4"
+        >
+          {body}
+        </button>
+      ) : (
+        <Link
+          href={href}
+          className="flex h-full min-h-[320px] flex-col p-5 pb-4 sm:p-6 sm:pb-4"
+        >
+          {body}
+        </Link>
+      )}
+      <AnimatePresence>
+        {open && <BrandChoiceModal card={card} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -547,7 +633,7 @@ const normKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
 
 export default function OfficialPartnersSection() {
   const { t } = useLang();
-  const { officialPartners, masterBrands, homeBrands, productCategories } = useStore();
+  const { officialPartners, masterBrands, homeBrands, productCategories, products } = useStore();
   const sourcePartners = officialPartners ?? SEED_OFFICIAL_PARTNERS;
   const publishedPartners = sortOfficialPartners(
     sourcePartners.filter((p) => p.isPublished !== false),
@@ -563,14 +649,85 @@ export default function OfficialPartnersSection() {
   }, [officialPartners]);
   // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
   // Click destination precedence:
-  // 1. internal link override (e.g. "/products?cat=…" or "/products?brand=<uuid>")
-  // 2. product category match by partner id/name — partner cards are titled by
-  //    category ("Cocoa Powder"), so category must beat brand fuzzy-match
-  // 3. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
-  // 4. master brand / home brand id-name match (live partners often have empty brandIds)
-  // 5. "/products" (external links ignored — card stays in-site)
-  const partnerLink = (p: OfficialPartner) => {
+  // 1. explicit link override — honored even with 2+ brands (admin's explicit choice)
+  // 2. explicit brandIds — 1 brand goes direct, 2+ open brand-choice modal
+  // 3. derived brands: live partner rows often have empty brandIds, so derive
+  //    from products whose category matches the partner (1 → direct, 2+ → modal)
+  // 4. product category match (cards often titled by category)
+  // 5. master brand / home brand id-name match
+  // 6. "/products" (external links ignored — card stays in-site)
+  const catForPartner = (p: OfficialPartner): { slug: string; id: string } | null => {
+    const keys = [p.id, p.name].map(normKey).filter(Boolean);
+    // bidirectional match: "Cocoa Powder" ↔ "cocoa-powder-series" / "super-premium-cocoa-powder"
+    // exact > prefix > substring; ties prefer the shorter slug (more direct title match)
+    const matchScore = (candidate?: string): number => {
+      const n = normKey(candidate ?? "");
+      if (!n) return 0;
+      let best = 0;
+      for (const k of keys) {
+        if (k === n) best = Math.max(best, 3);
+        else if (k.startsWith(n) || n.startsWith(k)) best = Math.max(best, 2);
+        else if (k.includes(n) || n.includes(k)) best = Math.max(best, 1);
+      }
+      return best;
+    };
+    let cat: { slug: string; id: string; score: number } | null = null;
+    for (const c of productCategories) {
+      if (!c.isActive) continue;
+      const score = Math.max(matchScore(c.id), matchScore(c.slug), matchScore(c.name));
+      if (score <= 0) continue;
+      if (
+        !cat ||
+        score > cat.score ||
+        (score === cat.score && c.slug.length < cat.slug.length)
+      ) {
+        cat = { slug: c.slug, id: c.id, score };
+      }
+    }
+    return cat ? { slug: cat.slug, id: cat.id } : null;
+  };
+  const partnerBrands = (p: OfficialPartner): PartnerBrand[] => {
+    console.log("Partner", p)
+    // Gate on raw brandIds, not on masterBrands lookup — lookup may be
+    // empty/stale on landing while partner rows already carry brand_ids.
+    const ids = (p.brandIds ?? []).filter(Boolean);
+    if (ids.length > 0) {
+      const logos = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+      return ids.map((id, i) => {
+        const mb = masterBrands.find((b) => b.id === id);
+        return {
+          id,
+          name: mb?.name ?? id,
+          logo: mb?.logo ?? logos[i] ?? p.image ?? "",
+        };
+      });
+    }
+    // Live rows often have empty brandIds — derive from products in the
+    // partner's category so the modal can offer each distinct brand.
+    const cat = catForPartner(p);
+    if (!cat) return [];
+    const seen = new Map<string, PartnerBrand>();
+    for (const pr of products) {
+      if (pr.cat !== cat.slug) continue;
+      const bid = pr.brandId;
+      if (!bid || seen.has(bid)) continue;
+      const mb = masterBrands.find((b) => b.id === bid);
+      const brandName =
+        mb?.name ?? (typeof pr.brand === "string" ? pr.brand : pr.brand?.name) ?? bid;
+      seen.set(bid, {
+        id: bid,
+        name: brandName,
+        logo: mb?.logo ?? "",
+      });
+    }
+    return [...seen.values()];
+  };
+  const partnerLink = (p: OfficialPartner, brands: PartnerBrand[]) => {
     if (typeof p.link === "string" && p.link.startsWith("/")) return p.link;
+
+    if (brands.length === 1) return `/products?brand=${brands[0].id}`;
+    // 2+ brands: modal handles navigation; link unused but keep category fallback
+    // so non-JS / static contexts still land somewhere sensible.
 
     const keys = [p.id, p.name].map(normKey).filter(Boolean);
     // bidirectional match: "Cocoa Powder" ↔ "cocoa-powder-series" / "super-premium-cocoa-powder"
@@ -602,9 +759,6 @@ export default function OfficialPartnersSection() {
     }
     if (cat) return `/products?cat=${cat.slug}`;
 
-    const ids = (p.brandIds ?? []).filter(Boolean);
-    if (ids.length > 0) return `/products?brand=${ids.join(",")}`;
-
     const matches = (candidates: (string | undefined)[]) =>
       candidates.some((c) => matchScore(c) > 0);
 
@@ -618,6 +772,7 @@ export default function OfficialPartnersSection() {
   };
   const cards: PartnerCard[] = publishedPartners.length
     ? publishedPartners.map((p) => {
+        const brands = partnerBrands(p);
         const rightVisual = p.background || "";
         const bottomLogos =
           Array.isArray(p.images) && p.images.filter(Boolean).length
@@ -634,8 +789,9 @@ export default function OfficialPartnersSection() {
             `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
           brandLogo: bottomLogos[0] || p.image || "",
           brandName: p.name,
-          link: partnerLink(p),
-          brandIds: (p.brandIds ?? []).filter(Boolean), // kept for admin/debug; href uses link
+          link: partnerLink(p, brands),
+          brandIds: (p.brandIds ?? []).filter(Boolean),
+          brands,
           color:
             typeof p.color === "string" &&
             /^#[0-9a-fA-F]{6}$/.test(p.color.trim())
