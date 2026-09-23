@@ -1,0 +1,134 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e430] [cursor=pointer]
+  - alert [ref=e434]: Our Products
+  - generic [ref=e437]:
+    - banner [ref=e438]:
+      - navigation [ref=e439]:
+        - link [ref=e440] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e441]
+        - generic [ref=e442]:
+          - link "ABOUT" [ref=e443] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e444] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e445] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e446] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e447] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e448] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e449] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e450] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e452]:
+          - button "Switch to id" [ref=e453]: ID
+          - button "Switch to en" [ref=e454]: EN
+          - button "Switch to zh" [ref=e455]: 中文
+    - main [ref=e456]:
+      - navigation "Breadcrumb" [ref=e457]:
+        - list [ref=e458]:
+          - listitem [ref=e459]:
+            - link "Home" [ref=e460] [cursor=pointer]:
+              - /url: /
+            - text: /
+          - listitem [ref=e461]:
+            - generic [ref=e462]: Products
+      - generic [ref=e463]:
+        - paragraph [ref=e464]: PRODUCTS
+        - heading "Our Products" [level=1] [ref=e465]
+        - paragraph [ref=e466]: Couverture & matcha for professionals — wholesale MOQ 6kg. Filter by category.
+      - generic [ref=e467]:
+        - complementary [ref=e468]:
+          - generic [ref=e469]:
+            - generic [ref=e470]:
+              - paragraph [ref=e471]: Category
+              - generic [ref=e472]:
+                - button "All 3" [pressed] [ref=e473]:
+                  - generic [ref=e474]: All
+                  - generic [ref=e475]: "3"
+                - button "Japanese Tea Series 0" [ref=e476]:
+                  - generic [ref=e477]: Japanese Tea Series
+                  - generic [ref=e478]: "0"
+                - button "Super Premium Cocoa Powder 3" [ref=e479]:
+                  - generic [ref=e480]: Super Premium Cocoa Powder
+                  - generic [ref=e481]: "3"
+                - button "Cocoa Powder Series 0" [ref=e482]:
+                  - generic [ref=e483]: Cocoa Powder Series
+                  - generic [ref=e484]: "0"
+                - button "Other 0" [ref=e485]:
+                  - generic [ref=e486]: Other
+                  - generic [ref=e487]: "0"
+                - button "Matcha 0" [ref=e488]:
+                  - generic [ref=e489]: Matcha
+                  - generic [ref=e490]: "0"
+                - button "Chocolate 0" [ref=e491]:
+                  - generic [ref=e492]: Chocolate
+                  - generic [ref=e493]: "0"
+            - generic [ref=e495]:
+              - paragraph [ref=e496]: Brand
+              - generic [ref=e497]:
+                - button "All Brands 3" [ref=e498]:
+                  - generic [ref=e499]: All Brands
+                  - generic [ref=e500]: "3"
+                - button "Tzong Hsin 0" [ref=e501]:
+                  - generic [ref=e502]: Tzong Hsin
+                  - generic [ref=e503]: "0"
+                - button "Avante 0" [ref=e504]:
+                  - generic [ref=e505]: Avante
+                  - generic [ref=e506]: "0"
+                - button "Ofi 0" [ref=e507]:
+                  - generic [ref=e508]: Ofi
+                  - generic [ref=e509]: "0"
+                - button "Le Bourne 0" [ref=e510]:
+                  - generic [ref=e511]: Le Bourne
+                  - generic [ref=e512]: "0"
+                - button "Aiya 0" [ref=e513]:
+                  - generic [ref=e514]: Aiya
+                  - generic [ref=e515]: "0"
+                - button "Barry Callebaut 0" [ref=e516]:
+                  - generic [ref=e517]: Barry Callebaut
+                  - generic [ref=e518]: "0"
+                - button "Bensdorp 3" [pressed] [ref=e519]:
+                  - generic [ref=e520]: Bensdorp
+                  - generic [ref=e521]: "3"
+            - generic [ref=e523]:
+              - paragraph [ref=e524]: 3 products
+              - button "Clear" [ref=e525]
+        - generic [ref=e527]:
+          - link [ref=e528] [cursor=pointer]:
+            - /url: /products/bensdorp-queen-anna
+            - img "Bensdorp Queen Anna" [ref=e530]
+            - generic [ref=e533]:
+              - heading "Bensdorp Queen Anna" [level=3] [ref=e534]
+              - paragraph
+              - paragraph
+          - link [ref=e536] [cursor=pointer]:
+            - /url: /products/bensdorp-10-12-sr
+            - img "Bensdorp 10/12 SR" [ref=e538]
+            - generic [ref=e541]:
+              - heading "Bensdorp 10/12 SR" [level=3] [ref=e542]
+              - paragraph
+              - paragraph
+          - link [ref=e544] [cursor=pointer]:
+            - /url: /products/bensdorp-10-12-ddp
+            - img "Bensdorp 10/12 DDP" [ref=e546]
+            - generic [ref=e549]:
+              - heading "Bensdorp 10/12 DDP" [level=3] [ref=e550]
+              - paragraph
+              - paragraph
+    - contentinfo [ref=e552]:
+      - generic [ref=e553]:
+        - generic [ref=e554]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e555]:
+          - link "CATALOG PDF" [ref=e556] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e557] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e558] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e559] [cursor=pointer]:
+            - /url: /admin/login

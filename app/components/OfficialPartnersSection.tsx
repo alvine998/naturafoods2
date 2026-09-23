@@ -678,9 +678,12 @@ function Reveal({
   );
 }
 
+// Normalize for loose id/name matching: "Japanese Tea Series" -> "japaneseteaseries"
+const normKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
 export default function OfficialPartnersSection() {
   const { t } = useLang();
-  const { officialPartners } = useStore();
+  const { officialPartners, masterBrands, homeBrands, productCategories } = useStore();
   const sourcePartners = officialPartners ?? SEED_OFFICIAL_PARTNERS;
   const publishedPartners = sourcePartners
     .filter((p) => p.isPublished !== false)
@@ -698,11 +701,30 @@ export default function OfficialPartnersSection() {
   // Click destination precedence:
   // 1. brandIds -> /products?brand=a,b (products page calls API with ?brandId=a,b)
   // 2. internal link override (e.g. "/products?brand=<uuid>" or "/products?cat=cocoa")
-  // 3. "/products" (external links ignored — card stays in-site)
-  const partnerLink = (p: { brandIds?: string[]; link?: string }) => {
+  // 3. resolve partner id/name against Master Brands, categories, home brands —
+  //    live partners often have empty brandIds (backend PUT used to drop them)
+  // 4. "/products" (external links ignored — card stays in-site)
+  const partnerLink = (p: OfficialPartner) => {
     const ids = (p.brandIds ?? []).filter(Boolean);
     if (ids.length > 0) return `/products?brand=${ids.join(",")}`;
     if (typeof p.link === "string" && p.link.startsWith("/")) return p.link;
+
+    const keys = [p.id, p.name].map(normKey).filter(Boolean);
+    const matches = (candidates: (string | undefined)[]) =>
+      candidates.some((c) => {
+        const n = normKey(c ?? "");
+        return !!n && keys.some((k) => k === n || k.includes(n));
+      });
+
+    const mb = masterBrands.find((b) => matches([b.id, b.slug, b.name]));
+    if (mb) return `/products?brand=${mb.id}`;
+
+    const cat = productCategories.find((c) => matches([c.id, c.slug, c.name]));
+    if (cat) return `/products?cat=${cat.slug}`;
+
+    const hb = homeBrands.find((h) => matches([h.id, h.name]) && (h.brandIds ?? []).length > 0);
+    if (hb) return `/products?brand=${(hb.brandIds ?? []).join(",")}`;
+
     return "/products";
   };
   const cards: PartnerCard[] = publishedPartners.length

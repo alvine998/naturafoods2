@@ -85,29 +85,35 @@ function ProductsInner() {
     let cancelled = false;
     setLoading(true);
     const brandParam = selectedBrands.length > 0 ? selectedBrands.join(",") : undefined;
-    const q = buildQuery({ cat: cat !== "all" ? cat : undefined, brandId: brandParam, limit: 50, sort: "createdAt:desc" });
+    // server ignores ?cat= — it filters on categoryId only (verified against live API)
+    const catId = cat !== "all" ? productCategories.find((c) => c.slug === cat)?.id : undefined;
+    const q = buildQuery({ categoryId: catId, brandId: brandParam, limit: 50, sort: "createdAt:desc" });
     apiFetch<Product[]>(`/products${q}`)
       .then((json) => {
         if (!cancelled && json.success && Array.isArray(json.data)) {
-          const norm = (json.data as unknown as Record<string, unknown>[]).map((raw) => ({
-            slug: String(raw.slug ?? raw.id ?? ""),
-            cat: (raw.cat as Product["cat"]) ?? "choco",
-            title: String(raw.title ?? ""),
-            note: String(raw.note ?? ""),
-            tag: String(raw.tag ?? ""),
-            img: String(raw.img ?? raw.image ?? ""),
-            desc: String(raw.desc ?? raw.description ?? ""),
-            type: (raw.type as Product["type"]) ?? "general",
-            isHighlight: Boolean(raw.isHighlight ?? false),
-            brandId: (raw.brandId as string) ?? ((raw.brand as Record<string, unknown>)?.id as string) ?? null,
-          })) as Product[];
+          const norm = (json.data as unknown as Record<string, unknown>[]).map((raw) => {
+            const catObj = raw.category as { slug?: unknown } | undefined;
+            return {
+              slug: String(raw.slug ?? raw.id ?? ""),
+              // API returns category.slug — top-level `cat` no longer exists
+              cat: String(raw.cat ?? catObj?.slug ?? ""),
+              title: String(raw.title ?? ""),
+              note: String(raw.note ?? ""),
+              tag: String(raw.tag ?? ""),
+              img: String(raw.img ?? raw.image ?? ""),
+              desc: String(raw.desc ?? raw.description ?? ""),
+              type: (raw.type as Product["type"]) ?? "general",
+              isHighlight: Boolean(raw.isHighlight ?? false),
+              brandId: (raw.brandId as string) ?? ((raw.brand as Record<string, unknown>)?.id as string) ?? null,
+            } as Product;
+          });
           setApiItems(norm.filter((x) => x.slug));
         }
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [cat, selectedBrands.join(",")]);
+  }, [cat, selectedBrands.join(","), productCategories]);
 
   const source = apiItems ?? items;
   const filtered = source.filter((x) => (cat === "all" || x.cat === cat) && (selectedBrands.length === 0 || selectedBrands.includes(x.brandId ?? "")));

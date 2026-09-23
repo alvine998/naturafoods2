@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - img "NaturaFoods" [ref=e5]
+      - paragraph [ref=e6]: PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS
+    - paragraph [ref=e9]: BAKING INGREDIENTS · IMPORT EXPERIENCE 2010–2016 · INDONESIA
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - navigation [ref=e12]:
+        - link [ref=e13] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e14]
+        - generic [ref=e15]:
+          - link "ABOUT" [ref=e16] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e17] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e18] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e19] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e20] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e21] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e22] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e23] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e25]:
+          - button "Switch to id" [ref=e26]: ID
+          - button "Switch to en" [ref=e27]: EN
+          - button "Switch to zh" [ref=e28]: 中文
+    - region "Highlights" [ref=e29]:
+      - generic [ref=e38]:
+        - heading "Welcome to PT Natura Inti Sukses" [level=1] [ref=e40]
+        - img "PT. Natura Inti Sukses Logo" [ref=e43]
+    - generic [ref=e45]:
+      - generic [ref=e47]:
+        - img "NaturaFoods" [ref=e49]
+        - heading "Official Partner For Indonesia :" [level=2] [ref=e50]
+        - paragraph [ref=e51]: Discover quality ingredients from NaturaFoods to support every idea and innovation for your business.
+      - generic [ref=e52]:
+        - link [ref=e54] [cursor=pointer]:
+          - /url: /products
+          - heading "Bens Dorp" [level=3] [ref=e57]
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: Cocoa powder berkualitas tinggi untuk cita rasa cokelat yang kaya dan autentik.
+            - img "Bens Dorp" [ref=e66]
+          - img "Bens Dorp" [ref=e70]
+        - link [ref=e72] [cursor=pointer]:
+          - /url: /products
+          - heading "Afya" [level=3] [ref=e75]
+          - generic [ref=e80]:
+            - paragraph [ref=e81]: Bubuk teh hijau premium dengan warna cerah dan rasa khas jepang.
+            - img "Afya" [ref=e84]
+          - img "Afya" [ref=e88]
+        - link [ref=e90] [cursor=pointer]:
+          - /url: /products
+          - heading "Trang Nghi" [level=3] [ref=e93]
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: Filling premium untuk berbagai kreasi roti, kue, dan pastry dengan tekstur lembut dan rasa istimewa.
+            - img "Trang Nghi" [ref=e102]
+          - img "Trang Nghi" [ref=e106]
+        - link [ref=e108] [cursor=pointer]:
+          - /url: /products
+          - heading "OFI" [level=3] [ref=e111]
+          - generic [ref=e116]:
+            - paragraph [ref=e117]: Kacang pilihan dengan kualitas terbaik untuk kreasi yang lebih beragam.
+            - img "OFI" [ref=e120]
+          - img "OFI" [ref=e124]
+        - link [ref=e126] [cursor=pointer]:
+          - /url: /products
+          - heading "Le Bourne" [level=3] [ref=e129]
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: Cokelat berkualitas tinggi dengan rasa lezat dan tekstur sempurna untuk berbagai kebutuhan.
+            - img "Le Bourne" [ref=e138]
+          - img "Le Bourne" [ref=e142]
+        - link [ref=e144] [cursor=pointer]:
+          - /url: /products
+          - heading "KingLand" [level=3] [ref=e147]
+          - generic [ref=e152]:
+            - paragraph [ref=e153]: Kismis berkualitas dari pilihan terbaik untuk rasa manis alami dan tekstur yang sempurna.
+            - img "KingLand" [ref=e156]
+          - img "KingLand" [ref=e160]
+    - generic [ref=e184]:
+      - generic [ref=e185]:
+        - heading "Become a partner." [level=3] [ref=e186]
+        - paragraph [ref=e187]: Tell us your outlet, volume and city — we'll send a price list and samples. Selected quality, qualified support.
+        - link "Go to contact page" [ref=e189] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e192]:
+        - paragraph [ref=e193]: Full inquiry form moved to
+        - link "CONTACT US" [ref=e194] [cursor=pointer]:
+          - /url: /contact
+        - link "hello@naturafoods.id" [ref=e196] [cursor=pointer]:
+          - /url: mailto:hello@naturafoods.id
+    - contentinfo [ref=e197]:
+      - generic [ref=e198]:
+        - generic [ref=e199]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e200]:
+          - link "CATALOG PDF" [ref=e201] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e202] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e203] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e204] [cursor=pointer]:
+            - /url: /admin/login
+    - link "Chat on WhatsApp" [ref=e205] [cursor=pointer]:
+      - /url: https://wa.me/6281295071397
+  - button "Open Next.js Dev Tools" [ref=e213] [cursor=pointer]
+  - alert [ref=e217]

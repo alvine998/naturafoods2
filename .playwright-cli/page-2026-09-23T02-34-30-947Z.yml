@@ -1,0 +1,237 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e213] [cursor=pointer]
+  - alert [ref=e217]: Our Products
+  - generic [ref=e567]:
+    - banner [ref=e568]:
+      - navigation [ref=e569]:
+        - link [ref=e570] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e571]
+        - generic [ref=e572]:
+          - link "ABOUT" [ref=e573] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e574] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e575] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e576] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e577] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e578] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e579] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e580] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e582]:
+          - button "Switch to id" [ref=e583]: ID
+          - button "Switch to en" [ref=e584]: EN
+          - button "Switch to zh" [ref=e585]: 中文
+    - main [ref=e586]:
+      - navigation "Breadcrumb" [ref=e587]:
+        - list [ref=e588]:
+          - listitem [ref=e589]:
+            - link "Home" [ref=e590] [cursor=pointer]:
+              - /url: /
+            - text: /
+          - listitem [ref=e591]:
+            - generic [ref=e592]: Products
+      - generic [ref=e593]:
+        - paragraph [ref=e594]: PRODUCTS
+        - heading "Our Products" [level=1] [ref=e595]
+        - paragraph [ref=e596]: Couverture & matcha for professionals — wholesale MOQ 6kg. Filter by category.
+      - generic [ref=e597]:
+        - complementary [ref=e598]:
+          - generic [ref=e599]:
+            - generic [ref=e600]:
+              - paragraph [ref=e601]: Category
+              - generic [ref=e602]:
+                - button "All 18" [pressed] [ref=e603]:
+                  - generic [ref=e604]: All
+                  - generic [ref=e605]: "18"
+                - button "Japanese Tea Series 0" [ref=e606]:
+                  - generic [ref=e607]: Japanese Tea Series
+                  - generic [ref=e608]: "0"
+                - button "Super Premium Cocoa Powder 0" [ref=e609]:
+                  - generic [ref=e610]: Super Premium Cocoa Powder
+                  - generic [ref=e611]: "0"
+                - button "Cocoa Powder Series 0" [ref=e612]:
+                  - generic [ref=e613]: Cocoa Powder Series
+                  - generic [ref=e614]: "0"
+                - button "Other 0" [ref=e615]:
+                  - generic [ref=e616]: Other
+                  - generic [ref=e617]: "0"
+                - button "Matcha 0" [ref=e618]:
+                  - generic [ref=e619]: Matcha
+                  - generic [ref=e620]: "0"
+                - button "Chocolate 18" [ref=e621]:
+                  - generic [ref=e622]: Chocolate
+                  - generic [ref=e623]: "18"
+            - generic [ref=e625]:
+              - paragraph [ref=e626]: Brand
+              - generic [ref=e627]:
+                - button "All Brands 18" [pressed] [ref=e628]:
+                  - generic [ref=e629]: All Brands
+                  - generic [ref=e630]: "18"
+                - button "Tzong Hsin 0" [ref=e631]:
+                  - generic [ref=e632]: Tzong Hsin
+                  - generic [ref=e633]: "0"
+                - button "Avante 6" [ref=e634]:
+                  - generic [ref=e635]: Avante
+                  - generic [ref=e636]: "6"
+                - button "Ofi 0" [ref=e637]:
+                  - generic [ref=e638]: Ofi
+                  - generic [ref=e639]: "0"
+                - button "Le Bourne 0" [ref=e640]:
+                  - generic [ref=e641]: Le Bourne
+                  - generic [ref=e642]: "0"
+                - button "Aiya 2" [ref=e643]:
+                  - generic [ref=e644]: Aiya
+                  - generic [ref=e645]: "2"
+                - button "Barry Callebaut 5" [ref=e646]:
+                  - generic [ref=e647]: Barry Callebaut
+                  - generic [ref=e648]: "5"
+                - button "Bensdorp 3" [ref=e649]:
+                  - generic [ref=e650]: Bensdorp
+                  - generic [ref=e651]: "3"
+            - paragraph [ref=e654]: 18 products
+        - generic [ref=e656]:
+          - link [ref=e657] [cursor=pointer]:
+            - /url: /products/aiya-matcha-type-bh-high-grade
+            - img "Aiya Matcha Type BH (High Grade)" [ref=e659]
+            - generic [ref=e662]:
+              - heading "Aiya Matcha Type BH (High Grade)" [level=3] [ref=e663]
+              - paragraph
+              - paragraph
+          - link [ref=e665] [cursor=pointer]:
+            - /url: /products/aiya-matcha-type-bm
+            - img "Aiya Matcha Type BM" [ref=e667]
+            - generic [ref=e670]:
+              - heading "Aiya Matcha Type BM" [level=3] [ref=e671]
+              - paragraph
+              - paragraph
+          - link [ref=e673] [cursor=pointer]:
+            - /url: /products/bensdorp-queen-anna
+            - img "Bensdorp Queen Anna" [ref=e675]
+            - generic [ref=e678]:
+              - heading "Bensdorp Queen Anna" [level=3] [ref=e679]
+              - paragraph
+              - paragraph
+          - link [ref=e681] [cursor=pointer]:
+            - /url: /products/bensdorp-10-12-sr
+            - img "Bensdorp 10/12 SR" [ref=e683]
+            - generic [ref=e686]:
+              - heading "Bensdorp 10/12 SR" [level=3] [ref=e687]
+              - paragraph
+              - paragraph
+          - link [ref=e689] [cursor=pointer]:
+            - /url: /products/bensdorp-10-12-ddp
+            - img "Bensdorp 10/12 DDP" [ref=e691]
+            - generic [ref=e694]:
+              - heading "Bensdorp 10/12 DDP" [level=3] [ref=e695]
+              - paragraph
+              - paragraph
+          - link [ref=e697] [cursor=pointer]:
+            - /url: /products/barry-callebaut-pd-4011
+            - img "Barry Callebaut PD 4011" [ref=e699]
+            - generic [ref=e702]:
+              - heading "Barry Callebaut PD 4011" [level=3] [ref=e703]
+              - paragraph
+              - paragraph
+          - link [ref=e705] [cursor=pointer]:
+            - /url: /products/barry-callebaut-maleo-22-24
+            - img "Barry Callebaut Maleo 22/24" [ref=e707]
+            - generic [ref=e710]:
+              - heading "Barry Callebaut Maleo 22/24" [level=3] [ref=e711]
+              - paragraph
+              - paragraph
+          - link [ref=e713] [cursor=pointer]:
+            - /url: /products/barry-callebaut-df760-11
+            - img "Barry Callebaut DF760-11" [ref=e715]
+            - generic [ref=e718]:
+              - heading "Barry Callebaut DF760-11" [level=3] [ref=e719]
+              - paragraph
+              - paragraph
+          - link [ref=e721] [cursor=pointer]:
+            - /url: /products/barry-callebaut-df-800-11
+            - img "Barry Callebaut DF 800-11" [ref=e723]
+            - generic [ref=e726]:
+              - heading "Barry Callebaut DF 800-11" [level=3] [ref=e727]
+              - paragraph
+              - paragraph
+          - link [ref=e729] [cursor=pointer]:
+            - /url: /products/barry-callebaut-df-780-20
+            - img "Barry Callebaut DF 780-20" [ref=e731]
+            - generic [ref=e734]:
+              - heading "Barry Callebaut DF 780-20" [level=3] [ref=e735]
+              - paragraph
+              - paragraph
+          - link [ref=e737] [cursor=pointer]:
+            - /url: /products/ebony
+            - img "Ebony" [ref=e739]
+            - generic [ref=e742]:
+              - heading "Ebony" [level=3] [ref=e743]
+              - paragraph
+              - paragraph
+          - link [ref=e745] [cursor=pointer]:
+            - /url: /products/hoojicha
+            - img "Hoojicha" [ref=e747]
+            - generic [ref=e750]:
+              - heading "Hoojicha" [level=3] [ref=e751]
+              - paragraph
+              - paragraph
+          - link [ref=e753] [cursor=pointer]:
+            - /url: /products/brown-sugar
+            - img "Brown Sugar" [ref=e755]
+            - generic [ref=e758]:
+              - heading "Brown Sugar" [level=3] [ref=e759]
+              - paragraph
+              - paragraph
+          - link [ref=e761] [cursor=pointer]:
+            - /url: /products/almond-slice
+            - img "Almond Slice" [ref=e763]
+            - generic [ref=e766]:
+              - heading "Almond Slice" [level=3] [ref=e767]
+              - paragraph
+              - paragraph
+          - link [ref=e769] [cursor=pointer]:
+            - /url: /products/mochi-filling-strech
+            - img "Mochi Filling Strech" [ref=e771]
+            - generic [ref=e774]:
+              - heading "Mochi Filling Strech" [level=3] [ref=e775]
+              - paragraph
+              - paragraph
+          - link [ref=e777] [cursor=pointer]:
+            - /url: /products/kingland-raisin
+            - img "Kingland Raisin" [ref=e779]
+            - generic [ref=e782]:
+              - heading "Kingland Raisin" [level=3] [ref=e783]
+              - paragraph
+              - paragraph
+          - link [ref=e785] [cursor=pointer]:
+            - /url: /products/avante-queen-anna
+            - img "Avante Queen Anna" [ref=e787]
+            - generic [ref=e790]:
+              - heading "Avante Queen Anna" [level=3] [ref=e791]
+              - paragraph
+              - paragraph
+          - link [ref=e793] [cursor=pointer]:
+            - /url: /products/avante-muchuu
+            - img "Avante Muchuu" [ref=e795]
+            - generic [ref=e798]:
+              - heading "Avante Muchuu" [level=3] [ref=e799]
+              - paragraph
+              - paragraph
+    - contentinfo [ref=e801]:
+      - generic [ref=e802]:
+        - generic [ref=e803]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e804]:
+          - link "CATALOG PDF" [ref=e805] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e806] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e807] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e808] [cursor=pointer]:
+            - /url: /admin/login

@@ -1,0 +1,303 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - img "NaturaFoods" [ref=e5]
+      - paragraph [ref=e6]: PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS
+    - paragraph [ref=e9]: BAKING INGREDIENTS · IMPORT EXPERIENCE 2010–2016 · INDONESIA
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - navigation [ref=e12]:
+        - link [ref=e13] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e14]
+        - generic [ref=e15]:
+          - link "ABOUT" [ref=e16] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e17] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e18] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e19] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e20] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e21] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e22] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e23] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e25]:
+          - button "Switch to id" [ref=e26]: ID
+          - button "Switch to en" [ref=e27]: EN
+          - button "Switch to zh" [ref=e28]: 中文
+    - region "Highlights" [ref=e29]:
+      - generic [ref=e38]:
+        - heading "Welcome to PT Natura Inti Sukses" [level=1] [ref=e40]
+        - img "PT. Natura Inti Sukses Logo" [ref=e43]
+    - generic [ref=e45]:
+      - generic [ref=e47]:
+        - img "NaturaFoods" [ref=e49]
+        - heading "Official Partner For Indonesia :" [level=2] [ref=e50]
+        - paragraph [ref=e51]: Discover quality ingredients from NaturaFoods to support every idea and innovation for your business.
+      - generic [ref=e52]:
+        - link [ref=e54] [cursor=pointer]:
+          - /url: /products?cat=japanese-tea-series
+          - heading "Japanese Tea Series" [level=3] [ref=e57]
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: Bubuk teh hijau premium dengan warna cerah dan rasa khas Jepang.
+            - img "Japanese Tea Series" [ref=e66]
+          - img "Japanese Tea Series" [ref=e70]
+        - link [ref=e72] [cursor=pointer]:
+          - /url: /products?brand=a32da4d1-a0dd-4a32-a350-be1dfb3f4aec
+          - heading "Cocoa Powder" [level=3] [ref=e75]
+          - generic [ref=e80]:
+            - paragraph [ref=e81]: A trusted partner for premium cocoa ingredients.
+            - img "Cocoa Powder" [ref=e84]
+          - generic [ref=e86]:
+            - img "Cocoa Powder" [ref=e88]
+            - img "Cocoa Powder logo 2" [ref=e90]
+        - link [ref=e92] [cursor=pointer]:
+          - /url: /products?brand=590c1ec7-2561-4d15-be0b-938e57dacac5
+          - heading "Specialty Filling" [level=3] [ref=e95]
+          - generic [ref=e100]:
+            - paragraph [ref=e101]: Filling premium untuk berbagai kreasi roti, kue, dan pastry dengan tekstur lembut dan rasa istimewa.
+            - img "Specialty Filling" [ref=e104]
+          - img "Specialty Filling" [ref=e108]
+        - link [ref=e110] [cursor=pointer]:
+          - /url: /products?brand=7e6a23fd-a207-4c4d-aef7-ba07f1582df5
+          - heading "Nuts" [level=3] [ref=e113]
+          - generic [ref=e118]:
+            - paragraph [ref=e119]: Kacang pilihan dengan kualitas terbaik untuk kreasi yang lebih bernutrisi
+            - img "Nuts" [ref=e122]
+          - img "Nuts" [ref=e126]
+        - link [ref=e128] [cursor=pointer]:
+          - /url: /products?cat=choco
+          - heading "Chocolate" [level=3] [ref=e131]
+          - generic [ref=e136]:
+            - paragraph [ref=e137]: Cokelat berkualitas tinggi dengan rasa lezat dan tekstur sempurna untuk berbagai kebutuhan.
+            - img "Chocolate" [ref=e140]
+          - img "Chocolate" [ref=e144]
+        - link [ref=e146] [cursor=pointer]:
+          - /url: /products?brand=928b2058-f481-4d3a-8e36-3a20c11f3220
+          - heading "Raisin" [level=3] [ref=e149]
+          - generic [ref=e154]:
+            - paragraph [ref=e155]: Kismis berkualitas dari pilihan terbaik untuk rasa manis alami dan tekstur yang sempurna.
+            - img "Raisin" [ref=e158]
+          - img "Raisin" [ref=e162]
+    - generic [ref=e164]:
+      - generic [ref=e166]:
+        - heading "Our Retail Home Brand" [level=2] [ref=e167]
+        - img "Avante Ingredients Series" [ref=e169]
+      - generic [ref=e171]:
+        - link [ref=e173] [cursor=pointer]:
+          - /url: /products?brand=590c1ec7-2561-4d15-be0b-938e57dacac5
+          - img "Filling" [ref=e174]
+        - link [ref=e176] [cursor=pointer]:
+          - /url: /products?brand=c5077608-be56-4b66-b809-ed78dec5282b,a32da4d1-a0dd-4a32-a350-be1dfb3f4aec
+          - img "Cocoa" [ref=e177]
+        - link [ref=e179] [cursor=pointer]:
+          - /url: /products?brand=bbe845b0-2261-41f6-927a-7c5e2541a04a
+          - img "Matcha" [ref=e180]
+        - link [ref=e182] [cursor=pointer]:
+          - /url: /products?brand=928b2058-f481-4d3a-8e36-3a20c11f3220
+          - img "Raisin" [ref=e183]
+        - link [ref=e185] [cursor=pointer]:
+          - /url: /products?brand=116af1b0-1f8e-42e5-84bf-3abaf42615ce
+          - img "Chocolatte" [ref=e186]
+        - link [ref=e188] [cursor=pointer]:
+          - /url: /products?brand=7e6a23fd-a207-4c4d-aef7-ba07f1582df5
+          - img "Nuts" [ref=e189]
+    - generic [ref=e191]:
+      - generic [ref=e193]:
+        - heading "Small Pack for Ingredients Store :" [level=2] [ref=e194]
+        - iframe [ref=e196]
+      - generic [ref=e198]:
+        - img "Ebony" [ref=e201]
+        - img "Hoojicha" [ref=e204]
+        - img "Brown Sugar" [ref=e207]
+        - img "Almond Slice" [ref=e210]
+        - img "Mochi Filling Strech" [ref=e213]
+        - img "Kingland Raisin" [ref=e216]
+        - img "Avante Queen Anna" [ref=e219]
+        - img "Avante Muchuu" [ref=e222]
+        - img "Ebony" [ref=e225]
+        - img "Hoojicha" [ref=e228]
+        - img "Brown Sugar" [ref=e231]
+        - img "Almond Slice" [ref=e234]
+        - img "Mochi Filling Strech" [ref=e237]
+        - img "Kingland Raisin" [ref=e240]
+        - img "Avante Queen Anna" [ref=e243]
+        - img "Avante Muchuu" [ref=e246]
+    - generic [ref=e248]:
+      - generic [ref=e249]:
+        - generic [ref=e251]:
+          - img "NaturaFoods" [ref=e252]
+          - heading "Japanese Tea Series" [level=2] [ref=e253]
+        - generic [ref=e256]:
+          - generic [ref=e257]:
+            - img "Aiya Matcha Type BH (High Grade)" [ref=e259]
+            - generic [ref=e260]:
+              - generic [ref=e261]: Aiya Matcha Type BH (High Grade)
+              - paragraph
+              - link "Download Product" [ref=e264] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789734586479-hdyucj.pdf
+          - generic [ref=e265]:
+            - img "Aiya Matcha Type BM" [ref=e267]
+            - generic [ref=e268]:
+              - generic [ref=e269]: Aiya Matcha Type BM
+              - paragraph
+              - link "Download Product" [ref=e272] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789734533715-ojgjre.pdf
+      - generic [ref=e273]:
+        - generic [ref=e275]:
+          - img "NaturaFoods" [ref=e276]
+          - heading "Super Premium Cocoa Powder African Beans 100%" [level=2] [ref=e277]: Super Premium Cocoa PowderAfrican Beans 100%
+        - generic [ref=e280]:
+          - generic [ref=e281]:
+            - img "Bensdorp Queen Anna" [ref=e283]
+            - generic [ref=e284]:
+              - generic [ref=e285]: Bensdorp Queen Anna
+              - paragraph
+              - link "Download Product" [ref=e288] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789732846743-jerqmz.pdf
+          - generic [ref=e289]:
+            - img "Bensdorp 10/12 SR" [ref=e291]
+            - generic [ref=e292]:
+              - generic [ref=e293]: Bensdorp 10/12 SR
+              - paragraph
+              - link "Download Product" [ref=e296] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789732796608-1ulfsk.pdf
+          - generic [ref=e297]:
+            - img "Bensdorp 10/12 DDP" [ref=e299]
+            - generic [ref=e300]:
+              - generic [ref=e301]: Bensdorp 10/12 DDP
+              - paragraph
+              - link "Download Product" [ref=e304] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789732744498-lf759i.pdf
+      - generic [ref=e305]:
+        - generic [ref=e307]:
+          - img "NaturaFoods" [ref=e308]
+          - heading "Cocoa Powder Series" [level=2] [ref=e309]
+        - generic [ref=e312]:
+          - generic [ref=e313]:
+            - img "Barry Callebaut PD 4011" [ref=e315]
+            - generic [ref=e316]:
+              - generic [ref=e317]: Barry Callebaut PD 4011
+              - paragraph
+              - link "Download Product" [ref=e320] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789723302353-okquz3.pdf
+          - generic [ref=e321]:
+            - img "Barry Callebaut Maleo 22/24" [ref=e323]
+            - generic [ref=e324]:
+              - generic [ref=e325]: Barry Callebaut Maleo 22/24
+              - paragraph
+              - link "Download Product" [ref=e328] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789723262555-5zwsyc.pdf
+          - generic [ref=e329]:
+            - img "Barry Callebaut DF760-11" [ref=e331]
+            - generic [ref=e332]:
+              - generic [ref=e333]: Barry Callebaut DF760-11
+              - paragraph
+              - link "Download Product" [ref=e336] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789722985702-bxijm9.pdf
+          - generic [ref=e337]:
+            - img "Barry Callebaut DF 800-11" [ref=e339]
+            - generic [ref=e340]:
+              - generic [ref=e341]: Barry Callebaut DF 800-11
+              - paragraph
+              - link "Download Product" [ref=e344] [cursor=pointer]:
+                - /url: https://cdn-naturafoods.alvineitsolutions.com/products/1789723093674-guny0r.pdf
+    - generic [ref=e346]:
+      - generic [ref=e347]:
+        - generic [ref=e350]:
+          - link "Raisin India" [ref=e351] [cursor=pointer]:
+            - img "Raisin India" [ref=e352]
+          - button "Previous" [ref=e353]
+          - button "Next" [ref=e356]
+          - generic [ref=e359]:
+            - generic [ref=e360]:
+              - button "Go to slide 1" [ref=e361]
+              - button "Go to slide 2" [ref=e362]
+              - button "Go to slide 3" [ref=e363]
+            - generic [ref=e364]: 01 / 03
+        - link "Innovation 1" [ref=e368] [cursor=pointer]:
+          - img "Innovation 1" [ref=e369]
+      - generic [ref=e370]:
+        - generic [ref=e371]:
+          - paragraph [ref=e372]: ARTICLES
+          - heading "Latest story." [level=2] [ref=e373]
+          - paragraph [ref=e374]: Guides for cafés, hotels & kitchens — tempering, matcha grades, cold-chain and more.
+        - link "View more" [ref=e376] [cursor=pointer]:
+          - /url: /articles
+      - generic [ref=e379]:
+        - generic [ref=e380]:
+          - link [ref=e381] [cursor=pointer]:
+            - /url: /articles/baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan
+            - img "Baking Demo di Bandung tembus 80+ Peserta, Bawakan 7 Menu Andalan di Ny Liem!" [ref=e382]
+          - generic [ref=e383]:
+            - generic [ref=e384]:
+              - generic [ref=e385]: Demo
+              - generic [ref=e386]: 2026-09-15
+            - link [ref=e387] [cursor=pointer]:
+              - /url: /articles/baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan
+              - heading "Baking Demo di Bandung tembus 80+ Peserta, Bawakan 7 Menu Andalan di Ny Liem!" [level=3] [ref=e388]
+            - paragraph [ref=e389]: Bandung, 5 September 2026 – Antusiasme luar biasa ditunjukkan oleh para pecinta baking di Bandung dalam kegiatan Baking Demo bersama Bensdorp & Avante yang diselenggarakan di NY LIEM, Bandung. Acara ini sukses dihadiri oleh lebih dari 80 peserta, mulai dari baking enthusiast, home baker, hingga pelaku usaha kuliner.
+            - link "Read more" [ref=e390] [cursor=pointer]:
+              - /url: /articles/baking-demo-di-bandung-tembus-80-peserta-bawakan-7-menu-andalan
+        - generic [ref=e393]:
+          - link [ref=e394] [cursor=pointer]:
+            - /url: /articles/new-barry-callebaut-luncurkan-instagram-barrycallebaut-id-untuk
+            - img "NEW! Barry Callebaut luncurkan Instagram @barrycallebaut_id untuk masyarakat Indonesia" [ref=e395]
+          - generic [ref=e396]:
+            - generic [ref=e397]:
+              - generic [ref=e398]: Social Media
+              - generic [ref=e399]: 2026-09-15
+            - link [ref=e400] [cursor=pointer]:
+              - /url: /articles/new-barry-callebaut-luncurkan-instagram-barrycallebaut-id-untuk
+              - heading "NEW! Barry Callebaut luncurkan Instagram @barrycallebaut_id untuk masyarakat Indonesia" [level=3] [ref=e401]
+            - paragraph [ref=e402]: Kabar terbaru untuk para pecinta cokelat, baker, pastry enthusiast, dan pelaku industri bakery di Indonesia! Barry Callebaut kini hadir lebih dekat dengan masyarakat Indonesia melalui akun Instagram resmi terbaru, @barrycallebaut_id.
+            - link "Read more" [ref=e403] [cursor=pointer]:
+              - /url: /articles/new-barry-callebaut-luncurkan-instagram-barrycallebaut-id-untuk
+        - generic [ref=e406]:
+          - link [ref=e407] [cursor=pointer]:
+            - /url: /articles/national-meeting-naturafoods-x-barry-callebaut-berjalan-lancar
+            - img "National Meeting Naturafoods x Barry Callebaut berjalan lancar!" [ref=e408]
+          - generic [ref=e409]:
+            - generic [ref=e410]:
+              - generic [ref=e411]: National Meeting
+              - generic [ref=e412]: 2026-09-15
+            - link [ref=e413] [cursor=pointer]:
+              - /url: /articles/national-meeting-naturafoods-x-barry-callebaut-berjalan-lancar
+              - heading "National Meeting Naturafoods x Barry Callebaut berjalan lancar!" [level=3] [ref=e414]
+            - paragraph [ref=e415]: National Meeting Naturafoods x Barry Callebaut telah sukses diselenggarakan dengan lancar dan penuh semangat kebersamaan. Kegiatan ini menjadi momentum penting untuk memperkuat sinergi antara kedua perusahaan sekaligus menyatukan visi dalam menghadapi perkembangan industri food, bakery, dan chocolate yang terus berkembang.
+            - link "Read more" [ref=e416] [cursor=pointer]:
+              - /url: /articles/national-meeting-naturafoods-x-barry-callebaut-berjalan-lancar
+    - generic [ref=e421]:
+      - generic [ref=e422]:
+        - heading "Become a partner." [level=3] [ref=e423]
+        - paragraph [ref=e424]: Tell us your outlet, volume and city — we'll send a price list and samples. Selected quality, qualified support.
+        - link "Go to contact page" [ref=e426] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e429]:
+        - paragraph [ref=e430]: Full inquiry form moved to
+        - link "CONTACT US" [ref=e431] [cursor=pointer]:
+          - /url: /contact
+        - link "hello@naturafoods.id" [ref=e433] [cursor=pointer]:
+          - /url: mailto:hello@naturafoods.id
+    - contentinfo [ref=e434]:
+      - generic [ref=e435]:
+        - generic [ref=e436]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e437]:
+          - link "CATALOG PDF" [ref=e438] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e439] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e440] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e441] [cursor=pointer]:
+            - /url: /admin/login
+    - link "Chat on WhatsApp" [ref=e442] [cursor=pointer]:
+      - /url: https://wa.me/6281295071397
+  - button "Open Next.js Dev Tools" [ref=e450] [cursor=pointer]
+  - alert [ref=e454]

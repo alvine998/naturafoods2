@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e213] [cursor=pointer]
+  - alert [ref=e217]: Our Products
+  - generic [ref=e567]:
+    - banner [ref=e568]:
+      - navigation [ref=e569]:
+        - link [ref=e570] [cursor=pointer]:
+          - /url: /
+          - img "NaturaFoods" [ref=e571]
+        - generic [ref=e572]:
+          - link "ABOUT" [ref=e573] [cursor=pointer]:
+            - /url: /about
+          - link "PRODUCTS" [ref=e574] [cursor=pointer]:
+            - /url: /products
+          - link "ARTICLES" [ref=e575] [cursor=pointer]:
+            - /url: /articles
+          - link "EDUCATION" [ref=e576] [cursor=pointer]:
+            - /url: /education
+          - link "INNOVATION" [ref=e577] [cursor=pointer]:
+            - /url: /innovation
+          - link "SOCIAL MEDIA" [ref=e578] [cursor=pointer]:
+            - /url: /social-media
+          - link "CONTACT" [ref=e579] [cursor=pointer]:
+            - /url: /contact
+          - link "CAREERS" [ref=e580] [cursor=pointer]:
+            - /url: /careers
+        - generic [ref=e582]:
+          - button "Switch to id" [ref=e583]: ID
+          - button "Switch to en" [ref=e584]: EN
+          - button "Switch to zh" [ref=e585]: 中文
+    - main [ref=e586]:
+      - navigation "Breadcrumb" [ref=e587]:
+        - list [ref=e588]:
+          - listitem [ref=e589]:
+            - link "Home" [ref=e590] [cursor=pointer]:
+              - /url: /
+            - text: /
+          - listitem [ref=e591]:
+            - generic [ref=e592]: Products
+      - generic [ref=e593]:
+        - paragraph [ref=e594]: PRODUCTS
+        - heading "Our Products" [level=1] [ref=e595]
+        - paragraph [ref=e596]: Couverture & matcha for professionals — wholesale MOQ 6kg. Filter by category.
+      - generic [ref=e597]:
+        - complementary [ref=e598]:
+          - generic [ref=e599]:
+            - generic [ref=e600]:
+              - paragraph [ref=e601]: Category
+              - generic [ref=e602]:
+                - button "All 2" [ref=e603]:
+                  - generic [ref=e604]: All
+                  - generic [ref=e605]: "2"
+                - button "Japanese Tea Series 0" [ref=e606]:
+                  - generic [ref=e607]: Japanese Tea Series
+                  - generic [ref=e608]: "0"
+                - button "Super Premium Cocoa Powder 0" [ref=e609]:
+                  - generic [ref=e610]: Super Premium Cocoa Powder
+                  - generic [ref=e611]: "0"
+                - button "Cocoa Powder Series 0" [ref=e612]:
+                  - generic [ref=e613]: Cocoa Powder Series
+                  - generic [ref=e614]: "0"
+                - button "Other 0" [ref=e615]:
+                  - generic [ref=e616]: Other
+                  - generic [ref=e617]: "0"
+                - button "Matcha 0" [ref=e618]:
+                  - generic [ref=e619]: Matcha
+                  - generic [ref=e620]: "0"
+                - button "Chocolate 2" [pressed] [ref=e621]:
+                  - generic [ref=e622]: Chocolate
+                  - generic [ref=e623]: "2"
+            - generic [ref=e625]:
+              - paragraph [ref=e626]: Brand
+              - generic [ref=e627]:
+                - button "All Brands 2" [pressed] [ref=e628]:
+                  - generic [ref=e629]: All Brands
+                  - generic [ref=e630]: "2"
+                - button "Tzong Hsin 0" [ref=e631]:
+                  - generic [ref=e632]: Tzong Hsin
+                  - generic [ref=e633]: "0"
+                - button "Avante 1" [ref=e634]:
+                  - generic [ref=e635]: Avante
+                  - generic [ref=e636]: "1"
+                - button "Ofi 0" [ref=e637]:
+                  - generic [ref=e638]: Ofi
+                  - generic [ref=e639]: "0"
+                - button "Le Bourne 0" [ref=e640]:
+                  - generic [ref=e641]: Le Bourne
+                  - generic [ref=e642]: "0"
+                - button "Aiya 0" [ref=e643]:
+                  - generic [ref=e644]: Aiya
+                  - generic [ref=e645]: "0"
+                - button "Barry Callebaut 0" [ref=e646]:
+                  - generic [ref=e647]: Barry Callebaut
+                  - generic [ref=e648]: "0"
+                - button "Bensdorp 0" [ref=e649]:
+                  - generic [ref=e650]: Bensdorp
+                  - generic [ref=e651]: "0"
+            - generic [ref=e653]:
+              - paragraph [ref=e654]: 2 products
+              - button "Clear" [ref=e655]
+        - generic [ref=e657]:
+          - link [ref=e658] [cursor=pointer]:
+            - /url: /products/ebony
+            - img "Ebony" [ref=e660]
+            - generic [ref=e663]:
+              - heading "Ebony" [level=3] [ref=e664]
+              - paragraph
+              - paragraph
+          - link [ref=e666] [cursor=pointer]:
+            - /url: /products/avante-queen-anna
+            - img "Avante Queen Anna" [ref=e668]
+            - generic [ref=e671]:
+              - heading "Avante Queen Anna" [level=3] [ref=e672]
+              - paragraph
+              - paragraph
+    - contentinfo [ref=e674]:
+      - generic [ref=e675]:
+        - generic [ref=e676]: © 2026 PT NATURA INTI SUKSES — FOOD & BEVERAGE INGREDIENTS · BAKING INGREDIENTS · INDONESIA
+        - generic [ref=e677]:
+          - link "CATALOG PDF" [ref=e678] [cursor=pointer]:
+            - /url: https://cdn-naturafoods.alvineitsolutions.com/Product%20Specification%20(3)_compressed.pdf
+          - link "INSTAGRAM" [ref=e679] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "CAREERS" [ref=e680] [cursor=pointer]:
+            - /url: /careers
+          - link "ADMIN" [ref=e681] [cursor=pointer]:
+            - /url: /admin/login
