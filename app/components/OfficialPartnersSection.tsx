@@ -5,6 +5,7 @@ import { ArrowRight, X } from "lucide-react";
 import Link from "next/link";
 import Image from "./SafeImage";
 import ContactInfoSection from "./ContactInfoSection";
+import YouTubeEmbed from "./YouTubeEmbed";
 import { sortByLandingOrder, sortOfficialPartners, useStore } from "../lib/store";
 import { useLang } from "../i18n";
 import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
@@ -379,11 +380,9 @@ function SmallPackSection() {
               {t.homeSmallPackTitle}
             </h2>
             <div className="mx-auto max-w-xl aspect-video rounded-xl overflow-hidden">
-              <iframe
+              <YouTubeEmbed
                 src="https://www.youtube.com/embed/7NYnW0M_obg?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
                 title={t.homeSmallPackTitle}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
                 className="w-full h-full"
               />
             </div>

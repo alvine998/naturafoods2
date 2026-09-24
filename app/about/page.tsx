@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Eye, Compass } from "lucide-react";
 import SiteNav from "../components/SiteNav";
+import YouTubeEmbed from "../components/YouTubeEmbed";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
 
@@ -47,12 +48,11 @@ export default function AboutPage() {
               fill
               priority
             />
-            <iframe
+            <YouTubeEmbed
               src="https://www.youtube.com/embed/FT558Ad3rfY?autoplay=1&mute=1&loop=1&playlist=FT558Ad3rfY&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
               title="About Hero Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 h-full w-full object-cover"
+              wrapperClassName="absolute inset-0"
+              className="h-full w-full object-cover"
             />
           </div>
         </div>
