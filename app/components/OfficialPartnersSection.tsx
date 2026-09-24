@@ -15,14 +15,10 @@ type PartnerBrand = { id: string; name: string; logo: string };
 type PartnerCard = {
   title: string;
   description: string;
-  image: string;
-  brandLogo: string;
-  brandName: string;
   link: string;
   color: string;
   background?: string;
   images?: string[];
-  brandIds?: string[];
   brands?: PartnerBrand[];
   sortIndex: number;
 };
@@ -40,10 +36,6 @@ const partnerCards: PartnerCard[] = [
     title: "Cocoa Powder",
     description:
       "Cocoa powder berkualitas tinggi untuk cita rasa cokelat yang kaya dan autentik.",
-    image:
-      "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80",
-    brandLogo: "",
-    brandName: "Bens Dorp",
     link: "/products?cat=cocoa-powder-series",
     color: "#5D4037",
     sortIndex: 1,
@@ -52,10 +44,6 @@ const partnerCards: PartnerCard[] = [
     title: "Japanese Tea Series",
     description:
       "Bubuk teh hijau premium dengan warna cerah dan rasa khas jepang.",
-    image:
-      "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&q=80",
-    brandLogo: "",
-    brandName: "Afya",
     link: "/products?cat=japanese-tea-series",
     color: "#2E7D32",
     sortIndex: 2,
@@ -64,10 +52,6 @@ const partnerCards: PartnerCard[] = [
     title: "Specialty Filling",
     description:
       "Filling premium untuk berbagai kreasi roti, kue, dan pastry dengan tekstur lembut dan rasa istimewa.",
-    image:
-      "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80",
-    brandLogo: "",
-    brandName: "Trang Nghi",
     link: "/products?cat=specialty-filling",
     color: "#1565C0",
     sortIndex: 3,
@@ -76,10 +60,6 @@ const partnerCards: PartnerCard[] = [
     title: "Nuts",
     description:
       "Kacang pilihan dengan kualitas terbaik untuk kreasi yang lebih beragam.",
-    image:
-      "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=600&q=80",
-    brandLogo: "",
-    brandName: "OFI",
     link: "/products?cat=nuts",
     color: "#795548",
     sortIndex: 4,
@@ -88,10 +68,6 @@ const partnerCards: PartnerCard[] = [
     title: "Chocolate",
     description:
       "Cokelat berkualitas tinggi dengan rasa lezat dan tekstur sempurna untuk berbagai kebutuhan.",
-    image:
-      "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",
-    brandLogo: "",
-    brandName: "Le Bourne",
     link: "/products?cat=choco",
     color: "#3E2723",
     sortIndex: 5,
@@ -100,10 +76,6 @@ const partnerCards: PartnerCard[] = [
     title: "Raisin",
     description:
       "Kismis berkualitas dari pilihan terbaik untuk rasa manis alami dan tekstur yang sempurna.",
-    image:
-      "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&q=80",
-    brandLogo: "",
-    brandName: "KingLand",
     link: "/products?cat=raisin",
     color: "#827717",
     sortIndex: 6,
@@ -189,11 +161,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   const bottomLogos =
     Array.isArray(card.images) && card.images.filter(Boolean).length
       ? card.images.filter(Boolean)
-      : card.brandLogo && card.brandLogo.trim() !== ""
-        ? [card.brandLogo]
-        : card.image
-          ? [card.image]
-          : [];
+      : [];
   const body = (
     <>
         {/* header: title + arrow */}
@@ -242,9 +210,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                   <div key={src + i} className="relative h-12 w-[150px] max-w-full shrink-0">
                     <Image
                       src={src}
-                      alt={
-                        i === 0 ? card.brandName : `${card.brandName} logo ${i + 1}`
-                      }
+                      alt={i === 0 ? card.title : `${card.title} logo ${i + 1}`}
                       fill
                       sizes="120px"
                       unoptimized={src.includes("r2.dev")}
@@ -264,7 +230,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
              </div>
            ) : (
              <p className="text-center text-sm font-semibold text-black/70">
-               {card.brandName}
+               {card.title}
              </p>
            )}
          </div>
@@ -311,7 +277,6 @@ type BrandTile = {
   slug: string;
   title: string;
   img: string;
-  desc?: string;
   brandIds: string[];
 };
 
@@ -324,7 +289,6 @@ function RetailBrandSection() {
       slug: h.id,
       title: h.name,
       img: h.image,
-      desc: h.desc,
       brandIds: h.brandIds ?? [],
     }))
     .filter((h) => h.slug && h.img?.trim())
@@ -442,18 +406,14 @@ function SmallPackSection() {
                 className="w-[180px] shrink-0 rounded-2xl p-4"
               >
                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3">
-                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <Image
-                     src={item.img}
-                     alt={item.title}
-                     className="w-full h-full object-cover"
-                     width={180}
-                     height={240}
-                   />
-                 </div>
-                {/* <p className="text-sm text-center text-[#2D4A22] font-medium truncate">
-                  {item.title}
-                </p> */}
+                    <Image
+                      src={item.img}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      width={180}
+                      height={240}
+                    />
+                  </div>
               </div>
             ))}
           </motion.div>
@@ -472,10 +432,6 @@ type CocoaProduct = {
   slug: string;
   file?: string;
 };
-
-const barryCallebautProducts: CocoaProduct[] = [];
-
-const bensdorpProducts: CocoaProduct[] = [];
 
 function CocoaProductCard({
   product,
@@ -631,6 +587,43 @@ function Reveal({
 // Normalize for loose id/name matching: "Japanese Tea Series" -> "japaneseteaseries"
 const normKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
 
+// exact > prefix > substring match of a candidate against partner id/name keys
+const scoreAgainst = (keys: string[], candidate?: string): number => {
+  const n = normKey(candidate ?? "");
+  if (!n) return 0;
+  let best = 0;
+  for (const k of keys) {
+    if (k === n) best = Math.max(best, 3);
+    else if (k.startsWith(n) || n.startsWith(k)) best = Math.max(best, 2);
+    else if (k.includes(n) || n.includes(k)) best = Math.max(best, 1);
+  }
+  return best;
+};
+
+type PartnerCategory = { id: string; slug: string; name: string; isActive?: boolean };
+
+// "Cocoa Powder" ↔ "cocoa-powder-series"; ties prefer the shorter slug
+const findPartnerCategory = (
+  productCategories: PartnerCategory[],
+  p: OfficialPartner,
+): { slug: string; id: string } | null => {
+  const keys = [p.id, p.name].map(normKey).filter(Boolean);
+  let best: { slug: string; id: string; score: number } | null = null;
+  for (const c of productCategories) {
+    if (!c.isActive) continue;
+    const score = Math.max(
+      scoreAgainst(keys, c.id),
+      scoreAgainst(keys, c.slug),
+      scoreAgainst(keys, c.name),
+    );
+    if (score <= 0) continue;
+    if (!best || score > best.score || (score === best.score && c.slug.length < best.slug.length)) {
+      best = { slug: c.slug, id: c.id, score };
+    }
+  }
+  return best ? { slug: best.slug, id: best.id } : null;
+};
+
 export default function OfficialPartnersSection() {
   const { t } = useLang();
   const { officialPartners, masterBrands, homeBrands, productCategories, products } = useStore();
@@ -638,56 +631,9 @@ export default function OfficialPartnersSection() {
   const publishedPartners = sortOfficialPartners(
     sourcePartners.filter((p) => p.isPublished !== false),
   );
-  useEffect(() => {
-    // runs in browser — check browser DevTools console, not `next dev` terminal
-    console.log("[OfficialPartners] published:", publishedPartners.map((p) => ({
-      id: p.id,
-      brandIds: (p as unknown as Record<string, unknown>).brandIds,
-      brand_ids: (p as unknown as Record<string, unknown>).brand_ids,
-      link: p.link,
-    })));
-  }, [officialPartners]);
-  // Map OfficialPartner (color=card bg, background=single right visual, images[]=bottom logos) -> PartnerCard
-  // Click destination precedence:
-  // 1. explicit link override — honored even with 2+ brands (admin's explicit choice)
-  // 2. explicit brandIds — 1 brand goes direct, 2+ open brand-choice modal
-  // 3. derived brands: live partner rows often have empty brandIds, so derive
-  //    from products whose category matches the partner (1 → direct, 2+ → modal)
-  // 4. product category match (cards often titled by category)
-  // 5. master brand / home brand id-name match
-  // 6. "/products" (external links ignored — card stays in-site)
-  const catForPartner = (p: OfficialPartner): { slug: string; id: string } | null => {
-    const keys = [p.id, p.name].map(normKey).filter(Boolean);
-    // bidirectional match: "Cocoa Powder" ↔ "cocoa-powder-series" / "super-premium-cocoa-powder"
-    // exact > prefix > substring; ties prefer the shorter slug (more direct title match)
-    const matchScore = (candidate?: string): number => {
-      const n = normKey(candidate ?? "");
-      if (!n) return 0;
-      let best = 0;
-      for (const k of keys) {
-        if (k === n) best = Math.max(best, 3);
-        else if (k.startsWith(n) || n.startsWith(k)) best = Math.max(best, 2);
-        else if (k.includes(n) || n.includes(k)) best = Math.max(best, 1);
-      }
-      return best;
-    };
-    let cat: { slug: string; id: string; score: number } | null = null;
-    for (const c of productCategories) {
-      if (!c.isActive) continue;
-      const score = Math.max(matchScore(c.id), matchScore(c.slug), matchScore(c.name));
-      if (score <= 0) continue;
-      if (
-        !cat ||
-        score > cat.score ||
-        (score === cat.score && c.slug.length < cat.slug.length)
-      ) {
-        cat = { slug: c.slug, id: c.id, score };
-      }
-    }
-    return cat ? { slug: cat.slug, id: cat.id } : null;
-  };
+  // Card destination: explicit in-site link > brandIds (1 direct, 2+ modal) >
+  // derived brands from the partner's product category > category/brand match > "/products"
   const partnerBrands = (p: OfficialPartner): PartnerBrand[] => {
-    console.log("Partner", p)
     // Gate on raw brandIds, not on masterBrands lookup — lookup may be
     // empty/stale on landing while partner rows already carry brand_ids.
     const ids = (p.brandIds ?? []).filter(Boolean);
@@ -704,7 +650,7 @@ export default function OfficialPartnersSection() {
     }
     // Live rows often have empty brandIds — derive from products in the
     // partner's category so the modal can offer each distinct brand.
-    const cat = catForPartner(p);
+    const cat = findPartnerCategory(productCategories, p);
     if (!cat) return [];
     const seen = new Map<string, PartnerBrand>();
     for (const pr of products) {
@@ -728,39 +674,12 @@ export default function OfficialPartnersSection() {
     if (brands.length === 1) return `/products?brand=${brands[0].id}`;
     // 2+ brands: modal handles navigation; link unused but keep category fallback
     // so non-JS / static contexts still land somewhere sensible.
-
-    const keys = [p.id, p.name].map(normKey).filter(Boolean);
-    // bidirectional match: "Cocoa Powder" ↔ "cocoa-powder-series" / "super-premium-cocoa-powder"
-    // exact > prefix > substring; ties prefer the shorter slug (more direct title match)
-    const matchScore = (candidate?: string): number => {
-      const n = normKey(candidate ?? "");
-      if (!n) return 0;
-      let best = 0;
-      for (const k of keys) {
-        if (k === n) best = Math.max(best, 3);
-        else if (k.startsWith(n) || n.startsWith(k)) best = Math.max(best, 2);
-        else if (k.includes(n) || n.includes(k)) best = Math.max(best, 1);
-      }
-      return best;
-    };
-
-    let cat: { slug: string; score: number } | null = null;
-    for (const c of productCategories) {
-      if (!c.isActive) continue;
-      const score = Math.max(matchScore(c.id), matchScore(c.slug), matchScore(c.name));
-      if (score <= 0) continue;
-      if (
-        !cat ||
-        score > cat.score ||
-        (score === cat.score && c.slug.length < cat.slug.length)
-      ) {
-        cat = { slug: c.slug, score };
-      }
-    }
+    const cat = findPartnerCategory(productCategories, p);
     if (cat) return `/products?cat=${cat.slug}`;
 
+    const keys = [p.id, p.name].map(normKey).filter(Boolean);
     const matches = (candidates: (string | undefined)[]) =>
-      candidates.some((c) => matchScore(c) > 0);
+      candidates.some((c) => scoreAgainst(keys, c) > 0);
 
     const mb = masterBrands.find((b) => matches([b.id, b.slug, b.name]));
     if (mb) return `/products?brand=${mb.id}`;
@@ -783,14 +702,7 @@ export default function OfficialPartnersSection() {
         return {
           title: p.name,
           description: p.description,
-          image:
-            p.image ||
-            bottomLogos[0] ||
-            `https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80`,
-          brandLogo: bottomLogos[0] || p.image || "",
-          brandName: p.name,
           link: partnerLink(p, brands),
-          brandIds: (p.brandIds ?? []).filter(Boolean),
           brands,
           color:
             typeof p.color === "string" &&
@@ -802,13 +714,7 @@ export default function OfficialPartnersSection() {
           sortIndex: p.sortIndex ?? p.order ?? 0,
         };
       })
-    : [...partnerCards].sort((a, b) => a.sortIndex - b.sortIndex).map((c) => ({
-        ...c,
-        background: undefined,
-      }));
-
-  // Fallback to static cards if no dynamic partners published
-  const displayCards = cards.length ? cards : partnerCards;
+    : [...partnerCards];
 
   return (
     <>
@@ -837,13 +743,13 @@ export default function OfficialPartnersSection() {
             </div>
           </Reveal>
 
-          {displayCards.length === 0 ? (
+          {cards.length === 0 ? (
             <p className="text-center text-sm text-[#8B6F47]">
               {t.homeNoPartners}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {displayCards.map((card, index) => (
+              {cards.map((card, index) => (
                 <PartnerCard
                   key={card.title + index}
                   card={card}
