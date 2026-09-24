@@ -154,7 +154,7 @@ export default function Home() {
 
         {/* <HighlightedProductsSection /> */}
         <OfficialPartnersSection />
-        <ContactInfoSection />
+        {/* <ContactInfoSection /> */}
         <LatestStoriesSection />
 
         <section className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-14 md:px-8">
