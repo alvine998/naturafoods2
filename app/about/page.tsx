@@ -102,25 +102,26 @@ export default function AboutPage() {
       <section id="description" className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-24">
         <div className="grid gap-10 md:grid-cols-[1.05fr_0.95fr] md:items-start md:gap-16">
           <div>
-            <Reveal><p className="text-[11px] tracking-[0.24em] text-[#8B6F47]">{L.storyEyebrow}</p></Reveal>
-            <Reveal delay={0.06}><h2 className="mt-3 font-[var(--font-display)] text-[30px] font-light leading-none tracking-tight text-[#2D4A22] sm:text-[36px] md:text-[44px]">{L.storyTitle}<br /><span className="font-normal italic">{L.storyTitleIt}</span></h2></Reveal>
-            <Reveal delay={0.12} className="mt-6 grid gap-4 text-[14px] leading-7 text-[#1a1a16]/70">
+            <p className="text-[11px] tracking-[0.24em] text-[#8B6F47]">{L.storyEyebrow}</p>
+            <h2 className="mt-3 font-[var(--font-display)] text-[30px] font-light leading-none tracking-tight text-[#2D4A22] sm:text-[36px] md:text-[44px]">{L.storyTitle}<br /><span className="font-normal italic">{L.storyTitleIt}</span></h2>
+            <div className="mt-6 grid gap-4 text-[14px] leading-7 text-[#1a1a16]/70">
               <p>{L.storyP1}</p>
               <p>{L.storyP2}</p>
               <p className="font-medium text-[#2D4A22]">{L.storyP3}</p>
-            </Reveal>
-            <Reveal delay={0.18} className="mt-8 flex gap-5 border-l-2 border-[#2D4A22]/15 pl-5">
+            </div>
+            <div className="mt-8 flex gap-5 border-l-2 border-[#2D4A22]/15 pl-5">
               <blockquote className="font-[var(--font-display)] text-[18px] italic leading-7 text-[#2D4A22]">“{L.quote}”<span className="mt-2 block font-sans text-[11px] tracking-[0.12em] text-[#8B6F47]">{L.quoteBy}</span></blockquote>
-            </Reveal>
+            </div>
           </div>
+
           <div className="grid gap-4">
-            <Reveal y={24} className="overflow-hidden rounded-[24px] bg-[#FFF7E8]">
+            <div className="overflow-hidden rounded-[24px] bg-[#FFF7E8]">
               <Image src={L.storyImage} alt="Baking" className="aspect-[4/3] w-full object-cover" width={600} height={450} />
               <div className="p-5">
                 <div className="text-[11px] tracking-[0.14em] text-[#8B6F47]">{L.storyCardLabel}</div>
                 <div className="mt-1 text-[13px] leading-6 text-[#1a1a16]/70">{L.storyCardDesc}</div>
               </div>
-            </Reveal>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-[20px] bg-[#2D4A22] p-5 text-white">
                 <div className="text-[11px] tracking-[0.14em] text-white/60">{L.promiseLabel}</div>

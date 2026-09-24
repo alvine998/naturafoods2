@@ -14,13 +14,18 @@ export default function YouTubeEmbed({
   wrapperClassName?: string;
 }) {
   const ref = useRef<HTMLIFrameElement>(null);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
 
   const cmd = (func: string) =>
     ref.current?.contentWindow?.postMessage(
       JSON.stringify({ event: "command", func, args: [] }),
       "*",
     );
+
+  const unmuteOnLoad = () => {
+    cmd("unMute");
+    cmd("playVideo");
+  };
 
   const toggle = () => {
     const next = !muted;
@@ -40,6 +45,7 @@ export default function YouTubeEmbed({
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
+        onLoad={unmuteOnLoad}
         className={className}
       />
       <button
