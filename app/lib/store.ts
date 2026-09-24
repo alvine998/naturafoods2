@@ -437,7 +437,7 @@ function initStore() {
     // Then try API — overwrite if successful
     const fetchSalesList = async (): Promise<unknown> => {
       try {
-        const json = await apiFetch<unknown>("/sales-contacts?limit=50");
+        const json = await apiFetch<unknown>("/sales?limit=50");
         if (json.success && json.data != null) return json.data as unknown;
       } catch {}
       return null as unknown;
