@@ -6,9 +6,13 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { LanguageSwitcher, useLang } from "../i18n";
+import { useCompanySettings } from "../lib/companySettings";
 
 export default function SiteNav() {
   const { locale, t } = useLang();
+  const company = useCompanySettings();
+  const logoSrc = company.logo?.trim() || t.settings.logoUrl || "/logo.png";
+  const logoAlt = t.settings.logoAlt || company.name || "NaturaFoods";
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -94,17 +98,17 @@ export default function SiteNav() {
         <nav className="mx-auto flex h-[64px] max-w-[1440px] items-center justify-between gap-4 px-6 md:px-8">
           {/* left */}
            <Link href="/" className="flex items-center gap-3 shrink-0">
-             {/* eslint-disable-next-line @next/next/no-img-element */}
-             <Image
-               src="/logo.png"
-               alt="NaturaFoods"
-               width={335}
-               height={102}
-               priority
-               style={{ width: "auto" }}
-               className="h-7 w-auto object-contain md:h-14"
-             />
-           </Link>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <Image
+                src={logoSrc}
+                alt={logoAlt}
+                width={335}
+                height={102}
+                priority
+                style={{ width: "auto" }}
+                className="h-7 w-auto object-contain md:h-14"
+              />
+            </Link>
 
           {/* center — desktop */}
           <div className="hidden items-center gap-1 lg:flex">
@@ -165,15 +169,15 @@ export default function SiteNav() {
                    onClick={() => setOpen(false)}
                    className="flex items-center gap-2"
                  >
-                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <Image
-                     src="/logo.png"
-                     alt="NaturaFoods"
-                     width={335}
-                     height={102}
-                     style={{ width: "auto" }}
-                     className="h-7 w-auto"
-                   />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <Image
+                      src={logoSrc}
+                      alt={logoAlt}
+                      width={335}
+                      height={102}
+                      style={{ width: "auto" }}
+                      className="h-7 w-auto"
+                    />
                    <span className="text-[10px] tracking-[0.18em] text-[#8B6F47]">
                      MENU
                    </span>

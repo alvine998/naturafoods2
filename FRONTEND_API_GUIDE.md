@@ -287,4 +287,32 @@ curl -X POST http://localhost:4000/api/v1/admin/products -H "Authorization: Bear
 curl http://localhost:4000/api/v1/products?isHighlight=true
 curl -X PATCH http://localhost:4000/api/v1/admin/official-partners/bensdorp/publish -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"isPublished": false}'
 curl -X POST http://localhost:4000/api/v1/admin/uploads -H "Authorization: Bearer <token>" -F "file=@./bensdorp.png" -F "folder=partners"
+curl http://localhost:4000/api/v1/company-settings
 ```
+
+## 15. Company Settings (singleton)
+
+Backend `backend.md:18` (`company_settings` table, id `"default"`). Frontend client `app/lib/companySettings.ts` — public hook `useCompanySettings()` (localStorage `nf_company_settings` cache, event `nf_company_settings_updated`), admin page `app/admin/settings/page.tsx`.
+
+```ts
+import { fetchCompanySettings, createCompanySettings, replaceCompanySettings, patchCompanySettings, deleteCompanySettings } from "@/app/lib/companySettings";
+
+// public singleton (recreates default server-side when empty)
+const { data } = await apiFetch<CompanySettings>("/company-settings");
+const { data: byId } = await apiFetch<CompanySettings>(`/company-settings/${id}`);
+
+// admin (Authorization: Bearer <token> via apiFetch /admin/*)
+const { data: current } = await apiFetch<CompanySettings>("/admin/company-settings"); // 404 when no row
+await apiFetch("/admin/company-settings", { method: "POST", body: JSON.stringify({ id: "default", name, logo, description, visi, misi }) }); // 409 if exists
+await apiFetch("/admin/company-settings", { method: "PUT", body: JSON.stringify({ ...settings }) }); // full replace
+await apiFetch("/admin/company-settings", { method: "PATCH", body: JSON.stringify({ misi: "…" }) }); // partial
+await apiFetch("/admin/company-settings", { method: "DELETE" }); // next public GET recreates default
+```
+
+```tsx
+// public components
+import { useCompanySettings } from "@/app/lib/companySettings";
+const company = useCompanySettings(); // { name, logo, visi, misi, ... }
+```
+
+Consumers: `SiteNav` (logo `company.logo`), `SiteFooter` (instagram + locale `settings.footerCopy`), `app/about/page.tsx` (Visi/Misi bodies `company.visi` / `company.misi`, titles stay per-locale `aboutDetail.values`).

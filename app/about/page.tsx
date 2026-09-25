@@ -8,6 +8,7 @@ import SiteNav from "../components/SiteNav";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import SiteFooter from "../components/SiteFooter";
 import { useLang } from "../i18n";
+import { useCompanySettings } from "../lib/companySettings";
 
 function Reveal({ children, delay = 0, y = 18, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
   return <motion.div initial={{ opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>{children}</motion.div>;
@@ -16,8 +17,11 @@ function Reveal({ children, delay = 0, y = 18, className = "" }: { children: Rea
 export default function AboutPage() {
   const { t } = useLang();
   const L = t.aboutDetail;
-  const vision = L.values[0];
-  const mission = L.values[1];
+  const company = useCompanySettings();
+  // Visi/Misi bodies come from Admin → Settings (company_settings singleton);
+  // card titles stay per-locale defaults. Edit at /admin/settings.
+  const vision = { t: L.values[0]?.t, d: company.visi?.trim() || L.values[0]?.d };
+  const mission = { t: L.values[1]?.t, d: company.misi?.trim() || L.values[1]?.d };
 
   const aboutVideoPoster = L.aboutHeroVideoPoster || "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80";
   const [aboutVideoReady, setAboutVideoReady] = useState(false);

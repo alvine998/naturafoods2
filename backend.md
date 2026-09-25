@@ -538,6 +538,9 @@ paths:
   /assistant/chat: {post: {}}
   /admin/uploads: {post: {}}
   /admin/stats: {get: {}}
+  /company-settings: {get: {}}
+  /company-settings/{id}: {get: {}}
+  /admin/company-settings: {get: {}, post: {}, put: {}, patch: {}, delete: {}}
 ```
 
 ---
@@ -626,6 +629,29 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model CompanySetting {
+  id          String   @id @default("default")
+  name        String
+  logo        String?
+  description String?  @db.Text
+  visi        String?  @db.Text
+  misi        String?  @db.Text
+  tagline     String?
+  email       String?
+  phone       String?
+  whatsapp    String?
+  address     String?  @db.Text
+  website     String?
+  instagram   String?
+  facebook    String?
+  tiktok      String?
+  youtube     String?
+  mapsUrl     String?  @map("maps_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  @@map("company_settings")
+}
 ```
 
 ---
@@ -682,5 +708,122 @@ curl -X PATCH https://api-naturafoods.alvineitsolutions.com/api/v1/admin/officia
 # upload
 curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/admin/uploads \
   -H "Authorization: Bearer <token>" -F "file=@./bensdorp.png" -F "folder=partners"
+
+# company settings (public singleton)
+curl https://api-naturafoods.alvineitsolutions.com/api/v1/company-settings
+
+# create (409 if row exists)
+curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"id":"default","name":"PT Natura Inti Sukses","logo":"/logo.png","visi":"...","misi":"..."}'
+
+# full replace / partial / reset (next public GET recreates default)
+curl -X PUT https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"id":"default","name":"PT Natura Inti Sukses","visi":"...","misi":"..."}'
+curl -X PATCH https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"misi":"Updated misi..."}'
+curl -X DELETE https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
+  -H "Authorization: Bearer <token>"
 ```
+
+---
+
+## 18. Company Settings (singleton)
+
+Admin page `app/admin/settings/page.tsx` edits company name, logo, description, visi, misi, contact & social links. Public components (`SiteNav` logo, `SiteFooter`, About Visi/Misi) read the singleton via `app/lib/companySettings.ts` (`useCompanySettings()`, localStorage `nf_company_settings` cache).
+
+### 18.1 SQL (MySQL)
+
+```sql
+CREATE TABLE IF NOT EXISTS `company_settings` (
+  `id` varchar(50) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `logo` varchar(500) DEFAULT NULL,
+  `description` mediumtext,
+  `visi` mediumtext,
+  `misi` mediumtext,
+  `tagline` varchar(300) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `whatsapp` varchar(50) DEFAULT NULL,
+  `address` mediumtext,
+  `website` varchar(500) DEFAULT NULL,
+  `instagram` varchar(500) DEFAULT NULL,
+  `facebook` varchar(500) DEFAULT NULL,
+  `tiktok` varchar(500) DEFAULT NULL,
+  `youtube` varchar(500) DEFAULT NULL,
+  `maps_url` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+Singleton id is `"default"`. Timestamps use `created_at`/`updated_at` (`YYYY-MM-DD HH:mm:ss`, UTC); API serializes ISO8601 `created_at`/`updated_at` (camelCase `createdAt`/`updatedAt` also accepted on write).
+
+Default row (created on first public GET when table is empty):
+
+```json
+{
+  "id": "default",
+  "name": "PT Natura Inti Sukses",
+  "logo": "/logo.png",
+  "description": "PT Natura Inti Sukses is an importer & distributor of food and beverage ingredients in Indonesia — especially baking ingredients.",
+  "visi": "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
+  "misi": "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  "tagline": "Food & Beverage Ingredients · Baking Ingredients",
+  "email": "info@naturafoods.co.id",
+  "phone": "0812 9507 1397",
+  "whatsapp": "",
+  "address": "Jl. Pangeran Tubagus Angke No.128-129, RT.15/RW.2, Angke, Kec. Tambora, Kota Jakarta Barat, DKI Jakarta 11330",
+  "website": "",
+  "instagram": "https://instagram.com",
+  "facebook": "",
+  "tiktok": "",
+  "youtube": "",
+  "maps_url": ""
+}
+```
+
+### 18.2 Model
+
+```ts
+type CompanySettings = {
+  id: string;        // PK, singleton "default"
+  name: string;      // required, 2-200 chars
+  logo: string;      // URL or /logo.png, 0-500
+  description: string;
+  visi: string;
+  misi: string;
+  tagline: string;   // 0-300
+  email: string;     // 0-150, email format when non-empty
+  phone: string;     // 0-50
+  whatsapp: string;  // 0-50
+  address: string;
+  website: string;   // 0-500, URL when non-empty
+  instagram: string; // 0-500, URL when non-empty
+  facebook: string;
+  tiktok: string;
+  youtube: string;
+  maps_url: string;  // 0-500, URL when non-empty
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 18.3 Endpoints
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| `GET` | `/company-settings` | Public | Singleton. If no row, server inserts + returns the default row. Cached. |
+| `GET` | `/company-settings/:id` | Public | Row by PK. `404 NOT_FOUND` if missing. |
+| `GET` | `/admin/company-settings` | Auth | Singleton for the admin form. `404 NOT_FOUND` when no row (frontend then POSTs on save). |
+| `POST` | `/admin/company-settings` | Auth | Create singleton. `409 CONFLICT` if a row (or `id`) already exists. `422 VALIDATION_ERROR` when `name` missing/invalid. |
+| `PUT` | `/admin/company-settings` | Auth | Full replace of the singleton. `404 NOT_FOUND` when no row (frontend falls back to POST). |
+| `PATCH` | `/admin/company-settings` | Auth | Partial update of the singleton. `404 NOT_FOUND` when no row. |
+| `DELETE` | `/admin/company-settings` | Auth | Delete the singleton row. Next public `GET` recreates the default. |
+
+All responses use the standard envelope (`backend.md:1.2`). Error codes: `UNAUTHORIZED` (401), `NOT_FOUND` (404), `CONFLICT` (409), `VALIDATION_ERROR` (422).
 

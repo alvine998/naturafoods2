@@ -24,6 +24,7 @@ import {
   Share2,
   Info,
   Bookmark,
+  Settings,
 } from "lucide-react";
 import { logout } from "../lib/auth";
 import { useLang } from "../i18n";
@@ -52,6 +53,7 @@ const ROUTES = [
   "/admin/sales",
   "/admin/social-media",
   "/admin/about",
+  "/admin/settings",
 ] as const;
 
 const ICONS = [
@@ -72,6 +74,7 @@ const ICONS = [
   Phone,
   Share2,
   Info,
+  Settings,
 ] as const;
 
 // Sections hidden from the sidebar — pages stay reachable by direct URL
