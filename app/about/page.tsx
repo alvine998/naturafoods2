@@ -38,8 +38,8 @@ export default function AboutPage() {
 
       {/* HERO VIDEO */}
       <section aria-label="About" className="w-full">
-        <div className="relative min-h-[70vh] overflow-hidden bg-[#1a1a16]">
-          <div className="relative h-[70vh] min-h-[520px]">
+        <div className="relative min-h-[95vh] overflow-hidden bg-[#1a1a16]">
+          <div className="relative h-[95vh] min-h-[520px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <Image
               src={aboutVideoPoster}
