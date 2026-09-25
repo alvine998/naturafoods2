@@ -159,10 +159,20 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
   const multi = (card.brands ?? []).length > 1;
   const rightVisual =
     card.background && card.background.trim() !== "" ? card.background : "";
-  const bottomLogos =
+  // Bottom bar shows brandIds logos (resolved via masterBrands in `card.brands`).
+  // Fall back to legacy images[] only when no brand logo is available.
+  const brandLogos = (card.brands ?? []).filter(
+    (b) => b.logo && b.logo.trim() !== "",
+  );
+  const imageLogos =
     Array.isArray(card.images) && card.images.filter(Boolean).length
-      ? card.images.filter(Boolean)
+      ? card.images.filter(Boolean).map((src) => ({
+          id: src,
+          name: card.title,
+          logo: src,
+        }))
       : [];
+  const bottomLogos = brandLogos.length > 0 ? brandLogos : imageLogos;
   const body = (
     <>
         {/* header: title + arrow */}
@@ -203,18 +213,24 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
            )}
         </div>
 
-        {/* bottom logo bar */}
+        {/* bottom logo bar — brandIds logos */}
          <div className="mt-5 rounded-[16px] bg-[#CFC6B8] px-4 py-3">
            {bottomLogos.length > 0 ? (
-             <div className="flex flex-row items-center justify-center gap-x-6 gap-y-2">
-                {bottomLogos.slice(0, 4).map((src, i) => (
-                  <div key={src + i} className="relative h-12 w-[150px] max-w-full shrink-0">
+             <div className="flex items-center justify-center gap-2">
+               <div
+                 className="grid w-full flex-1 items-center justify-items-center gap-x-4 gap-y-2"
+                 style={{
+                   gridTemplateColumns: `repeat(${Math.min(bottomLogos.slice(0, 4).length, 4)}, minmax(0, 1fr))`,
+                 }}
+               >
+                {bottomLogos.slice(0, 4).map((b, i) => (
+                  <div key={b.id + i} className="relative h-10 sm:h-12 w-full max-w-[160px]">
                     <Image
-                      src={src}
-                      alt={i === 0 ? card.title : `${card.title} logo ${i + 1}`}
+                      src={b.logo}
+                      alt={b.name || (i === 0 ? card.title : `${card.title} logo ${i + 1}`)}
                       fill
-                      sizes="120px"
-                      unoptimized={src.includes("r2.dev")}
+                      sizes="(max-width: 640px) 35vw, 140px"
+                      unoptimized={b.logo.includes("r2.dev")}
                       className="object-contain"
                       onError={(e) => {
                         const box = (e.currentTarget as HTMLImageElement).parentElement;
@@ -223,8 +239,9 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                     />
                   </div>
                 ))}
+               </div>
                {bottomLogos.length > 4 && (
-                 <span className="text-[11px] font-medium text-black/60">
+                 <span className="shrink-0 text-[11px] font-medium text-black/60">
                    +{bottomLogos.length - 4}
                  </span>
                )}
@@ -692,12 +709,16 @@ export default function OfficialPartnersSection() {
     ? publishedPartners.map((p) => {
         const brands = partnerBrands(p);
         const rightVisual = p.background || "";
-        const bottomLogos =
+        // Bottom bar: use brandIds logos (resolved masterBrand logos).
+        // Fall back to legacy images[]/image only when no brand logo exists.
+        const brandLogos = brands.map((b) => b.logo).filter(Boolean);
+        const fallbackLogos =
           Array.isArray(p.images) && p.images.filter(Boolean).length
             ? p.images.filter(Boolean)
             : p.image
               ? [p.image]
               : [];
+        const bottomLogos = brandLogos.length > 0 ? brandLogos : fallbackLogos;
         return {
           title: p.name,
           description: p.description,
