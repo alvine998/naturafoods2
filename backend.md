@@ -638,6 +638,7 @@ model CompanySetting {
   visi        String?  @db.Text
   misi        String?  @db.Text
   visiBackground String? @map("visi_background")
+  misiBackground String? @map("misi_background")
   visiPersonPhoto String? @map("visi_person_photo")
   visiPersonName String? @map("visi_person_name")
   visiPersonPosition String? @map("visi_person_position")
@@ -752,6 +753,7 @@ CREATE TABLE IF NOT EXISTS `company_settings` (
   `visi` mediumtext,
   `misi` mediumtext,
   `visi_background` varchar(500) DEFAULT NULL,
+  `misi_background` varchar(500) DEFAULT NULL,
   `visi_person_photo` varchar(500) DEFAULT NULL,
   `visi_person_name` varchar(200) DEFAULT NULL,
   `visi_person_position` varchar(200) DEFAULT NULL,
@@ -788,6 +790,7 @@ Default row (created on first public GET when table is empty):
   "visi": "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
   "misi": "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
   "visi_background": "",
+  "misi_background": "",
   "visi_person_photo": "",
   "visi_person_name": "",
   "visi_person_position": "",
@@ -819,6 +822,7 @@ type CompanySettings = {
   visi: string;
   misi: string;
   visi_background: string;      // optional image URL, empty uses the current cream background
+  misi_background: string;      // optional image URL, empty keeps the plain white Misi card
   visi_person_photo: string;    // optional image URL
   visi_person_name: string;     // optional, profile appears when photo and name are set
   visi_person_position: string;

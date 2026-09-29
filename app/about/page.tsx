@@ -220,6 +220,18 @@ export default function AboutPage() {
             {/* MISI — detail card */}
             <Reveal delay={0.1}>
               <div className="relative overflow-hidden rounded-[28px] border border-[#2D4A22]/10 bg-white p-7 sm:p-10 md:p-12">
+                {company.misi_background && (
+                  <>
+                    <Image
+                      src={company.misi_background}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1280px) 100vw, 1216px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-white/85" />
+                  </>
+                )}
                 {!hasMisiProfile && (
                   <span aria-hidden className="pointer-events-none absolute -top-14 right-0 select-none font-[var(--font-display)] text-[190px] font-light leading-none text-[#2D4A22]/[0.04] md:text-[230px]">02</span>
                 )}

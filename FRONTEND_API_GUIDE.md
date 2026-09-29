@@ -303,18 +303,18 @@ const { data: byId } = await apiFetch<CompanySettings>(`/company-settings/${id}`
 
 // admin (Authorization: Bearer <token> via apiFetch /admin/*)
 const { data: current } = await apiFetch<CompanySettings>("/admin/company-settings"); // 404 when no row
-await apiFetch("/admin/company-settings", { method: "POST", body: JSON.stringify({ id: "default", name, logo, description, visi, misi, visi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position }) }); // 409 if exists
+await apiFetch("/admin/company-settings", { method: "POST", body: JSON.stringify({ id: "default", name, logo, description, visi, misi, visi_background, misi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position }) }); // 409 if exists
 await apiFetch("/admin/company-settings", { method: "PUT", body: JSON.stringify({ ...settings }) }); // full replace
-await apiFetch("/admin/company-settings", { method: "PATCH", body: JSON.stringify({ misi: "…", visi_background: "https://cdn.example/vision-bg.webp" }) }); // partial
+await apiFetch("/admin/company-settings", { method: "PATCH", body: JSON.stringify({ misi: "…", visi_background: "https://cdn.example/vision-bg.webp", misi_background: "https://cdn.example/mission-bg.webp" }) }); // partial
 await apiFetch("/admin/company-settings", { method: "DELETE" }); // next public GET recreates default
 ```
 
 ```tsx
 // public components
 import { useCompanySettings } from "@/app/lib/companySettings";
-const company = useCompanySettings(); // { name, logo, visi, misi, visi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position, ... }
+const company = useCompanySettings(); // { name, logo, visi, misi, visi_background, misi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position, ... }
 ```
 
-The `visi_background` image is optional; an empty string keeps the current cream background. The optional profiles are displayed at the bottom of each card when both the photo and name are set (`visi_person_*` on the Vision card, `misi_person_*` on the Mission card); positions may be empty. The backend `company_settings` table/API must persist and return these fields (see `backend.md`, Company Settings SQL/model).
+The `visi_background` image is optional; an empty string keeps the current cream background. The `misi_background` image is optional; an empty string keeps the plain white Misi card. The optional profiles are displayed at the bottom of each card when both the photo and name are set (`visi_person_*` on the Vision card, `misi_person_*` on the Mission card); positions may be empty. The backend `company_settings` table/API must persist and return these fields (see `backend.md`, Company Settings SQL/model).
 
 Consumers: `SiteNav` (logo `company.logo`), `SiteFooter` (instagram + locale `settings.footerCopy`), `app/about/page.tsx` (Visi/Misi bodies and optional background/profile from company settings; titles stay per-locale `aboutDetail.values`).

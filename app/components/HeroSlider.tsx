@@ -138,7 +138,7 @@ export default function HeroSlider({
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                  className="font-bold text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
+                  className="font-poppins font-bold text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
                 >
                   {welcomeGreeting}
                   <br className="hidden sm:block" />{" "}

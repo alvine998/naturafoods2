@@ -17,6 +17,7 @@ export type CompanySettings = {
   visi: string;
   misi: string;
   visi_background: string;
+  misi_background: string;
   visi_person_photo: string;
   visi_person_name: string;
   visi_person_position: string;
@@ -51,6 +52,7 @@ export const DEFAULT_COMPANY_SETTINGS: CompanySettings = {
   visi: "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
   misi: "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
   visi_background: "",
+  misi_background: "",
   visi_person_photo: "",
   visi_person_name: "",
   visi_person_position: "",
@@ -86,6 +88,7 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     visi: str(r.visi ?? r.vision ?? DEFAULT_COMPANY_SETTINGS.visi),
     misi: str(r.misi ?? r.mission ?? DEFAULT_COMPANY_SETTINGS.misi),
     visi_background: str(r.visi_background ?? r.visiBackground ?? ""),
+    misi_background: str(r.misi_background ?? r.misiBackground ?? ""),
     visi_person_photo: str(r.visi_person_photo ?? r.visiPersonPhoto ?? ""),
     visi_person_name: str(r.visi_person_name ?? r.visiPersonName ?? ""),
     visi_person_position: str(r.visi_person_position ?? r.visiPersonPosition ?? ""),

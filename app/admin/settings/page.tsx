@@ -93,6 +93,7 @@ export default function CompanySettingsAdminPage() {
       ...form,
       name: form.name.trim() || DEFAULT_COMPANY_SETTINGS.name,
       visiBackground: form.visi_background,
+      misiBackground: form.misi_background,
       visiPersonPhoto: form.visi_person_photo,
       visiPersonName: form.visi_person_name,
       visiPersonPosition: form.visi_person_position,
@@ -224,9 +225,14 @@ export default function CompanySettingsAdminPage() {
               <TextArea value={form.misi} onChange={(e) => set("misi", e.target.value)} rows={3} placeholder={DEFAULT_COMPANY_SETTINGS.misi} />
             </Field>
           </div>
-          <div className="sm:col-span-2">
-            <Field label="Background photo (optional)">
+          <div>
+            <Field label="Visi — background photo (optional)">
               <FileUpload value={form.visi_background} onChange={(v) => set("visi_background", v)} folder="settings" />
+            </Field>
+          </div>
+          <div>
+            <Field label="Misi — background photo (optional)">
+              <FileUpload value={form.misi_background} onChange={(v) => set("misi_background", v)} folder="settings" />
             </Field>
           </div>
           <div className="sm:col-span-2 border-t border-[#2D4A22]/10 pt-3">
