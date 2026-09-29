@@ -16,6 +16,13 @@ export type CompanySettings = {
   description: string;
   visi: string;
   misi: string;
+  visi_background: string;
+  visi_person_photo: string;
+  visi_person_name: string;
+  visi_person_position: string;
+  misi_person_photo: string;
+  misi_person_name: string;
+  misi_person_position: string;
   tagline: string;
   email: string;
   phone: string;
@@ -43,6 +50,13 @@ export const DEFAULT_COMPANY_SETTINGS: CompanySettings = {
     "PT Natura Inti Sukses is an importer & distributor of food and beverage ingredients in Indonesia — especially baking ingredients.",
   visi: "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
   misi: "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  visi_background: "",
+  visi_person_photo: "",
+  visi_person_name: "",
+  visi_person_position: "",
+  misi_person_photo: "",
+  misi_person_name: "",
+  misi_person_position: "",
   tagline: "Food & Beverage Ingredients · Baking Ingredients",
   email: "info@naturafoods.co.id",
   phone: "0812 9507 1397",
@@ -71,6 +85,13 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     description: str(r.description ?? DEFAULT_COMPANY_SETTINGS.description),
     visi: str(r.visi ?? r.vision ?? DEFAULT_COMPANY_SETTINGS.visi),
     misi: str(r.misi ?? r.mission ?? DEFAULT_COMPANY_SETTINGS.misi),
+    visi_background: str(r.visi_background ?? r.visiBackground ?? ""),
+    visi_person_photo: str(r.visi_person_photo ?? r.visiPersonPhoto ?? ""),
+    visi_person_name: str(r.visi_person_name ?? r.visiPersonName ?? ""),
+    visi_person_position: str(r.visi_person_position ?? r.visiPersonPosition ?? ""),
+    misi_person_photo: str(r.misi_person_photo ?? r.misiPersonPhoto ?? ""),
+    misi_person_name: str(r.misi_person_name ?? r.misiPersonName ?? ""),
+    misi_person_position: str(r.misi_person_position ?? r.misiPersonPosition ?? ""),
     tagline: str(r.tagline ?? DEFAULT_COMPANY_SETTINGS.tagline),
     email: str(r.email ?? DEFAULT_COMPANY_SETTINGS.email),
     phone: str(r.phone ?? DEFAULT_COMPANY_SETTINGS.phone),
@@ -148,6 +169,21 @@ export async function fetchAdminCompanySettings(): Promise<CompanySettings | nul
   return null;
 }
 
+/**
+ * Fresh existence check for save-time branching (POST when missing, PUT when
+ * present). Returns false ONLY on 404 — any other failure (network, 401…)
+ * is rethrown so callers surface the real error instead of guessing wrong.
+ */
+export async function companySettingsExists(): Promise<boolean> {
+  try {
+    const json = await apiFetch<unknown>("/admin/company-settings");
+    return json.success && json.data != null;
+  } catch (e) {
+    if ((e as { status?: number })?.status === 404) return false;
+    throw e;
+  }
+}
+
 export async function createCompanySettings(payload: Partial<CompanySettings>): Promise<CompanySettings> {
   const json = await apiFetch<unknown>("/admin/company-settings", {
     method: "POST",
@@ -196,12 +232,18 @@ export async function deleteCompanySettings(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export function useCompanySettings(): CompanySettings {
-  const [settings, setSettings] = useState<CompanySettings>(() => {
-    if (typeof window === "undefined") return { ...DEFAULT_COMPANY_SETTINGS };
-    return loadCached();
-  });
+  // NOTE: always start from defaults so the first client render matches SSR.
+  // Reading localStorage in the initializer would render cached (admin-saved)
+  // values during hydration while the server rendered defaults → hydration
+  // mismatch (e.g. conditionally rendered profile photos). Cached/API values
+  // are applied in the effect below, after hydration. Same pattern as
+  // LanguageProvider in app/i18n.tsx.
+  const [settings, setSettings] = useState<CompanySettings>({ ...DEFAULT_COMPANY_SETTINGS });
   useEffect(() => {
     let cancelled = false;
+    // fetchCompanySettings() returns fresh API data on success and falls back
+    // to the localStorage cache on failure, so cached values still apply —
+    // just after hydration instead of during it.
     fetchCompanySettings().then((next) => {
       if (!cancelled) setSettings(next);
     });

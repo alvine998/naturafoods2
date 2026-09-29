@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useSyncExternalStore } from "react";
-import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_MASTER_BRANDS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_SOCIAL_MEDIA } from "./data";
-import type { Article, Edu, HomeBrand, Innovation, Job, MasterBrand, OfficialPartner, Product, ProductCategory, Inquiry, SalesContact, SocialMedia } from "./data";
+import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_MASTER_BRANDS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_PROMO_BANNERS, SEED_SOCIAL_MEDIA } from "./data";
+import type { Article, Edu, HomeBrand, Innovation, Job, MasterBrand, OfficialPartner, Product, ProductCategory, Inquiry, PromoBanner, SalesContact, SocialMedia } from "./data";
 import { apiFetch, buildQuery } from "./api";
 
-const KEYS = { products: "nf_products", articles: "nf_articles", edu: "nf_edu", innovation: "nf_innovation", jobs: "nf_jobs", inquiries: "nf_inquiries", officialPartners: "nf_official_partners", salesContacts: "nf_sales_contacts", homeBrands: "nf_home_brands", productCategories: "nf_product_categories", socialMedia: "nf_social_media", masterBrands: "nf_master_brands" } as const;
+const KEYS = { products: "nf_products", articles: "nf_articles", edu: "nf_edu", innovation: "nf_innovation", jobs: "nf_jobs", inquiries: "nf_inquiries", officialPartners: "nf_official_partners", salesContacts: "nf_sales_contacts", homeBrands: "nf_home_brands", productCategories: "nf_product_categories", socialMedia: "nf_social_media", masterBrands: "nf_master_brands", promoBanners: "nf_promo_banners" } as const;
 
 function load<T>(key: string, fallback: T): T {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) as T : fallback; } catch { return fallback; }
@@ -185,6 +185,38 @@ function normalizeHomeBrands(raw: unknown): HomeBrand[] {
   })).filter((h) => h.id && h.name);
 }
 
+export function normalizePromoBanners(raw: unknown): PromoBanner[] {
+  if (!Array.isArray(raw)) return SEED_PROMO_BANNERS;
+  return (raw as Record<string, unknown>[]).map((b) => {
+    const rawStatus = typeof b.status === "string" ? b.status.toLowerCase() : "";
+    // Accept boolean / snake_case variants from the API.
+    const activeFlag = b.isActive ?? b.is_active ?? b.isPublished ?? b.is_published;
+    const status = rawStatus === "active" || rawStatus === "inactive"
+      ? (rawStatus as PromoBanner["status"])
+      : activeFlag === true || activeFlag === "true" || activeFlag === 1
+        ? "active"
+        : activeFlag === false || activeFlag === "false" || activeFlag === 0
+          ? "inactive"
+          : rawStatus === "published" || rawStatus === "enabled" || rawStatus === "1" || rawStatus === "true"
+            ? "active"
+            : "inactive";
+    return {
+      id: String(b.id ?? ""),
+      name: String(b.name ?? b.title ?? ""),
+      description: String(b.description ?? b.desc ?? ""),
+      status,
+      image: String(b.image ?? b.img ?? ""),
+      sortIndex: toSortIndex(b.sortIndex ?? b.sort_index),
+      createdAt: b.createdAt as string | undefined,
+      updatedAt: b.updatedAt as string | undefined,
+    };
+  }).filter((b) => b.id && b.name);
+}
+
+export function isActivePromoBanner(b: PromoBanner): boolean {
+  return b.status === "active";
+}
+
 // Legacy dummy contacts removed from SEED_SALES_CONTACTS — drop any cached
 // copies still sitting in browsers' localStorage so they don't resurface.
 const REMOVED_DUMMY_SALES_IDS = new Set(["andi-wijaya", "sinta-putri"]);
@@ -337,6 +369,7 @@ type StoreState = {
   productCategories: ProductCategory[];
   socialMedia: SocialMedia[];
   masterBrands: MasterBrand[];
+  promoBanners: PromoBanner[];
   inquiries: Inquiry[];
 };
 
@@ -357,6 +390,7 @@ let storeState: StoreState = {
   productCategories: SEED_PRODUCT_CATEGORIES,
   socialMedia: SEED_SOCIAL_MEDIA,
   masterBrands: SEED_MASTER_BRANDS,
+  promoBanners: SEED_PROMO_BANNERS,
   inquiries: [],
 };
 
@@ -398,6 +432,7 @@ function patchStore(partial: StoreSetter) {
     save(KEYS.productCategories, s.productCategories);
     save(KEYS.socialMedia, s.socialMedia);
     save(KEYS.masterBrands, s.masterBrands);
+    save(KEYS.promoBanners, s.promoBanners);
     save(KEYS.inquiries, s.inquiries);
   }
   emitChange();
@@ -423,6 +458,7 @@ function initStore() {
       productCategories: load(KEYS.productCategories, SEED_PRODUCT_CATEGORIES) as ProductCategory[],
       socialMedia: migrateSocialMedia(load(KEYS.socialMedia, SEED_SOCIAL_MEDIA)) as SocialMedia[],
       masterBrands: load(KEYS.masterBrands, SEED_MASTER_BRANDS) as MasterBrand[],
+      promoBanners: normalizePromoBanners(load(KEYS.promoBanners, SEED_PROMO_BANNERS)),
       inquiries: load(KEYS.inquiries, [] as Inquiry[]) as Inquiry[],
     });
 
@@ -443,7 +479,7 @@ function initStore() {
       return null as unknown;
     };
 
-    const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia, apiMasterBrands] = await Promise.all([
+    const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia, apiMasterBrands, apiPromoBanners] = await Promise.all([
       fetchFromApi<unknown>("/products?limit=50", null as unknown),
       fetchFromApi<unknown>("/articles?limit=50", null as unknown),
       fetchFromApi<unknown>("/official-partners?limit=50", null as unknown),
@@ -455,6 +491,9 @@ function initStore() {
       fetchFromApi<unknown>("/categories?limit=50", null as unknown),
       fetchFromApi<unknown>("/social-media?limit=50", null as unknown),
       fetchFromApi<unknown>("/brands?limit=50", null as unknown),
+      // Admin list first (all statuses when authed); fetchFromApi retries the
+      // public /promo-banners (active only) on 401.
+      fetchFromApi<unknown>("/admin/promo-banners?limit=50", null as unknown),
     ]);
 
     const patch: Partial<StoreState> = { ready: true, apiReady: true };
@@ -500,6 +539,10 @@ function initStore() {
       })).filter((b: MasterBrand) => b.id && b.name);
       if (norm.length) patch.masterBrands = norm;
     }
+    if (apiPromoBanners && Array.isArray(apiPromoBanners) && apiPromoBanners.length) {
+      const norm = normalizePromoBanners(apiPromoBanners);
+      if (norm.length) patch.promoBanners = norm;
+    }
 
     // inquiries is admin-only — try but ignore if unauthorized
     try {
@@ -541,6 +584,7 @@ export function useStore() {
       innovation: SEED_INNOVATION, jobs: SEED_JOBS, officialPartners: SEED_OFFICIAL_PARTNERS,
       salesContacts: [], homeBrands: SEED_HOMEBRANDS, productCategories: SEED_PRODUCT_CATEGORIES,
       socialMedia: SEED_SOCIAL_MEDIA, masterBrands: SEED_MASTER_BRANDS,
+      promoBanners: SEED_PROMO_BANNERS,
     });
     Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
     try { localStorage.removeItem("nf_last_fetch_ts"); } catch {}
@@ -560,6 +604,7 @@ export function useStore() {
     setInquiries: (v: FieldUpdater<Inquiry[]>) => patchStore((s) => ({ inquiries: typeof v === "function" ? v(s.inquiries) : v })),
     setSocialMedia: (v: FieldUpdater<SocialMedia[]>) => patchStore((s) => ({ socialMedia: typeof v === "function" ? v(s.socialMedia) : v })),
     setMasterBrands: (v: FieldUpdater<MasterBrand[]>) => patchStore((s) => ({ masterBrands: typeof v === "function" ? v(s.masterBrands) : v })),
+    setPromoBanners: (v: FieldUpdater<PromoBanner[]>) => patchStore((s) => ({ promoBanners: typeof v === "function" ? v(s.promoBanners) : v })),
     reset,
   };
 }
@@ -786,4 +831,32 @@ export async function apiToggleMasterBrandActive(slug: string, isActive: boolean
 export async function apiDeleteMasterBrand(slug: string): Promise<void> {
   const json = await apiFetch(`/admin/brands/${encodeURIComponent(slug)}`, { method: "DELETE" });
   if (!json.success) throw new Error(json.error?.message || "Delete failed");
+}
+
+// ---------------------------------------------------------------------------
+// Promo banners — public list + local cache helpers
+// Only `active` banners render on Home (top of education section).
+// ---------------------------------------------------------------------------
+export function getSeedPromoBanners(): PromoBanner[] {
+  try {
+    const v = localStorage.getItem(KEYS.promoBanners);
+    if (v) return normalizePromoBanners(JSON.parse(v));
+  } catch {}
+  return SEED_PROMO_BANNERS;
+}
+
+export function getActivePromoBanners(list?: PromoBanner[]): PromoBanner[] {
+  const src = list ?? getSeedPromoBanners();
+  return sortByLandingOrder(src.filter(isActivePromoBanner));
+}
+
+export async function fetchPublicPromoBanners(limit = 50): Promise<PromoBanner[] | null> {
+  try {
+    const json = await apiFetch<unknown>(`/promo-banners${buildQuery({ page: 1, limit })}`);
+    if (!json.success || !Array.isArray(json.data)) return null;
+    const list = normalizePromoBanners(json.data).filter(isActivePromoBanner);
+    return list.length ? sortByLandingOrder(list) : null;
+  } catch {
+    return null;
+  }
 }

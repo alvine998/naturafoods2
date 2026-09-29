@@ -270,6 +270,7 @@ export default function DashboardPage() {
             { href: "/admin/social-media", label: (a.tabs as unknown as string[])[14] ?? "Social Media", c: counts[14] ?? 0 },
             { href: "/admin/about", label: (a.tabs as unknown as string[])[15] ?? "About", c: counts[15] ?? 0 },
             { href: "/admin/settings", label: (a.tabs as unknown as string[])[16] ?? "Settings", c: counts[16] ?? 0 },
+            { href: "/admin/promo-banners", label: (a.tabs as unknown as string[])[17] ?? "Promo Banners", c: counts[17] ?? s.promoBanners.length ?? 0 },
           ].map((x) => (
             <Link key={x.href} href={x.href} className="flex items-center justify-between rounded-xl border border-[#2D4A22]/6 bg-white px-3 py-2.5 text-[12px] transition-all hover:border-[#2D4A22]/15 hover:bg-[#2D4A22]/[0.02]">
               <span className="text-[#2D4A22] truncate">{x.label}</span>

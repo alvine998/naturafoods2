@@ -637,6 +637,13 @@ model CompanySetting {
   description String?  @db.Text
   visi        String?  @db.Text
   misi        String?  @db.Text
+  visiBackground String? @map("visi_background")
+  visiPersonPhoto String? @map("visi_person_photo")
+  visiPersonName String? @map("visi_person_name")
+  visiPersonPosition String? @map("visi_person_position")
+  misiPersonPhoto String? @map("misi_person_photo")
+  misiPersonName String? @map("misi_person_name")
+  misiPersonPosition String? @map("misi_person_position")
   tagline     String?
   email       String?
   phone       String?
@@ -744,6 +751,13 @@ CREATE TABLE IF NOT EXISTS `company_settings` (
   `description` mediumtext,
   `visi` mediumtext,
   `misi` mediumtext,
+  `visi_background` varchar(500) DEFAULT NULL,
+  `visi_person_photo` varchar(500) DEFAULT NULL,
+  `visi_person_name` varchar(200) DEFAULT NULL,
+  `visi_person_position` varchar(200) DEFAULT NULL,
+  `misi_person_photo` varchar(500) DEFAULT NULL,
+  `misi_person_name` varchar(200) DEFAULT NULL,
+  `misi_person_position` varchar(200) DEFAULT NULL,
   `tagline` varchar(300) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
@@ -773,6 +787,13 @@ Default row (created on first public GET when table is empty):
   "description": "PT Natura Inti Sukses is an importer & distributor of food and beverage ingredients in Indonesia — especially baking ingredients.",
   "visi": "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
   "misi": "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  "visi_background": "",
+  "visi_person_photo": "",
+  "visi_person_name": "",
+  "visi_person_position": "",
+  "misi_person_photo": "",
+  "misi_person_name": "",
+  "misi_person_position": "",
   "tagline": "Food & Beverage Ingredients · Baking Ingredients",
   "email": "info@naturafoods.co.id",
   "phone": "0812 9507 1397",
@@ -797,6 +818,13 @@ type CompanySettings = {
   description: string;
   visi: string;
   misi: string;
+  visi_background: string;      // optional image URL, empty uses the current cream background
+  visi_person_photo: string;    // optional image URL
+  visi_person_name: string;     // optional, profile appears when photo and name are set
+  visi_person_position: string;
+  misi_person_photo: string;    // optional image URL
+  misi_person_name: string;     // optional, profile appears when photo and name are set
+  misi_person_position: string;
   tagline: string;   // 0-300
   email: string;     // 0-150, email format when non-empty
   phone: string;     // 0-50
@@ -826,4 +854,64 @@ type CompanySettings = {
 | `DELETE` | `/admin/company-settings` | Auth | Delete the singleton row. Next public `GET` recreates the default. |
 
 All responses use the standard envelope (`backend.md:1.2`). Error codes: `UNAUTHORIZED` (401), `NOT_FOUND` (404), `CONFLICT` (409), `VALIDATION_ERROR` (422).
+
+---
+
+## 19. Promo Banners (Home education-section banner)
+
+Admin page `app/admin/promo-banners/page.tsx` manages promo banners. Public component `app/components/PromoBannerSlider.tsx` renders them at the **top of the education section on Home** (inside `EduInnoSliderBanner`, above the education slider). Only `status = "active"` banners render: **1 active → single static banner, >1 active → auto slider** (arrows + dots + counter, same UX as the education slider).
+
+Frontend state: `app/lib/store.ts` (`promoBanners: PromoBanner[]`, localStorage `nf_promo_banners` cache; bootstrap tries `GET /admin/promo-banners` when authed and falls back to public `GET /promo-banners`).
+
+### 19.1 Model
+
+```ts
+type PromoBannerStatus = "active" | "inactive";
+type PromoBanner = {
+  id: string;        // UUID assigned by the server (never sent on create)
+  name: string;      // required, ≤150 chars (banner title, used as alt + caption)
+  description: string; // optional caption
+  status: PromoBannerStatus; // "active" renders on Home, "inactive" hidden (default "active")
+  image: string;     // required URL from POST /admin/uploads (folder "promo-banners")
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+The frontend keeps an extra local-only `sortIndex` for stable ordering; it is never sent to the API. `normalizePromoBanners` also accepts legacy `isActive`/`is_active` booleans, `img` alias for `image`, and `desc` alias for `description`.
+
+### 19.2 Endpoints
+
+Base `/api/v1`. Public list/detail return **active banners only**.
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| `GET` | `/promo-banners?page=&limit=&q=&sort=` | Public | Active only. `page` def 1, `limit` def 10 max 50, `sort` e.g. `createdAt:desc`, `q` searches name+description. Returns `{data: PromoBanner[], meta: PaginationMeta}`. |
+| `GET` | `/promo-banners/:id` | Public | One active banner by UUID. `404 NOT_FOUND` if missing/inactive. |
+| `GET` | `/admin/promo-banners` | Auth | All statuses. Same query as public + `status=active\|inactive` filter (`422` if invalid). |
+| `POST` | `/admin/promo-banners` | Auth | Body `{name*, image*, description?, status?}` (no `id` — server assigns UUID). → `201`. `422` when `name`/`image` missing or `status` invalid. |
+| `GET` | `/admin/promo-banners/:id` | Auth | Any status by UUID. `404` if missing. |
+| `PUT` | `/admin/promo-banners/:id` | Auth | Partial update `{name?, description?, image?, status?}`. `422` on empty name/image or bad status. |
+| `DELETE` | `/admin/promo-banners/:id` | Auth | Hard delete. → `204` empty, `404` if missing. |
+
+Frontend sends only `{name, description, status, image}` on POST/PUT and `{status}` on quick toggle; the admin page refetches `GET /admin/promo-banners` on mount so inactive rows stay visible (public bootstrap would otherwise hide them).
+
+Upload folder: `promo-banners` (`POST /admin/uploads` with `folder=promo-banners`, image max 10MB).
+
+### 19.3 DB Suggestion (Prisma)
+
+```prisma
+model PromoBanner {
+  id          String   @id @default(uuid()) // UUID assigned by the server
+  name        String   @db.VarChar(150)
+  description String?  @db.Text
+  status      String   @default("active") // "active" | "inactive"
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([status])
+}
+```
+
+Add to OpenAPI paths: `/promo-banners: {get: {}}`, `/promo-banners/{id}: {get: {}}`, `/admin/promo-banners: {get: {}, post: {}}`, `/admin/promo-banners/{id}: {get: {}, put: {}, delete: {}}`.
 

@@ -11,6 +11,8 @@ export type SalesContact = { id: string; name: string; gender: string; position:
 export type HomeBrand = { id: string; name: string; image: string; desc: string; brandIds?: string[]; createdAt?: string; updatedAt?: string; sortIndex?: number };
 export type SocialMedia = { id: string; name: string; description: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string; sortIndex?: number };
 export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean; sortIndex?: number };
+export type PromoBannerStatus = "active" | "inactive";
+export type PromoBanner = { id: string; name: string; description: string; status: PromoBannerStatus; image: string; sortIndex?: number; createdAt?: string; updatedAt?: string };
 
 export const SEED_PRODUCTS: Product[] = [];
 
@@ -50,6 +52,8 @@ export const SEED_HOMEBRANDS: HomeBrand[] = [];
 export const SEED_SOCIAL_MEDIA: SocialMedia[] = [];
 
 export const SEED_MASTER_BRANDS: MasterBrand[] = [];
+
+export const SEED_PROMO_BANNERS: PromoBanner[] = [];
 
 export const SEED_PRODUCT_CATEGORIES: ProductCategory[] = [
   { id: "cat-choco", slug: "choco", name: "Choco", description: "Couverture & chocolate products", isActive: true, isHighlight: true },

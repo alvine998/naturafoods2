@@ -4,6 +4,7 @@ import Image from "./SafeImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { sortByLandingOrder, useStore } from "../lib/store";
+import PromoBannerSlider from "./PromoBannerSlider";
 
 type SlideItem = {
   id: string;
@@ -170,6 +171,10 @@ export default function EduInnoSliderBanner() {
 
   return (
     <>
+      {/* Promo banner sits at the top of the education section on Home.
+          Renders nothing when no active promo banner exists. */}
+      <PromoBannerSlider />
+
       {showEdu && (
         <div className="mb-10 sm:mb-14">
           <HeroSlider items={eduSlides} ready={ready} />

@@ -37,7 +37,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 
 export default function LatestStoriesSection() {
   const { t } = useLang();
-  const { articles, edu, innovation, ready } = useStore();
+  const { articles, edu, innovation, promoBanners, ready } = useStore();
 
   const list: Article[] = sortByDateDesc(
     (articles ?? []).filter((a): a is Article => a !== null && Boolean(a.slug) && Boolean(a.title))
@@ -47,7 +47,8 @@ export default function LatestStoriesSection() {
   // not be gated on articles. Only skip the whole section once loading is
   // done AND every source is confirmed empty.
   const hasEduInno = (edu ?? []).length > 0 || (innovation ?? []).length > 0;
-  if (ready && !hasEduInno && list.length === 0) return null;
+  const hasPromo = (promoBanners ?? []).some((b) => b.status === "active");
+  if (ready && !hasEduInno && !hasPromo && list.length === 0) return null;
 
   return (
     <section id="latest-stories" className="bg-white py-12 sm:py-16 md:py-20">

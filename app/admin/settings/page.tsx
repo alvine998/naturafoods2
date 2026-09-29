@@ -8,6 +8,7 @@ import AdminShell from "../AdminShell";
 import { Card, Field, FileUpload, Input, TextArea } from "../_components";
 import {
   DEFAULT_COMPANY_SETTINGS,
+  companySettingsExists,
   createCompanySettings,
   deleteCompanySettings,
   fetchAdminCompanySettings,
@@ -48,19 +49,32 @@ export default function CompanySettingsAdminPage() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      // Prefer the authed singleton; fall back to the public endpoint / local cache.
-      const admin = await fetchAdminCompanySettings().catch(() => null);
-      if (cancelled) return;
-      if (admin) {
-        setForm(admin);
-        setExists(true);
-      } else {
-        const pub = await fetchCompanySettings().catch(() => ({ ...DEFAULT_COMPANY_SETTINGS }));
+      try {
+        // Fresh existence check: POST when the row is missing, PUT when present.
+        const rowExists = await companySettingsExists();
         if (cancelled) return;
-        setForm(normalizeCompanySettings(pub));
-        setExists(false);
+        if (rowExists) {
+          // Prefer the authed singleton; fall back to the public endpoint / local cache.
+          const admin = await fetchAdminCompanySettings().catch(() => null);
+          if (cancelled) return;
+          const pub = admin ?? (await fetchCompanySettings().catch(() => ({ ...DEFAULT_COMPANY_SETTINGS })));
+          setForm(normalizeCompanySettings(pub));
+          setExists(true);
+        } else {
+          const pub = await fetchCompanySettings().catch(() => ({ ...DEFAULT_COMPANY_SETTINGS }));
+          if (cancelled) return;
+          setForm(normalizeCompanySettings(pub));
+          setExists(false);
+        }
+      } catch {
+        // API unreachable — work from local cache, existence unknown.
+        if (cancelled) return;
+        const cached = await fetchCompanySettings().catch(() => ({ ...DEFAULT_COMPANY_SETTINGS }));
+        if (cancelled) return;
+        setForm(normalizeCompanySettings(cached));
+        setExists(null);
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [gate]);
@@ -73,23 +87,46 @@ export default function CompanySettingsAdminPage() {
   const save = async () => {
     setErr(null);
     setSaving(true);
-    const payload: Partial<CompanySettings> = { ...form, name: form.name.trim() || DEFAULT_COMPANY_SETTINGS.name };
+    // ponytail: backend Prisma model uses camelCase fields (@map snake_case columns);
+    // snake_case write keys are silently ignored, so send both aliases.
+    const payload: Partial<CompanySettings> & Record<string, unknown> = {
+      ...form,
+      name: form.name.trim() || DEFAULT_COMPANY_SETTINGS.name,
+      visiBackground: form.visi_background,
+      visiPersonPhoto: form.visi_person_photo,
+      visiPersonName: form.visi_person_name,
+      visiPersonPosition: form.visi_person_position,
+      misiPersonPhoto: form.misi_person_photo,
+      misiPersonName: form.misi_person_name,
+      misiPersonPosition: form.misi_person_position,
+      mapsUrl: form.maps_url,
+    };
+    // Re-check existence at save time: the row may have appeared or
+    // disappeared since page load (public GET auto-creates the default row;
+    // another admin may have deleted it). POST when missing, PUT when present.
+    let rowExists = exists;
+    try {
+      rowExists = await companySettingsExists();
+    } catch {
+      // API unreachable here — keep last known state; the attempt below
+      // will surface the real error.
+    }
     try {
       let next: CompanySettings;
-      if (exists) {
+      if (!rowExists) {
         try {
-          next = await replaceCompanySettings(payload);
+          next = await createCompanySettings(payload); // POST — row doesn't exist
         } catch (e) {
-          // Row may have been deleted server-side — fall back to create.
-          if ((e as { status?: number })?.status === 404) next = await createCompanySettings(payload);
+          // Row appeared in the meantime (409) — switch to full replace.
+          if ((e as { status?: number })?.status === 409) next = await replaceCompanySettings(payload);
           else throw e;
         }
       } else {
         try {
-          next = await createCompanySettings(payload);
+          next = await replaceCompanySettings(payload); // PUT — row exists
         } catch (e) {
-          // Row already exists (409) — switch to full replace.
-          if ((e as { status?: number })?.status === 409) next = await replaceCompanySettings(payload);
+          // Row was deleted in the meantime (404) — fall back to create.
+          if ((e as { status?: number })?.status === 404) next = await createCompanySettings(payload);
           else throw e;
         }
       }
@@ -186,6 +223,38 @@ export default function CompanySettingsAdminPage() {
             <Field label="Misi">
               <TextArea value={form.misi} onChange={(e) => set("misi", e.target.value)} rows={3} placeholder={DEFAULT_COMPANY_SETTINGS.misi} />
             </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label="Background photo (optional)">
+              <FileUpload value={form.visi_background} onChange={(v) => set("visi_background", v)} folder="settings" />
+            </Field>
+          </div>
+          <div className="sm:col-span-2 border-t border-[#2D4A22]/10 pt-3">
+            <p className="mb-3 text-[11px] leading-5 text-[#8B6F47]">Optional profiles shown at the bottom of the Vision &amp; Mission cards. Leave the photo or name empty to hide a profile.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Visi — profile photo">
+                <FileUpload value={form.visi_person_photo} onChange={(v) => set("visi_person_photo", v)} folder="settings" />
+              </Field>
+              <div className="grid content-start gap-3">
+                <Field label="Visi — name">
+                  <Input value={form.visi_person_name} onChange={(e) => set("visi_person_name", e.target.value)} placeholder="John" />
+                </Field>
+                <Field label="Visi — position">
+                  <Input value={form.visi_person_position} onChange={(e) => set("visi_person_position", e.target.value)} placeholder="Director" />
+                </Field>
+              </div>
+              <Field label="Misi — profile photo">
+                <FileUpload value={form.misi_person_photo} onChange={(v) => set("misi_person_photo", v)} folder="settings" />
+              </Field>
+              <div className="grid content-start gap-3">
+                <Field label="Misi — name">
+                  <Input value={form.misi_person_name} onChange={(e) => set("misi_person_name", e.target.value)} placeholder="John" />
+                </Field>
+                <Field label="Misi — position">
+                  <Input value={form.misi_person_position} onChange={(e) => set("misi_person_position", e.target.value)} placeholder="Director" />
+                </Field>
+              </div>
+            </div>
           </div>
         </Section>
 
