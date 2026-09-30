@@ -12,7 +12,7 @@ export type HomeBrand = { id: string; name: string; image: string; desc: string;
 export type SocialMedia = { id: string; name: string; description: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string; sortIndex?: number };
 export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean; sortIndex?: number };
 export type PromoBannerStatus = "active" | "inactive";
-export type PromoBanner = { id: string; name: string; description: string; status: PromoBannerStatus; image: string; sortIndex?: number; createdAt?: string; updatedAt?: string };
+export type PromoBanner = { id: string; name: string; description: string; status: PromoBannerStatus; image: string; url?: string; sortIndex?: number; createdAt?: string; updatedAt?: string };
 
 export const SEED_PRODUCTS: Product[] = [];
 

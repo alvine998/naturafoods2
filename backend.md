@@ -877,12 +877,13 @@ type PromoBanner = {
   description: string; // optional caption
   status: PromoBannerStatus; // "active" renders on Home, "inactive" hidden (default "active")
   image: string;     // required URL from POST /admin/uploads (folder "promo-banners")
+  url: string;       // optional click target for the banner image (http/https only, "" = not a link)
   createdAt: string;
   updatedAt: string;
 }
 ```
 
-The frontend keeps an extra local-only `sortIndex` for stable ordering; it is never sent to the API. `normalizePromoBanners` also accepts legacy `isActive`/`is_active` booleans, `img` alias for `image`, and `desc` alias for `description`.
+The frontend keeps an extra local-only `sortIndex` for stable ordering; it is never sent to the API. `normalizePromoBanners` also accepts legacy `isActive`/`is_active` booleans, `img` alias for `image`, `desc` alias for `description`, and `link`/`targetUrl` aliases for `url`. `url` is filtered through `safeHttpUrl` (`app/lib/safe-url.ts`) — anything that is not `http:`/`https:` (e.g. `javascript:`, `data:`) is stored as `""` and the image renders non-clickable.
 
 ### 19.2 Endpoints
 
@@ -893,12 +894,12 @@ Base `/api/v1`. Public list/detail return **active banners only**.
 | `GET` | `/promo-banners?page=&limit=&q=&sort=` | Public | Active only. `page` def 1, `limit` def 10 max 50, `sort` e.g. `createdAt:desc`, `q` searches name+description. Returns `{data: PromoBanner[], meta: PaginationMeta}`. |
 | `GET` | `/promo-banners/:id` | Public | One active banner by UUID. `404 NOT_FOUND` if missing/inactive. |
 | `GET` | `/admin/promo-banners` | Auth | All statuses. Same query as public + `status=active\|inactive` filter (`422` if invalid). |
-| `POST` | `/admin/promo-banners` | Auth | Body `{name*, image*, description?, status?}` (no `id` — server assigns UUID). → `201`. `422` when `name`/`image` missing or `status` invalid. |
+| `POST` | `/admin/promo-banners` | Auth | Body `{name*, image*, description?, status?, url?}` (no `id` — server assigns UUID). → `201`. `422` when `name`/`image` missing or `status` invalid. |
 | `GET` | `/admin/promo-banners/:id` | Auth | Any status by UUID. `404` if missing. |
-| `PUT` | `/admin/promo-banners/:id` | Auth | Partial update `{name?, description?, image?, status?}`. `422` on empty name/image or bad status. |
+| `PUT` | `/admin/promo-banners/:id` | Auth | Partial update `{name?, description?, image?, status?, url?}`. `422` on empty name/image or bad status. |
 | `DELETE` | `/admin/promo-banners/:id` | Auth | Hard delete. → `204` empty, `404` if missing. |
 
-Frontend sends only `{name, description, status, image}` on POST/PUT and `{status}` on quick toggle; the admin page refetches `GET /admin/promo-banners` on mount so inactive rows stay visible (public bootstrap would otherwise hide them).
+Frontend sends only `{name, description, status, image, url}` on POST/PUT and `{status}` on quick toggle; the admin page refetches `GET /admin/promo-banners` on mount so inactive rows stay visible (public bootstrap would otherwise hide them).
 
 Upload folder: `promo-banners` (`POST /admin/uploads` with `folder=promo-banners`, image max 10MB).
 
@@ -911,6 +912,7 @@ model PromoBanner {
   description String?  @db.Text
   status      String   @default("active") // "active" | "inactive"
   image       String
+  url         String?  // click target for the image; null/"" = not a link
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([status])

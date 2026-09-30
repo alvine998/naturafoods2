@@ -4,6 +4,7 @@ import Image from "./SafeImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { isActivePromoBanner, sortByLandingOrder, useStore } from "../lib/store";
+import { safeHttpUrl } from "../lib/safe-url";
 import type { PromoBanner } from "../lib/data";
 
 function PromoCaption({ banner }: { banner: PromoBanner }) {
@@ -26,6 +27,7 @@ function PromoCaption({ banner }: { banner: PromoBanner }) {
 
 function PromoMedia({ banner }: { banner: PromoBanner }) {
   const src = banner.image?.trim() ? banner.image.trim() : null;
+  const href = safeHttpUrl(banner.url);
   if (!src) {
     return (
       <div className="grid min-h-[220px] sm:min-h-[320px] md:min-h-[380px] w-full place-items-center bg-[#F5EFE0] px-6 text-center">
@@ -36,10 +38,25 @@ function PromoMedia({ banner }: { banner: PromoBanner }) {
       </div>
     );
   }
+  const img = (
+    <Image src={src} alt={banner.name || "Promo banner"} width={1600} height={900} sizes="100vw" className="block h-auto w-full bg-white" />
+  );
   return (
     <div className="relative w-full">
-      <Image src={src} alt={banner.name || "Promo banner"} width={1600} height={900} sizes="100vw" className="block h-auto w-full bg-white" />
-      <PromoCaption banner={banner} />
+      {href ? (
+        <a
+          href={href}
+          target={href.startsWith("http://") ? undefined : "_blank"}
+          rel="noopener noreferrer"
+          aria-label={banner.name || "Promo banner"}
+          className="block transition-opacity hover:opacity-95"
+        >
+          {img}
+        </a>
+      ) : (
+        img
+      )}
+      {/* <PromoCaption banner={banner} /> */}
     </div>
   );
 }

@@ -12,6 +12,8 @@ const FALLBACK_VIDEO_SRC =
 const FALLBACK_VIDEO_POSTER =
   "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80";
 const CTA_ID = "contact";
+const H1_CLASS =
+  "font-nexa font-extralight text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg sm:whitespace-nowrap";
 
 export default function HeroSlider({
   onCta,
@@ -130,22 +132,41 @@ export default function HeroSlider({
           >
             <div className="w-full px-3 sm:px-5 md:px-6 lg:px-8">
               <div className="max-w-[640px] sm:max-w-[720px] md:max-w-[860px]">
-                <div className="overflow-hidden pb-3 -mb-3">
-                  <motion.h1
-                    key={welcomeTitle}
-                    initial={{ y: "110%", opacity: 0 }}
-                    animate={play ? { y: "0%", opacity: 1 } : { y: "110%", opacity: 0 }}
-                    transition={{ duration: 1.2, ease: "easeInOut" }}
-                  className="font-nexa font-extralight text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
-                >
-                  {welcomeGreeting}
-                  <br className="hidden sm:block" />{" "}
+                <div className="pb-3 -mb-3">
+                  <div className="overflow-hidden mb-2">
+                    <motion.h1
+                      key={`${welcomeTitle}-greeting`}
+                      initial={{ y: "110%", opacity: 0 }}
+                      animate={
+                        play ? { y: "0%", opacity: 1 } : { y: "110%", opacity: 0 }
+                      }
+                      transition={{ duration: 1.2, ease: "easeInOut" }}
+                      className={H1_CLASS + " mb-4"}
+                    >
+                      {welcomeGreeting}
+                    </motion.h1>
+                  </div>
                   {welcomeCompany ? (
-                    <strong className="sm:whitespace-nowrap font-extrabold">
-                      {welcomeCompany}
-                    </strong>
+                    <div className="overflow-hidden mt-2">
+                      <motion.h1
+                        key={`${welcomeTitle}-company`}
+                        initial={{ y: "110%", opacity: 0 }}
+                        animate={
+                          play
+                            ? { y: "0%", opacity: 1 }
+                            : { y: "110%", opacity: 0 }
+                        }
+                        transition={{
+                          duration: 1.2,
+                          delay: 0.12,
+                          ease: "easeInOut",
+                        }}
+                        className={H1_CLASS + " font-semibold"}
+                      >
+                        {welcomeCompany}
+                      </motion.h1>
+                    </div>
                   ) : null}
-                </motion.h1>
                 </div>
                 {/* <motion.p
                   initial={{ opacity: 0, y: 12 }}

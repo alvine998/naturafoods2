@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "../../components/SafeImage";
 import { useLang } from "../../i18n";
 import { normalizePromoBanners, useStore } from "../../lib/store";
+import { safeHttpUrl } from "../../lib/safe-url";
 import { isAuthed } from "../../lib/auth";
 import type { PromoBanner, PromoBannerStatus } from "../../lib/data";
 import AdminShell from "../AdminShell";
@@ -28,6 +29,7 @@ function toPayload(v: Partial<PromoBanner>) {
     description: String(v.description ?? ""),
     status: (v.status === "inactive" ? "inactive" : "active") as PromoBannerStatus,
     image: String(v.image ?? ""),
+    url: safeHttpUrl(v.url),
   };
 }
 
@@ -110,6 +112,7 @@ export default function PromoBannersPage() {
   const save = async () => {
     const payload = toPayload(f);
     if (!payload.name || !payload.image) { setErr("Name and image are required."); return; }
+    if (f.url?.trim() && !payload.url) { setErr("URL must start with http:// or https://."); return; }
     setSaving(true); setErr(null);
     try {
       if (isEdit) {
@@ -164,6 +167,7 @@ export default function PromoBannersPage() {
             <div className="sm:col-span-2"><Field label="name"><Input value={f.name ?? ""} maxLength={150} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Ramadhan Promo" /></Field></div>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={2} placeholder="Short promo description shown on the banner caption" /></Field></div>
             <div className="sm:col-span-2"><Field label="banner image (upload — max 10MB)"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="promo-banners" maxImageMB={10} /></Field></div>
+            <div className="sm:col-span-2"><Field label="link url (optional — banner image becomes a link)"><Input type="url" inputMode="url" value={f.url ?? ""} onChange={(e) => setF({ ...f, url: e.target.value })} placeholder="https://…" /></Field>{f.url?.trim() && !safeHttpUrl(f.url) && <p className="mt-1 text-[11px] text-red-600">Must start with http:// or https://</p>}</div>
             <Field label="status">
               <div className="flex gap-2">
                 {(["active", "inactive"] as PromoBannerStatus[]).map((st) => (

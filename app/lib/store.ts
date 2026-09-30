@@ -3,6 +3,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { SEED_ARTICLES, SEED_EDU, SEED_HOMEBRANDS, SEED_INNOVATION, SEED_JOBS, SEED_MASTER_BRANDS, SEED_OFFICIAL_PARTNERS, SEED_PRODUCT_CATEGORIES, SEED_PRODUCTS, SEED_PROMO_BANNERS, SEED_SOCIAL_MEDIA } from "./data";
 import type { Article, Edu, HomeBrand, Innovation, Job, MasterBrand, OfficialPartner, Product, ProductCategory, Inquiry, PromoBanner, SalesContact, SocialMedia } from "./data";
 import { apiFetch, buildQuery } from "./api";
+import { safeHttpUrl } from "./safe-url";
 
 const KEYS = { products: "nf_products", articles: "nf_articles", edu: "nf_edu", innovation: "nf_innovation", jobs: "nf_jobs", inquiries: "nf_inquiries", officialPartners: "nf_official_partners", salesContacts: "nf_sales_contacts", homeBrands: "nf_home_brands", productCategories: "nf_product_categories", socialMedia: "nf_social_media", masterBrands: "nf_master_brands", promoBanners: "nf_promo_banners" } as const;
 
@@ -206,6 +207,7 @@ export function normalizePromoBanners(raw: unknown): PromoBanner[] {
       description: String(b.description ?? b.desc ?? ""),
       status,
       image: String(b.image ?? b.img ?? ""),
+      url: safeHttpUrl(b.url ?? b.link ?? b.targetUrl),
       sortIndex: toSortIndex(b.sortIndex ?? b.sort_index),
       createdAt: b.createdAt as string | undefined,
       updatedAt: b.updatedAt as string | undefined,

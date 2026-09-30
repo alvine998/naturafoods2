@@ -268,6 +268,62 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
 }
 
 // ---------------------------------------------------------------------------
+// Upload compression — multi-MB source images break remote rendering later
+// (the optimizer downloads the full original and aborts after 7s), so shrink
+// raster images in the browser before they ever reach the CDN.
+// ---------------------------------------------------------------------------
+const MAX_UPLOAD_IMAGE_EDGE = 1600;
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob | null> {
+  return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+}
+
+/**
+ * Resize raster images to max 1600px on the longest edge and re-encode as WebP
+ * (JPEG fallback when the browser cannot encode WebP), keeping the original
+ * whenever the result would not be smaller. SVG/GIF (animation)/video/PDF pass
+ * through untouched.
+ */
+async function compressImageForUpload(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml" || file.type === "image/gif") return file;
+  const url = URL.createObjectURL(file);
+  try {
+    const img = document.createElement("img");
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.src = url;
+    });
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    if (!w || !h) return file;
+    const scale = Math.min(1, MAX_UPLOAD_IMAGE_EDGE / Math.max(w, h));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(w * scale));
+    canvas.height = Math.max(1, Math.round(h * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    let blob = await canvasToBlob(canvas, "image/webp", 0.82);
+    if (!blob || blob.type !== "image/webp") {
+      // no WebP encoder (older Safari) → flatten alpha and fall back to JPEG
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      blob = await canvasToBlob(canvas, "image/jpeg", 0.85);
+    }
+    if (!blob || blob.size >= file.size) return file;
+    const ext = blob.type === "image/webp" ? "webp" : "jpg";
+    const base = file.name.replace(/\.[^.]+$/, "") || "upload";
+    return new File([blob], `${base}.${ext}`, { type: blob.type, lastModified: file.lastModified });
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // FileUpload — now API-aware per FRONTEND_API_GUIDE.md:10
 // Uses POST /admin/uploads (R2 / local fallback) and falls back to dataURL for offline dev
 // ---------------------------------------------------------------------------
@@ -281,16 +337,19 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     setErr(null);
-    // Size limits (MB) — configurable per caller, defaults per guide
-    const isVid = file.type.startsWith("video/");
-    const max = isVid ? maxVideoMB * 1024 * 1024 : maxImageMB * 1024 * 1024;
-    if (file.size > max) {
-      setErr(isVid ? `Video too large (max ${maxVideoMB}MB)` : `Image too large (max ${maxImageMB}MB)`);
-      return;
-    }
     setUploading(true);
+    let prepared = file;
     try {
-      const url = await apiUploadFile(file, folder);
+      const isVid = file.type.startsWith("video/");
+      // Shrink raster images before the size gate so huge sources still upload
+      prepared = isVid ? file : await compressImageForUpload(file);
+      // Size limits (MB) — configurable per caller, defaults per guide
+      const max = isVid ? maxVideoMB * 1024 * 1024 : maxImageMB * 1024 * 1024;
+      if (prepared.size > max) {
+        setErr(isVid ? `Video too large (max ${maxVideoMB}MB)` : `Image too large (max ${maxImageMB}MB)`);
+        return;
+      }
+      const url = await apiUploadFile(prepared, folder);
       onChange(url);
     } catch (e) {
       // Fallback to base64 dataURL when the API can't be used:
@@ -304,10 +363,10 @@ export function FileUpload({ value, onChange, accept = "image/*", folder = "prod
       if (offline) {
         const reader = new FileReader();
         reader.onload = () => onChange(String(reader.result ?? ""));
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(prepared);
         setErr(null);
         setNotice(
-          file.size > 2 * 1024 * 1024
+          prepared.size > 2 * 1024 * 1024
             ? "API offline — kept as local preview. File is large and may not persist after reload."
             : "API offline — kept as local preview only, not synced to server."
         );
@@ -369,10 +428,11 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
       const uploaded: string[] = [];
       for (const file of picked) {
         const isVid = file.type.startsWith("video/");
+        const prepared = isVid ? file : await compressImageForUpload(file);
         const limit = isVid ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
-        if (file.size > limit) { setErr(`"${file.name}" too large (max ${isVid ? "20MB" : "5MB"})`); continue; }
+        if (prepared.size > limit) { setErr(`"${file.name}" too large (max ${isVid ? "20MB" : "5MB"})`); continue; }
         try {
-          const url = await apiUploadFile(file, folder);
+          const url = await apiUploadFile(prepared, folder);
           uploaded.push(url);
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Upload failed";
@@ -384,7 +444,7 @@ export function MultiFileUpload({ value = [], onChange, accept = "image/*", fold
               const reader = new FileReader();
               reader.onload = () => resolve(String(reader.result ?? ""));
               reader.onerror = () => reject(new Error("read failed"));
-              reader.readAsDataURL(file);
+              reader.readAsDataURL(prepared);
             });
             if (dataUrl) uploaded.push(dataUrl);
           } else {
