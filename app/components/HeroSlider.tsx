@@ -16,9 +16,11 @@ const CTA_ID = "contact";
 export default function HeroSlider({
   onCta,
   welcome,
+  play = true,
 }: {
   onCta?: (id: string) => void;
   welcome?: { title: string; sub: string };
+  play?: boolean;
 }) {
   const { t } = useLang();
   const videoSrc = t.heroVideoSrc || FALLBACK_VIDEO_SRC;
@@ -28,13 +30,14 @@ export default function HeroSlider({
   // welcome prop / site content). Split "greeting" from company name at "PT"
   // so layout stays: greeting on line 1, "PT Natura Inti Sukses" on line 2.
   const welcomeTitle =
-    welcome?.title || t.welcomeTitle || "Welcome to PT Natura Inti Sukses";
-  const ptIndex = welcomeTitle.indexOf("PT");
+    welcome?.title || t.welcomeTitle || "Welcome To PT Natura Inti Sukses";
+  const ptIndex = welcomeTitle.search(/\bpt\b/i);
   const welcomeGreeting =
     (ptIndex > 0
       ? welcomeTitle.slice(0, ptIndex).trim()
       : welcomeTitle.trim()) || welcomeTitle;
   const welcomeCompany = ptIndex > 0 ? welcomeTitle.slice(ptIndex).trim() : "";
+  const welcomeSub = welcome?.sub || t.welcomeSub;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [authed, setAuthed] = useState<boolean>(false);
@@ -131,35 +134,43 @@ export default function HeroSlider({
                   <motion.h1
                     key={welcomeTitle}
                     initial={{ y: "110%", opacity: 0 }}
-                    animate={{ y: ["110%", "0%", "0%", "110%"], opacity: [0, 1, 1, 0] }}
-                    transition={{
-                      duration: 4.5,
-                      times: [0, 0.28, 0.68, 1],
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  className="font-nexa font-bold text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
+                    animate={play ? { y: "0%", opacity: 1 } : { y: "110%", opacity: 0 }}
+                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                  className="font-nexa font-extralight text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg"
                 >
                   {welcomeGreeting}
                   <br className="hidden sm:block" />{" "}
                   {welcomeCompany ? (
-                    <span className="sm:whitespace-nowrap">
+                    <strong className="sm:whitespace-nowrap font-extrabold">
                       {welcomeCompany}
-                    </span>
+                    </strong>
                   ) : null}
                 </motion.h1>
                 </div>
+                {/* <motion.p
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-3 max-w-[54ch] font-montserrat text-[13px] font-light leading-6 text-white/80 drop-shadow sm:mt-4 sm:text-[15px] sm:leading-7"
+                >
+                  {welcomeSub}
+                </motion.p> */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  animate={play ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
                   transition={{
                     duration: 0.8,
                     delay: 0.6,
                     ease: [0.16, 1, 0.3, 1],
                   }}
-                  className="mt-4 sm:mt-5 -ml-2 sm:-ml-3 md:-ml-4"
+                  className="mt-4 sm:mt-5"
                 >
-                  <div className="relative h-[84px] sm:h-[112px] md:h-[140px] lg:h-[168px] w-full max-w-[560px]">
+                  <hr className="-ml-2 sm:-ml-3 md:ml-0 bg-green-700 text-green-700 w-24 h-1" />
+                  <h2 className="mt-3 whitespace-pre-line font-montserrat text-[14px] font-light leading-relaxed tracking-[0.16em] text-white drop-shadow sm:mt-4 sm:text-[24px]">
+                    {t.heroTagline}
+                  </h2>
+                </motion.div>
+                  {/* <div className="relative h-[84px] sm:h-[112px] md:h-[140px] lg:h-[168px] w-full max-w-[560px]">
                     <Image
                       src="https://cdn-naturafoods.alvineitsolutions.com/Logo%20Natura%20Outline.png"
                       alt="PT. Natura Inti Sukses Logo"
@@ -168,8 +179,7 @@ export default function HeroSlider({
                       priority
                       className="object-contain object-left drop-shadow-lg"
                     />
-                  </div>
-                </motion.div>
+                  </div> */}
               </div>
             </div>
           </motion.div>

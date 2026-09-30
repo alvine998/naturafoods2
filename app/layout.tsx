@@ -47,13 +47,18 @@ const nexa = localFont({
   variable: "--font-nexa",
   display: "swap",
 });
+const montserrat = localFont({
+  src: [{ path: "../public/fonts/Montserrat/Montserrat-VariableFont_wght.ttf", weight: "100 900", style: "normal" }],
+  variable: "--font-montserrat",
+  display: "swap",
+});
 
 export const metadata: Metadata = baseMetadata();
 export const viewport: Viewport = { themeColor: "#2D4A22", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} ${louisGeorgeCafe.variable} ${newake.variable} ${nexa.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} ${louisGeorgeCafe.variable} ${newake.variable} ${nexa.variable} ${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full bg-white text-[#1a1a16]">
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-8VQMTMC3D1" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">

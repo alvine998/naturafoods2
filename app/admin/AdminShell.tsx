@@ -219,16 +219,6 @@ export default function AdminShell({ counts, labels, children }: Props) {
               </p>
             </div>
           </div>
-          <div className="rounded-2xl border border-dashed border-[#2D4A22]/15 px-4 py-3 text-[11px] leading-5 text-[#8B6F47]">
-            Env:{" "}
-            <code className="rounded bg-white px-1 py-0.5">
-              NEXT_PUBLIC_API_URL
-            </code>{" "}
-            — defaults to{" "}
-            <code className="rounded bg-white px-1 py-0.5">
-              http://localhost:4000/api/v1
-            </code>
-          </div>
         </aside>
 
         {mobileOpen && (
