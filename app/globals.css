@@ -19,6 +19,10 @@
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
   --font-poppins: var(--font-poppins);
+  --font-louis-george-cafe: var(--font-louis-george-cafe);
+  --font-newake: var(--font-newake);
+  --font-nexa: var(--font-nexa);
+  --font-avenir: Avenir, "Avenir Next", "Avenir LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * { scrollbar-width: thin; scrollbar-color: var(--stone) transparent; }

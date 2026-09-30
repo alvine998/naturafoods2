@@ -22,13 +22,38 @@ const poppins = localFont({
   variable: "--font-poppins",
   display: "swap",
 });
+const louisGeorgeCafe = localFont({
+  src: [
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light.ttf", weight: "300", style: "normal" },
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light Italic.ttf", weight: "300", style: "italic" },
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe.ttf", weight: "400", style: "normal" },
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Italic.ttf", weight: "400", style: "italic" },
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold.ttf", weight: "700", style: "normal" },
+    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold Italic.ttf", weight: "700", style: "italic" },
+  ],
+  variable: "--font-louis-george-cafe",
+  display: "swap",
+});
+const newake = localFont({
+  src: [{ path: "../public/fonts/Newake/NewakeFont-Demo.otf", weight: "400", style: "normal" }],
+  variable: "--font-newake",
+  display: "swap",
+});
+const nexa = localFont({
+  src: [
+    { path: "../public/fonts/Nexa/Nexa-ExtraLight.ttf", weight: "200", style: "normal" },
+    { path: "../public/fonts/Nexa/Nexa-Heavy.ttf", weight: "800", style: "normal" },
+  ],
+  variable: "--font-nexa",
+  display: "swap",
+});
 
 export const metadata: Metadata = baseMetadata();
 export const viewport: Viewport = { themeColor: "#2D4A22", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} ${louisGeorgeCafe.variable} ${newake.variable} ${nexa.variable} h-full antialiased`}>
       <body className="min-h-full bg-white text-[#1a1a16]">
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-8VQMTMC3D1" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
