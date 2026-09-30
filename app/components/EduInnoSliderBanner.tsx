@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { sortByLandingOrder, useStore } from "../lib/store";
 import PromoBannerSlider from "./PromoBannerSlider";
+import BannerSkeleton from "./BannerSkeleton";
 
 type SlideItem = {
   id: string;
@@ -12,23 +13,6 @@ type SlideItem = {
   img: string;
   link?: string;
 };
-
-function SkeletonBanner() {
-  return (
-    <div className="relative w-screen left-1/2 -ml-[50vw] overflow-hidden">
-      <div className="w-full aspect-video bg-[#F5EFE0] animate-pulse">
-        <div className="mx-auto max-w-[1280px] px-5 sm:px-6 md:px-8 h-full flex items-end sm:items-center pb-6 sm:pb-0">
-          <div className="max-w-[600px] space-y-2 sm:space-y-4">
-            <div className="h-5 sm:h-7 w-32 rounded-full bg-[#2D4A22]/10" />
-            <div className="h-7 sm:h-12 w-44 sm:w-64 rounded-lg bg-[#2D4A22]/10" />
-            <div className="h-4 w-80 rounded bg-[#2D4A22]/8 max-sm:hidden" />
-            <div className="h-11 w-40 rounded-full bg-[#2D4A22]/10 max-sm:hidden" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
   const [current, setCurrent] = useState(0);
@@ -47,7 +31,7 @@ function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
     return () => clearInterval(t);
   }, [paused, go, len]);
 
-  if (!ready) return <SkeletonBanner />;
+  if (!ready) return <BannerSkeleton />;
   if (!len) return null;
 
   const slide = items[current];

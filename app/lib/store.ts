@@ -26,9 +26,13 @@ function save(key: string, v: unknown) {
 // ---------------------------------------------------------------------------
 // API helpers — best-effort fetch with fallback to localStorage / seed
 // ---------------------------------------------------------------------------
+// Bootstrap requests must not hang forever — without a deadline a stalled API
+// leaves the store "not ready" and every loading skeleton up indefinitely.
+const BOOTSTRAP_TIMEOUT_MS = 10_000;
+
 async function fetchFromApi<T>(path: string, fallback: T): Promise<T> {
   try {
-    const json = await apiFetch<T>(path);
+    const json = await apiFetch<T>(path, { signal: AbortSignal.timeout(BOOTSTRAP_TIMEOUT_MS) });
     if (json.success && json.data != null) return json.data as T;
     return fallback;
   } catch {
@@ -481,6 +485,22 @@ function initStore() {
       return null as unknown;
     };
 
+    // Promo banners: admin list when authed (all statuses). The admin route
+    // 401s for guests, so fall back to the public active-only list — otherwise
+    // a fresh browser (no token, no cache) shows no banner at all.
+    const fetchPromoBanners = async (): Promise<unknown> => {
+      const admin = await fetchFromApi<unknown>("/admin/promo-banners?limit=50", null as unknown);
+      if (admin && Array.isArray(admin) && admin.length) return admin;
+      return fetchPublicPromoBanners(50);
+    };
+
+    // Release the loading skeletons if the API is slow or unreachable —
+    // registered before the requests so it can actually fire (it used to sit
+    // after them, where it was already too late to matter).
+    const readyFallback = setTimeout(() => {
+      if (!storeState.ready) patchStore({ ready: true });
+    }, 2500);
+
     const [apiProducts, apiArticles, apiPartners, apiEdu, apiInnov, apiJobs, apiSales, apiHomeBrands, apiProductCategories, apiSocialMedia, apiMasterBrands, apiPromoBanners] = await Promise.all([
       fetchFromApi<unknown>("/products?limit=50", null as unknown),
       fetchFromApi<unknown>("/articles?limit=50", null as unknown),
@@ -493,9 +513,7 @@ function initStore() {
       fetchFromApi<unknown>("/categories?limit=50", null as unknown),
       fetchFromApi<unknown>("/social-media?limit=50", null as unknown),
       fetchFromApi<unknown>("/brands?limit=50", null as unknown),
-      // Admin list first (all statuses when authed); fetchFromApi retries the
-      // public /promo-banners (active only) on 401.
-      fetchFromApi<unknown>("/admin/promo-banners?limit=50", null as unknown),
+      fetchPromoBanners(),
     ]);
 
     const patch: Partial<StoreState> = { ready: true, apiReady: true };
@@ -565,11 +583,7 @@ function initStore() {
 
     patchStore(patch);
     try { localStorage.setItem("nf_last_fetch_ts", String(Date.now())); } catch {}
-
-    // Fallback: if API never responds, still mark ready after timeout
-    setTimeout(() => {
-      if (!storeState.ready) patchStore({ ready: true });
-    }, 2500);
+    clearTimeout(readyFallback);
   })();
   return initPromise;
 }
