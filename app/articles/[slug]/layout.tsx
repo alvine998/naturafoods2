@@ -3,6 +3,14 @@ import { API_BASE } from "../../lib/api";
 import { SEED_ARTICLES } from "../../lib/data";
 import { DEFAULT_OG_IMAGE, pageMetadata, SITE_URL } from "../../lib/seo";
 
+// generateMetadata below uses `cache: "no-store"` (fresh API data per
+// request), which forces this segment to be dynamic. Without this explicit
+// opt-in, Next prerenders /articles/[slug] as static at build time and then
+// throws "Page changed from static to dynamic at runtime" (500) on every
+// uncached slug in production.
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export function generateStaticParams() {
   return SEED_ARTICLES.map((a) => ({ slug: a.slug }));
 }
@@ -12,7 +20,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   try {
     const response = await fetch(`${API_BASE}/articles/${encodeURIComponent(slug)}`, {
-      signal: AbortSignal.timeout(5000),
+      // Detail payloads are huge (content is duplicated across locale
+      // fields, ~10-95MB). 5s is not enough to stream + parse them, so a
+      // short timeout always fell back to "Article not found" metadata.
+      signal: AbortSignal.timeout(15000),
       cache: "no-store",
     });
     if (response.ok) {
