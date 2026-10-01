@@ -231,6 +231,7 @@ type Article = {
   date: string;      // YYYY-MM-DD
   category: string;  // e.g. "Choco", "Matcha", "Operations", "General"
   img: string;       // URL (image/video dataURL or cdn)
+  keywords: string[]; // article keywords for search metadata
   isPublished?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -240,8 +241,9 @@ type Article = {
 ### 4.2 Endpoints
 - `GET /articles?q=&category=&page=&limit=&sort=date:desc`
 - `GET /articles/:slug`
-- `POST /admin/articles` Body full Article (without id). `slug, title` required.
-- `PUT /admin/articles/:slug`
+- `POST /admin/articles` Body full Article (without id). `slug, title` required; persist `keywords` as a string array.
+- `PUT /admin/articles/:slug` Body may include `keywords` as a string array; persist updates and include keywords in article responses.
+
 - `DELETE /admin/articles/:slug`
 - `PATCH /admin/articles/:slug/publish` `{isPublished}` (if needed).
 
@@ -589,6 +591,7 @@ model Article {
   date      DateTime
   category  String
   img       String
+  keywords  String[] @default([])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

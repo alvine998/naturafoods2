@@ -47,6 +47,7 @@ export default function ArticlesPage() {
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
+  const [keywordDraft, setKeywordDraft] = useState("");
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length];
   const sortedAll = useMemo(() => sortBySortIndex(s.articles as Article[]), [s.articles]);
@@ -76,9 +77,22 @@ export default function ArticlesPage() {
     reorder(from, from + dir);
   };
   const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
-  const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
-  const openEdit = (i: number) => { setF(s.articles[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
-  const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
+  const openAdd = () => { setF({}); setKeywordDraft(""); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
+  const openEdit = (i: number) => { setF(s.articles[i]); setKeywordDraft(""); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const closeForm = () => { setF({}); setKeywordDraft(""); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
+  const addKeywords = (value: string) => {
+    const additions = value.split(",").map((keyword) => keyword.trim()).filter(Boolean);
+    if (!additions.length) return;
+    setF((prev) => {
+      const keywords = [...(prev.keywords ?? [])];
+      for (const keyword of additions) {
+        if (!keywords.some((existing) => existing.toLowerCase() === keyword.toLowerCase())) keywords.push(keyword);
+      }
+      return { ...prev, keywords };
+    });
+    setKeywordDraft("");
+  };
+  const removeKeyword = (index: number) => setF((prev) => ({ ...prev, keywords: (prev.keywords ?? []).filter((_, i) => i !== index) }));
   const handleTitleChange = (title: string) => {
     setF((prev) => ({
       ...prev,
@@ -98,7 +112,7 @@ export default function ArticlesPage() {
     const isEdit = editIdx !== null;
     const originalSlug = isEdit ? s.articles[editIdx!].slug : null;
     const slug = ensureUniqueSlug(baseSlug, (s.articles as Article[]).map((x) => x.slug), originalSlug);
-    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? ""), sortIndex: toSortIndex(f.sortIndex) };
+    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? ""), keywords: (f.keywords ?? []).map((keyword) => keyword.trim()).filter(Boolean), sortIndex: toSortIndex(f.sortIndex) };
     // API expects also contentID/contentEN/contentZN aliases + isPublished etc — send both shapes for compat
     const payload: Record<string, unknown> = {
       slug: item.slug,
@@ -115,6 +129,7 @@ export default function ArticlesPage() {
       category: item.category,
       img: item.img,
       thumbnail: item.img,
+      keywords: item.keywords,
       sortIndex: item.sortIndex,
       status: "published",
       isPublished: true,
@@ -172,6 +187,27 @@ export default function ArticlesPage() {
             <Field label="slug (auto from title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
             <Field label="category"><Input value={f.category ?? ""} onChange={(e) => setF({ ...f, category: e.target.value })} placeholder="Guide" /></Field>
             <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
+            <div className="sm:col-span-2">
+              <Field label="keywords">
+                <Input
+                  value={keywordDraft}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.includes(",")) addKeywords(value);
+                    else setKeywordDraft(value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                      e.preventDefault();
+                      addKeywords(keywordDraft);
+                    }
+                  }}
+                  onBlur={() => addKeywords(keywordDraft)}
+                  placeholder="Type a keyword and press Enter or comma"
+                />
+              </Field>
+              {(f.keywords ?? []).length > 0 && <div className="mt-2 flex flex-wrap gap-2">{f.keywords?.map((keyword, index) => <span key={`${keyword}-${index}`} className="inline-flex items-center gap-1 rounded-full bg-[#2D4A22]/[0.06] px-3 py-1 text-[11px] text-[#2D4A22]">{keyword}<button type="button" onClick={() => removeKeyword(index)} className="ml-1 text-[#8B6F47] hover:text-red-700" aria-label={`Remove ${keyword}`}>×</button></span>)}</div>}
+            </div>
             <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="articles" /></Field></div>
             <div className="sm:col-span-2"><Field label="excerpt"><TextArea value={f.excerpt ?? ""} onChange={(e) => setF({ ...f, excerpt: e.target.value })} rows={2} placeholder="Short summary" /></Field></div>

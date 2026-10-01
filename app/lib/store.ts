@@ -78,6 +78,7 @@ function normalizeArticles(raw: unknown): Article[] {
     date: String(a.date ?? a.published_date ?? new Date().toISOString().slice(0, 10)),
     category: String(a.category ?? "General"),
     img: String(a.img ?? a.thumbnail ?? ""),
+    keywords: Array.isArray(a.keywords) ? a.keywords.map((keyword) => String(keyword).trim()).filter(Boolean) : typeof a.keywords === "string" ? a.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean) : [],
     sortIndex: toSortIndex(a.sortIndex ?? a.sort_index),
   })).filter((a) => a.slug && a.title);
 }
