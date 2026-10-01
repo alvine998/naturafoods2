@@ -47,7 +47,7 @@ export function pageMetadata(opts: { title: string; description: string; path: s
       url,
       images: [{
         url: image,
-        ...(image === DEFAULT_OG_IMAGE ? { width: 335, height: 102 } : { width: 1200, height: 630 }),
+        ...(image === DEFAULT_OG_IMAGE ? { width: 335, height: 102 } : {}),
         alt: opts.title,
       }],
     },

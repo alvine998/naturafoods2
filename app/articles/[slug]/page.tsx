@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "../../components/SafeImage";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera, Check, Copy, Link2, MessageCircle } from "lucide-react";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "../../components/JsonLd";
 import { SITE_URL } from "../../lib/seo";
@@ -11,6 +11,58 @@ import { useLang } from "../../i18n";
 import { SEED_ARTICLES } from "../../lib/data";
 import type { Article } from "../../lib/data";
 import { getArticleContent, fetchArticleBySlug } from "../../lib/store";
+
+function ArticleShareBar({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+  const encodedUrl = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title);
+
+  async function copyArticleLink() {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = url;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
+  function openShare(url: string) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  return (
+    <div className="mt-6 border-t border-[#2D4A22]/10 pt-5">
+      <p className="mb-3 text-[10px] font-medium tracking-[0.16em] text-[#8B6F47]">SHARE THIS ARTICLE</p>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => openShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`)} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 px-4 text-[11px] text-[#2D4A22] transition hover:bg-[#2D4A22] hover:text-white">
+          <span aria-hidden="true" className="font-bold">f</span> Facebook
+        </button>
+        <button type="button" onClick={() => openShare(`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`)} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 px-4 text-[11px] text-[#2D4A22] transition hover:bg-[#2D4A22] hover:text-white">
+          <span aria-hidden="true" className="font-semibold">𝕏</span> X
+        </button>
+        <button type="button" onClick={() => openShare(`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`)} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 px-4 text-[11px] text-[#2D4A22] transition hover:bg-[#2D4A22] hover:text-white">
+          <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+        </button>
+        <button type="button" onClick={() => { openShare("https://www.instagram.com/"); void copyArticleLink(); }} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 px-4 text-[11px] text-[#2D4A22] transition hover:bg-[#2D4A22] hover:text-white">
+          <Camera className="h-3.5 w-3.5" /> Instagram
+        </button>
+        <button type="button" onClick={copyArticleLink} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#2D4A22]/15 px-4 text-[11px] text-[#2D4A22] transition hover:bg-[#2D4A22] hover:text-white" aria-live="polite">
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? "Copied" : "Copy Link"}
+        </button>
+      </div>
+      <p className="mt-2 text-[10px] text-[#1a1a16]/45"><Link2 className="mr-1 inline h-3 w-3" />The article image appears automatically when the link is shared on platforms that support link previews. Instagram copies the link for you to paste into a message or story.</p>
+    </div>
+  );
+}
 
 // Mirrors the loaded detail layout (hero → chips → title → excerpt → body)
 // so the 13MB payloads don't show a bare "…" for ~15s.
@@ -94,6 +146,7 @@ export default function ArticleDetailPage() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] tracking-[0.14em] text-[#8B6F47]"><span className="rounded-full border border-[#2D4A22]/10 bg-white px-3 py-1">{article.category}</span><span>{article.date}</span></div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-light leading-none text-[#2D4A22] break-words">{article.title}</h1>
           <p className="mt-3 text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{article.excerpt}</p>
+          <ArticleShareBar title={article.title} url={`${SITE_URL}/articles/${encodeURIComponent(article.slug)}`} />
           <div className="prose prose-sm mt-6 max-w-none text-[13px] sm:text-[14px] leading-7 text-[#1a1a16]/70 break-words [&_img]:max-w-full [&_img]:rounded-xl [&_a]:text-[#2D4A22] [&_a]:underline" dangerouslySetInnerHTML={{ __html: getArticleContent(article, locale) }} />
         </div>
       </div>
