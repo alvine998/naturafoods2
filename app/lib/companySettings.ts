@@ -24,6 +24,8 @@ export type CompanySettings = {
   misi_person_photo: string;
   misi_person_name: string;
   misi_person_position: string;
+  career_banner: string;
+  career_url: string;
   tagline: string;
   email: string;
   phone: string;
@@ -59,6 +61,8 @@ export const DEFAULT_COMPANY_SETTINGS: CompanySettings = {
   misi_person_photo: "",
   misi_person_name: "",
   misi_person_position: "",
+  career_banner: "",
+  career_url: "",
   tagline: "Food & Beverage Ingredients · Baking Ingredients",
   email: "info@naturafoods.co.id",
   phone: "0812 9507 1397",
@@ -95,6 +99,8 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     misi_person_photo: str(r.misi_person_photo ?? r.misiPersonPhoto ?? ""),
     misi_person_name: str(r.misi_person_name ?? r.misiPersonName ?? ""),
     misi_person_position: str(r.misi_person_position ?? r.misiPersonPosition ?? ""),
+    career_banner: str(r.career_banner ?? r.careerBanner ?? ""),
+    career_url: str(r.career_url ?? r.careerUrl ?? r.url_career ?? r.urlCareer ?? ""),
     tagline: str(r.tagline ?? DEFAULT_COMPANY_SETTINGS.tagline),
     email: str(r.email ?? DEFAULT_COMPANY_SETTINGS.email),
     phone: str(r.phone ?? DEFAULT_COMPANY_SETTINGS.phone),

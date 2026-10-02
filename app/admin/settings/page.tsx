@@ -100,6 +100,8 @@ export default function CompanySettingsAdminPage() {
       misiPersonPhoto: form.misi_person_photo,
       misiPersonName: form.misi_person_name,
       misiPersonPosition: form.misi_person_position,
+      careerBanner: form.career_banner,
+      careerUrl: form.career_url,
       mapsUrl: form.maps_url,
     };
     // Re-check existence at save time: the row may have appeared or
@@ -261,6 +263,19 @@ export default function CompanySettingsAdminPage() {
                 </Field>
               </div>
             </div>
+          </div>
+        </Section>
+
+        <Section title="Careers" desc="The full-width banner image displayed at the top of the Careers page.">
+          <div className="sm:col-span-2">
+            <Field label="Careers banner image">
+              <FileUpload value={form.career_banner} onChange={(v) => set("career_banner", v)} folder="settings" />
+            </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label="Careers link URL">
+              <Input value={form.career_url} onChange={(e) => set("career_url", e.target.value)} placeholder="https://…" />
+            </Field>
           </div>
         </Section>
 

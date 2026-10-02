@@ -4,6 +4,10 @@ import Image from "../components/SafeImage";
 import Link from "next/link";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
+import { useCompanySettings } from "../lib/companySettings";
+
+const DEFAULT_CAREER_BANNER =
+  "https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png";
 
 const CAREERS = {
   en: {
@@ -31,15 +35,15 @@ const CAREERS = {
 } as const;
 
 export default function CareersPage() {
-  // ponytail: change href to company-specific Glints URL when available
-  const GLINTS_URL = "https://glints.com";
   const copy = CAREERS.en;
+  const companySettings = useCompanySettings();
+  const careerUrl = companySettings.career_url || "https://glints.com";
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
 
       <a
-        href={GLINTS_URL}
+        href={careerUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={copy.cta}
@@ -47,7 +51,7 @@ export default function CareersPage() {
       >
         {/* Full-bleed background image */}
         <Image
-          src="https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png"
+          src={companySettings.career_banner || DEFAULT_CAREER_BANNER}
           alt="NaturaFoods careers"
           fill
           priority
@@ -73,7 +77,7 @@ export default function CareersPage() {
               </p>
             </div>
             <a
-              href={GLINTS_URL}
+              href={careerUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] font-semibold tracking-[0.16em] text-white shadow-[0_8px_24px_rgba(45,74,34,0.18)] transition hover:bg-[#1e3317]"
