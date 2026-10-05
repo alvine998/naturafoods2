@@ -61,18 +61,18 @@ export default function LatestStoriesSection() {
         <>
         <div className="mt-10 sm:mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <Reveal>
-            <p className="text-[10px] tracking-[0.2em] text-[#8B6F47] sm:text-[11px] sm:tracking-[0.24em]">
+            <p className="text-[12px] tracking-[0.16em] text-[#8B6F47] sm:text-[13px] sm:tracking-[0.18em]">
               {t.articlesPage.eyebrow}
             </p>
-            <h2 className="mt-2 font-[var(--font-display)] text-[28px] font-light leading-none text-[#2D4A22] sm:text-[36px] md:text-[42px]">
+            <h2 className="mt-2 font-[var(--font-display)] text-[32px] font-light leading-tight text-[#2D4A22] sm:text-[40px] md:text-[48px]">
               {t.homeLatestA} <span className="italic font-normal">{t.homeLatestB}</span>
             </h2>
-            <p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-[#1a1a16]/60">{t.articlesPage.desc}</p>
+            <p className="mt-3 max-w-[48ch] text-[16px] leading-7 text-[#1a1a16]/60">{t.articlesPage.desc}</p>
           </Reveal>
           <Reveal delay={0.1}>
             <Link
               href="/articles"
-              className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"
+              className="inline-flex items-center gap-1 text-[13px] tracking-[0.1em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"
             >
               {t.homeCommon.viewMore} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -108,25 +108,25 @@ export default function LatestStoriesSection() {
                       />
                     )
                   ) : (
-                    <div className="grid h-full w-full place-items-center bg-[#F5EFE0] text-[11px] tracking-[0.14em] text-[#8B6F47]">
+                    <div className="grid h-full w-full place-items-center bg-[#F5EFE0] text-[13px] tracking-[0.1em] text-[#8B6F47]">
                       No image
                     </div>
                   )}
                 </Link>
                 <div className="p-4 sm:p-5">
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] tracking-[0.12em] text-[#8B6F47]">
+                  <div className="flex flex-wrap items-center gap-2 text-[13px] tracking-[0.08em] text-[#8B6F47]">
                     <span className="rounded-full border border-[#2D4A22]/10 bg-white px-2.5 py-1">{a.category}</span>
                     <span>{a.date}</span>
                   </div>
                   <Link href={`/articles/${a.slug}`} className="group/link">
-                    <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] break-words group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">
+                    <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[16px] sm:text-[17px] break-words group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">
                       {a.title}
                     </h3>
                   </Link>
-                  <p className="mt-2 text-[13px] leading-6 text-[#1a1a16]/60 line-clamp-2">{a.excerpt}</p>
+                  <p className="mt-2 text-[15px] leading-7 text-[#1a1a16]/60 line-clamp-2">{a.excerpt}</p>
                   <Link
                     href={`/articles/${a.slug}`}
-                    className="mt-4 inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"
+                    className="mt-4 inline-flex items-center gap-1 text-[13px] tracking-[0.1em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"
                   >
                     {t.articlesPage.readMore} <ArrowRight className="h-3 w-3" />
                   </Link>

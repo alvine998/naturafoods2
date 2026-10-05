@@ -116,7 +116,7 @@ export default function SiteNav() {
               <Link
                 key={n.href}
                 href={n.href}
-                className={`relative rounded-full px-3.5 py-2 text-[11px] tracking-[0.16em] transition ${
+                className={`relative rounded-full px-3.5 py-2 text-[13px] tracking-[0.12em] transition ${
                   isActive(n.href)
                     ? "text-[#2D4A22]"
                     : "text-[#2D4A22]/60 hover:text-[#2D4A22] hover:bg-[#2D4A22]/[0.06]"
@@ -178,7 +178,7 @@ export default function SiteNav() {
                       style={{ width: "auto" }}
                       className="h-7 w-auto"
                     />
-                   <span className="text-[10px] tracking-[0.18em] text-[#8B6F47]">
+                    <span className="text-[12px] tracking-[0.14em] text-[#8B6F47]">
                      MENU
                    </span>
                  </Link>
@@ -198,7 +198,7 @@ export default function SiteNav() {
                       key={n.href}
                       href={n.href}
                       onClick={() => setOpen(false)}
-                      className={`flex items-center justify-between rounded-2xl px-1 py-3.5 text-[13px] tracking-[0.14em] transition ${isActive(n.href) ? "text-[#2D4A22]" : "text-[#2D4A22]/80"}`}
+                      className={`flex items-center justify-between rounded-2xl px-1 py-3.5 text-[15px] tracking-[0.12em] transition ${isActive(n.href) ? "text-[#2D4A22]" : "text-[#2D4A22]/80"}`}
                     >
                       {n.label}
                       <ArrowRight className="h-3.5 w-3.5 text-[#C4B5A0]" />
@@ -208,7 +208,7 @@ export default function SiteNav() {
 
                 <div className="mt-8 grid gap-3 border-t border-[#2D4A22]/10 pt-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] tracking-[0.16em] text-[#8B6F47]">
+                    <span className="text-[13px] tracking-[0.12em] text-[#8B6F47]">
                       LANGUAGE
                     </span>
                     <LanguageSwitcher />
@@ -216,7 +216,7 @@ export default function SiteNav() {
                   <Link
                     href="/admin/login"
                     onClick={() => setOpen(false)}
-                    className="text-center text-[11px] tracking-[0.14em] text-[#8B6F47] hover:text-[#2D4A22]"
+                    className="text-center text-[13px] tracking-[0.12em] text-[#8B6F47] hover:text-[#2D4A22]"
                   >
                     ADMIN LOGIN
                   </Link>
@@ -224,7 +224,7 @@ export default function SiteNav() {
               </div>
 
               <div className="shrink-0 border-t border-[#2D4A22]/10 bg-white px-5 sm:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-                <div className="text-[11px] leading-5 text-[#8B6F47]">
+                <div className="text-[13px] leading-6 text-[#8B6F47]">
                   PT NaturaFoods Distribusi
                   <br />
                   Jakarta · Surabaya · Bali

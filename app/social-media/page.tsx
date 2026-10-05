@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { SocialMedia } from "../lib/data";
 import { fetchPublicSocialMedia, getSeedSocialMedia } from "../lib/store";
 import SiteNav from "../components/SiteNav";
+import { useLang } from "../i18n";
 
 function Reveal({
   children,
@@ -32,6 +33,7 @@ function Reveal({
 }
 
 export default function SocialMediaPage() {
+  const { t } = useLang();
   const [brands, setBrands] = useState<SocialMedia[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -96,18 +98,17 @@ export default function SocialMediaPage() {
 
           <Reveal delay={0.15}>
             <h1 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6">
-              <span className="text-white" style={{ WebkitTextStroke: '2px white', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>Our </span>
-              <span className="text-[#4A6741] italic" style={{ WebkitTextStroke: '2px #4A6741', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>Social Media</span>
+              <span className="text-white" style={{ WebkitTextStroke: '2px white', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{t.socialMediaPage.titleA} </span>
+              <span className="text-[#4A6741] italic" style={{ WebkitTextStroke: '2px #4A6741', paintOrder: 'stroke fill', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{t.socialMediaPage.titleB}</span>
             </h1>
           </Reveal>
 
           <Reveal delay={0.2}>
             <p className="max-w-2xl mx-auto text-white/90 text-sm sm:text-base leading-relaxed mb-2">
-              Follow dan ikuti terus update dari sosial kami,
+              {t.socialMediaPage.descA}
             </p>
             <p className="max-w-2xl mx-auto text-white/90 text-sm sm:text-base leading-relaxed">
-              agar kamu bisa terus terhubung dan juga update seputar produk dan
-              resep terbaru
+              {t.socialMediaPage.descB}
             </p>
           </Reveal>
         </div>
@@ -236,10 +237,10 @@ export default function SocialMediaPage() {
                 </div>
                 <div>
                   <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-white mb-2">
-                    Mari Terhubung Bersama Kami!
+                    {t.socialMediaPage.ctaTitle}
                   </h2>
                   <p className="text-white/70 text-sm sm:text-base">
-                    Jangan ragu untuk menghubungi kami untuk informasi lebih lanjut.
+                    {t.socialMediaPage.ctaDesc}
                   </p>
                 </div>
               </div>
@@ -247,7 +248,7 @@ export default function SocialMediaPage() {
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[#2D4A22] font-medium hover:bg-white transition-colors shrink-0"
               >
-                Hubungi Kami
+                {t.socialMediaPage.cta}
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>

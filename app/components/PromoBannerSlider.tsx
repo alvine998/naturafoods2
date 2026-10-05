@@ -25,7 +25,7 @@ function PromoCaption({ banner }: { banner: PromoBanner }) {
           </p>
         )}
         {desc && (
-          <p className="mt-2 max-w-[52ch] text-[12px] leading-5 text-white/80 sm:text-[13px]">
+          <p className="mt-2 max-w-[52ch] text-[15px] leading-6 text-white/90 sm:text-[16px]">
             {desc}
           </p>
         )}
@@ -45,7 +45,7 @@ function PromoMedia({ banner }: { banner: PromoBanner }) {
             {banner.name}
           </p>
           {banner.description && (
-            <p className="mt-2 text-[12px] text-[#8B6F47]">
+            <p className="mt-2 text-[14px] text-[#8B6F47]">
               {banner.description}
             </p>
           )}

@@ -53,7 +53,7 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="mt-3 sm:mt-4 max-w-[22ch] sm:max-w-none px-4 text-center text-[10px] leading-relaxed tracking-[0.22em] text-[#8B6F47] [text-wrap:balance] sm:text-[11px] sm:tracking-[0.35em] [@media(max-height:500px)]:mt-2 [@media(max-height:500px)]:text-[9px]"
+              className="mt-3 sm:mt-4 max-w-[22ch] sm:max-w-none px-4 text-center text-[12px] leading-relaxed tracking-[0.16em] text-[#8B6F47] [text-wrap:balance] sm:text-[13px] sm:tracking-[0.22em] [@media(max-height:500px)]:mt-2 [@media(max-height:500px)]:text-[11px]"
             >
               {sub ?? "CHOCO & MATCHA DISTRIBUTION"}
             </motion.p>
@@ -72,7 +72,7 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.1 }}
-            className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 w-full max-w-[92vw] -translate-x-1/2 px-6 text-center text-[9px] leading-relaxed tracking-[0.16em] text-[#C4B5A0] [text-wrap:balance] sm:bottom-8 sm:max-w-none sm:px-0 sm:text-[10px] sm:tracking-[0.2em]"
+            className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 w-full max-w-[92vw] -translate-x-1/2 px-6 text-center text-[11px] leading-relaxed tracking-[0.1em] text-[#C4B5A0] [text-wrap:balance] sm:bottom-8 sm:max-w-none sm:px-0 sm:text-[12px] sm:tracking-[0.14em]"
           >
             {foot ?? "EST. 2019 — JAKARTA · TOKYO · MELBOURNE"}
           </motion.p>

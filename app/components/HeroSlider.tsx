@@ -13,7 +13,7 @@ const FALLBACK_VIDEO_POSTER =
   "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&q=80";
 const CTA_ID = "contact";
 const H1_CLASS =
-  "font-nexa font-extralight text-[32px] sm:text-[44px] md:text-[60px] lg:text-[76px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg sm:whitespace-nowrap";
+  "font-nexa font-extralight text-[38px] sm:text-[50px] md:text-[68px] lg:text-[84px] leading-[0.95] tracking-[-0.02em] text-white drop-shadow-lg sm:whitespace-nowrap";
 
 export default function HeroSlider({
   onCta,
@@ -187,7 +187,7 @@ export default function HeroSlider({
                   className="mt-4 sm:mt-5"
                 >
                   <hr className="-ml-2 sm:-ml-3 md:ml-0 bg-green-700 text-green-700 w-24 h-1" />
-                  <h2 className="mt-3 whitespace-pre-line font-montserrat text-[14px] font-light leading-relaxed tracking-[0.16em] text-white drop-shadow sm:mt-4 sm:text-[24px]">
+                  <h2 className="mt-3 whitespace-pre-line font-montserrat text-[20px] font-light leading-relaxed tracking-[0.1em] text-white drop-shadow sm:mt-4 sm:text-[30px]">
                     {t.heroTagline}
                   </h2>
                 </motion.div>

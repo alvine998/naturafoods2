@@ -5,37 +5,14 @@ import Link from "next/link";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import { useCompanySettings } from "../lib/companySettings";
+import { useLang } from "../i18n";
 
 const DEFAULT_CAREER_BANNER =
   "https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png";
 
-const CAREERS = {
-  en: {
-    eyebrow: "CAREERS",
-    titleA: "Be a Part of",
-    titleB: "PT Natura Inti Sukses",
-    desc: "We believe people are our greatest asset. We create a supportive workplace where talent can grow, learn, and make a real impact on millions of people.",
-    cta: "View Openings on Glints",
-    via: "via Glints",
-    growTitle: "Let's Grow Together",
-    growDesc: "Join us and become part of a family that keeps growing and brings goodness to many people.",
-    growCta: "Lihat Lowongan di Glints",
-  },
-  id: {
-    eyebrow: "KARIR",
-    titleA: "Jadilah Bagian dari",
-    titleB: "PT Natura Inti Sukses",
-    desc: "Kami percaya sumber daya manusia adalah aset terbesar kami. Kami menciptakan tempat kerja yang suportif agar talenta dapat tumbuh, belajar, dan memberi dampak nyata bagi jutaan orang.",
-    cta: "Lihat Lowongan di Glints",
-    via: "via Glints",
-    growTitle: "Mari Tumbuh Bersama",
-    growDesc: "Bergabunglah bersama kami dan jadi bagian dari keluarga yang terus bertumbuh serta membawa kebaikan bagi banyak orang.",
-    growCta: "Lihat Lowongan di Glints",
-  },
-} as const;
-
 export default function CareersPage() {
-  const copy = CAREERS.en;
+  const { t } = useLang();
+  const copy = t.careersLanding;
   const companySettings = useCompanySettings();
   const careerUrl = companySettings.career_url || "https://glints.com";
   return (
@@ -52,7 +29,7 @@ export default function CareersPage() {
         {/* Full-bleed background image */}
         <Image
           src={companySettings.career_banner || DEFAULT_CAREER_BANNER}
-          alt="NaturaFoods careers"
+          alt={copy.imageAlt}
           fill
           priority
           sizes="100vw"
@@ -92,7 +69,7 @@ export default function CareersPage() {
               href="/"
               className="text-[11px] tracking-[0.16em] text-[#2D4A22]/60 underline decoration-[#2D4A22]/20 underline-offset-4 hover:text-[#2D4A22]"
             >
-              ← BACK TO HOME
+              {copy.backHome}
             </Link>
           </div>
         </div>

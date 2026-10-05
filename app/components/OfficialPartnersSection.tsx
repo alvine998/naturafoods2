@@ -114,8 +114,8 @@ function BrandChoiceModal({ card, onClose }: { card: PartnerCard; onClose: () =>
       >
         <div className="flex items-start justify-between gap-4 p-5 pb-0 sm:p-6 sm:pb-0">
           <div>
-            <h3 className="text-[18px] font-bold leading-tight text-[#2D4A22]">{card.title}</h3>
-            <p className="mt-1 text-[12px] tracking-[0.08em] text-[#8B6F47]">Choose a brand to view products</p>
+            <h3 className="text-[20px] font-bold leading-tight text-[#2D4A22]">{card.title}</h3>
+            <p className="mt-1 text-[14px] tracking-[0.04em] text-[#8B6F47]">Choose a brand to view products</p>
           </div>
           <button
             onClick={onClose}
@@ -137,7 +137,7 @@ function BrandChoiceModal({ card, onClose }: { card: PartnerCard; onClose: () =>
                   <Image src={b.logo} alt={b.name} fill sizes="96px" className="object-contain p-1" />
                 </span>
               ) : null}
-              <span className="min-w-0 flex-1 truncate text-[14px] font-medium text-[#2D4A22]">{b.name}</span>
+              <span className="min-w-0 flex-1 truncate text-[16px] font-medium text-[#2D4A22]">{b.name}</span>
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#2D4A22] text-white transition group-hover:translate-x-0.5">
                 <ArrowRight className="h-4 w-4" />
               </span>
@@ -178,7 +178,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
         {/* header: title + arrow */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-white text-[22px] font-bold leading-tight">
+            <h3 className="text-white text-[24px] font-bold leading-tight">
               {card.title}
             </h3>
             <div className="mt-2 h-[3px] w-10 bg-white/90" />
@@ -190,7 +190,7 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
 
         {/* body: description left, single product visual right (from background) */}
         <div className="mt-4 flex flex-1 flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-          <p className="min-w-0 flex-1 text-white/95 text-[15px] leading-relaxed">
+          <p className="min-w-0 flex-1 text-white/95 text-[18px] leading-relaxed">
             {card.description}
           </p>
            {rightVisual !== "" && (
@@ -241,13 +241,13 @@ function PartnerCard({ card, index }: { card: PartnerCard; index: number }) {
                 ))}
                </div>
                {bottomLogos.length > 4 && (
-                 <span className="shrink-0 text-[11px] font-medium text-black/60">
+                 <span className="shrink-0 text-[13px] font-medium text-black/60">
                    +{bottomLogos.length - 4}
                  </span>
                )}
              </div>
            ) : (
-             <p className="text-center text-sm font-semibold text-black/70">
+             <p className="text-center text-base font-semibold text-black/70">
                {card.title}
              </p>
            )}
@@ -321,7 +321,7 @@ function RetailBrandSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
           <div className="text-center mb-12">
-              <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl md:text-5xl text-[#2D4A22] mb-6">
+              <h2 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-6xl text-[#2D4A22] mb-6">
                 {t.homeRetailTitle}
               </h2>
              <div className="flex justify-center">
@@ -393,7 +393,7 @@ function SmallPackSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-8">
         <Reveal>
           <div className="text-center mb-12">
-            <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
+            <h2 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-6xl text-[#2D4A22] mb-4">
               {t.homeSmallPackTitle}
             </h2>
             <div className="mx-auto max-w-xl aspect-video rounded-xl overflow-hidden">
@@ -487,13 +487,13 @@ function CocoaProductCard({
              />
            ) : null}
          </div>
-        <p className="text-xs text-gray-600 leading-relaxed mb-3">
+        <p className="text-sm text-gray-600 leading-relaxed mb-3">
           {product.description}
         </p>
         <div className="flex gap-2">
           <a
             href={product.file || "#"}
-            className="text-xs text-[#2D4A22] underline hover:no-underline"
+            className="text-sm text-[#2D4A22] underline hover:no-underline"
           >
             Download Product
           </a>
@@ -538,10 +538,10 @@ function CocoaPowderSeriesSection() {
                    style={{ width: "auto" }}
                    className="h-10 w-auto object-contain sm:h-12"
                  />
-                 <h2 className="text-center font-[var(--font-display)] text-2xl leading-tight sm:text-3xl md:text-4xl text-[#2D4A22]">
+                  <h2 className="text-center font-[var(--font-display)] text-3xl leading-tight sm:text-4xl md:text-5xl text-[#2D4A22]">
                   {section.category.name}
                   <br />
-                  <span className="text-[20px] text-[#2D4A22]/80 font-normal">
+                  <span className="text-[22px] text-[#2D4A22]/80 font-normal">
                     {section.category?.description || ""}
                   </span>
                 </h2>
@@ -754,17 +754,17 @@ export default function OfficialPartnersSection() {
                     priority
                   />
                </div>
-              <h2 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl text-[#2D4A22] mb-4">
+              <h2 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-6xl text-[#2D4A22] mb-4">
                 {t.homePartnersTitle}
               </h2>
-              <p className="max-w-2xl mx-auto text-[#1a1a16]/60 text-sm sm:text-base leading-relaxed">
+              <p className="max-w-2xl mx-auto text-[#1a1a16]/60 text-base sm:text-lg leading-relaxed">
                 {t.homePartnersDesc}
               </p>
             </div>
           </Reveal>
 
           {cards.length === 0 ? (
-            <p className="text-center text-sm text-[#8B6F47]">
+            <p className="text-center text-base text-[#8B6F47]">
               {t.homeNoPartners}
             </p>
           ) : (

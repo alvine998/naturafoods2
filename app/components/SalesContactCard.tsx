@@ -20,11 +20,11 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
     <div className="mt-10 sm:mt-12 rounded-[20px] sm:rounded-[24px] border border-[#2D4A22]/10 bg-white p-5 sm:p-6 md:p-7">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">SALES & MARKETING</p>
-          <h3 className="mt-1 font-[var(--font-display)] text-[20px] sm:text-[22px] font-light leading-none text-[#2D4A22]">{t.title}</h3>
-          <p className="mt-2 max-w-[55ch] text-[12px] sm:text-[13px] leading-5 text-[#1a1a16]/60">{t.desc}</p>
+          <p className="text-[12px] tracking-[0.16em] text-[#8B6F47]">SALES & MARKETING</p>
+          <h3 className="mt-1 font-[var(--font-display)] text-[24px] sm:text-[26px] font-light leading-tight text-[#2D4A22]">{t.title}</h3>
+          <p className="mt-2 max-w-[55ch] text-[14px] sm:text-[15px] leading-6 text-[#1a1a16]/60">{t.desc}</p>
         </div>
-        <p className="text-[11px] tracking-[0.08em] text-[#8B6F47] sm:text-right">{t.foot}</p>
+        <p className="text-[13px] tracking-[0.06em] text-[#8B6F47] sm:text-right">{t.foot}</p>
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         {contacts.map((c) => {
@@ -40,16 +40,16 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
                 // eslint-disable-next-line @next/next/no-img-element
                 <Image src={photo} alt={c.name} className="h-11 w-11 shrink-0 rounded-full object-cover bg-[#F5EFE0]" width={44} height={44} unoptimized={photo.includes("r2.dev")} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
               ) : (
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2D4A22] text-[12px] font-medium tracking-[0.08em] text-white">{salesInitials(c.name)}</div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2D4A22] text-[13px] font-medium tracking-[0.06em] text-white">{salesInitials(c.name)}</div>
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-medium text-[#2D4A22]">{c.name}</p>
-                <p className="text-[11px] tracking-[0.06em] text-[#8B6F47]">{[c.position, c.location].filter(Boolean).join(" · ")}</p>
-                {c.whatsapp ? <a href={`tel:${digits}`} className="mt-2 inline-flex items-center gap-1.5 text-[12px] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"><Phone className="h-3 w-3" />{c.whatsapp}</a> : null}
-                {c.email ? <a href={`mailto:${c.email}`} className="mt-1 inline-flex items-center gap-1.5 truncate text-[12px] text-[#2D4A22]/70 underline decoration-[#2D4A22]/15 underline-offset-4"><Mail className="h-3 w-3" />{c.email}</a> : null}
+                <p className="text-[15px] font-medium text-[#2D4A22]">{c.name}</p>
+                <p className="text-[13px] tracking-[0.04em] text-[#8B6F47]">{[c.position, c.location].filter(Boolean).join(" · ")}</p>
+                {c.whatsapp ? <a href={`tel:${digits}`} className="mt-2 inline-flex items-center gap-1.5 text-[14px] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"><Phone className="h-3.5 w-3.5" />{c.whatsapp}</a> : null}
+                {c.email ? <a href={`mailto:${c.email}`} className="mt-1 inline-flex items-center gap-1.5 truncate text-[14px] text-[#2D4A22]/70 underline decoration-[#2D4A22]/15 underline-offset-4"><Mail className="h-3.5 w-3.5" />{c.email}</a> : null}
                 <div className="mt-3 flex gap-2">
-                  {wa ? <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] px-4 py-2 text-[11px] tracking-[0.12em] text-white hover:bg-[#1e3317]"><MessageCircle className="h-3.5 w-3.5" />{t.chat}</a> : null}
-                  {c.email ? <a href={`mailto:${c.email}?subject=${encodeURIComponent(productTitle ? `Inquiry: ${productTitle}` : `Price list request`)}`} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[11px] tracking-[0.12em] text-[#2D4A22] hover:bg-white"><Mail className="h-3.5 w-3.5" />{t.email}</a> : null}
+                  {wa ? <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2D4A22] px-4 py-2 text-[13px] tracking-[0.1em] text-white hover:bg-[#1e3317]"><MessageCircle className="h-4 w-4" />{t.chat}</a> : null}
+                  {c.email ? <a href={`mailto:${c.email}?subject=${encodeURIComponent(productTitle ? `Inquiry: ${productTitle}` : `Price list request`)}`} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#2D4A22]/15 bg-white px-4 py-2 text-[13px] tracking-[0.1em] text-[#2D4A22] hover:bg-white"><Mail className="h-4 w-4" />{t.email}</a> : null}
                 </div>
               </div>
             </div>

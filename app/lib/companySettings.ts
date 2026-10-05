@@ -14,8 +14,12 @@ export type CompanySettings = {
   name: string;
   logo: string;
   description: string;
-  visi: string;
-  misi: string;
+  visi_id: string;
+  visi_en: string;
+  visi_zn: string;
+  misi_id: string;
+  misi_en: string;
+  misi_zn: string;
   visi_background: string;
   misi_background: string;
   visi_person_photo: string;
@@ -51,8 +55,12 @@ export const DEFAULT_COMPANY_SETTINGS: CompanySettings = {
   logo: "/logo.png",
   description:
     "PT Natura Inti Sukses is an importer & distributor of food and beverage ingredients in Indonesia — especially baking ingredients.",
-  visi: "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
-  misi: "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  visi_id: "Menjadi Market Leader untuk Food Ingredient & Additives di Indonesia.",
+  visi_en: "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
+  visi_zn: "成为印度尼西亚食品原料与添加剂的市场领导者。",
+  misi_id: "Mencapai kepuasan pelanggan & pangsa pasar utama dengan produk berkualitas terseleksi & jaringan pemasaran yang didukung SDM berkualitas.",
+  misi_en: "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  misi_zn: "以精选优质产品与专业人才支持的营销网络，实现客户满意度与主要市场份额。",
   visi_background: "",
   misi_background: "",
   visi_person_photo: "",
@@ -89,8 +97,12 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     name: str(r.name ?? r.companyName ?? DEFAULT_COMPANY_SETTINGS.name),
     logo: str(r.logo ?? r.logoUrl ?? DEFAULT_COMPANY_SETTINGS.logo),
     description: str(r.description ?? DEFAULT_COMPANY_SETTINGS.description),
-    visi: str(r.visi ?? r.vision ?? DEFAULT_COMPANY_SETTINGS.visi),
-    misi: str(r.misi ?? r.mission ?? DEFAULT_COMPANY_SETTINGS.misi),
+    visi_id: str(r.visi_id ?? r.visiId, ""),
+    visi_en: str(r.visi_en ?? r.visiEn ?? r.visi ?? r.vision ?? DEFAULT_COMPANY_SETTINGS.visi_en),
+    visi_zn: str(r.visi_zn ?? r.visi_zh ?? r.visiZn ?? r.visiZh, ""),
+    misi_id: str(r.misi_id ?? r.misiId, ""),
+    misi_en: str(r.misi_en ?? r.misiEn ?? r.misi ?? r.mission ?? DEFAULT_COMPANY_SETTINGS.misi_en),
+    misi_zn: str(r.misi_zn ?? r.misi_zh ?? r.misiZn ?? r.misiZh, ""),
     visi_background: str(r.visi_background ?? r.visiBackground ?? ""),
     misi_background: str(r.misi_background ?? r.misiBackground ?? ""),
     visi_person_photo: str(r.visi_person_photo ?? r.visiPersonPhoto ?? ""),

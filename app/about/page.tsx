@@ -15,13 +15,21 @@ function Reveal({ children, delay = 0, y = 18, className = "" }: { children: Rea
 }
 
 export default function AboutPage() {
-  const { t } = useLang();
+  const { locale, t } = useLang();
   const L = t.aboutDetail;
   const company = useCompanySettings();
   // Visi/Misi bodies come from Admin → Settings (company_settings singleton);
   // card titles stay per-locale defaults. Edit at /admin/settings.
-  const vision = { t: L.values[0]?.t, d: company.visi?.trim() || L.values[0]?.d };
-  const mission = { t: L.values[1]?.t, d: company.misi?.trim() || L.values[1]?.d };
+  const visionValue = locale === "id" ? company.visi_id : locale === "zh" ? company.visi_zn : company.visi_en;
+  const missionValue = locale === "id" ? company.misi_id : locale === "zh" ? company.misi_zn : company.misi_en;
+  const vision = {
+    t: L.values[0]?.t,
+    d: visionValue.trim() || t.settings.vision || L.values[0]?.d,
+  };
+  const mission = {
+    t: L.values[1]?.t,
+    d: missionValue.trim() || t.settings.mission || L.values[1]?.d,
+  };
   const hasVisiProfile = Boolean(company.visi_person_photo?.trim() && company.visi_person_name?.trim());
   const hasMisiProfile = Boolean(company.misi_person_photo?.trim() && company.misi_person_name?.trim());
   // "Visi & Misi — quality, network, people." → display headline + italic second line

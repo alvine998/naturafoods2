@@ -40,13 +40,13 @@ export default function HighlightedProductsSection() {
             <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6">
                 <Reveal>
-                  <p className="text-[10px] tracking-[0.2em] sm:text-[11px] sm:tracking-[0.24em] text-[#8B6F47]">{cat.name.toUpperCase()}</p>
-                  <h2 className="mt-2 sm:mt-3 font-[var(--font-display)] text-[26px] sm:text-[34px] font-light leading-none text-[#2D4A22] md:text-[42px]">
+                  <p className="text-[12px] tracking-[0.16em] sm:text-[13px] sm:tracking-[0.18em] text-[#8B6F47]">{cat.name.toUpperCase()}</p>
+                  <h2 className="mt-2 sm:mt-3 font-[var(--font-display)] text-[30px] sm:text-[38px] font-light leading-tight text-[#2D4A22] md:text-[46px]">
                     {cat.description || cat.name} <span className="italic font-normal">series.</span>
                   </h2>
                 </Reveal>
                 <Reveal delay={0.1}>
-                  <Link href={`/products?cat=${cat.slug}`} className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">
+                  <Link href={`/products?cat=${cat.slug}`} className="inline-flex items-center gap-1 text-[13px] tracking-[0.1em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4">
                     {`View all ${cat.name}`} <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </Reveal>
@@ -64,12 +64,12 @@ export default function HighlightedProductsSection() {
                     <div className="p-4 sm:p-5">
                       <Link href={`/products/${p.slug}`} className="flex items-start justify-between gap-3 group/link">
                         <div className="min-w-0">
-                          <h3 className="font-medium leading-tight text-[#2D4A22] text-[14px] sm:text-[15px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3>
-                          <p className="mt-1 text-[12px] text-[#8B6F47]">{p.note}</p>
+                          <h3 className="font-medium leading-tight text-[#2D4A22] text-[16px] sm:text-[17px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3>
+                          <p className="mt-1 text-[14px] text-[#8B6F47]">{p.note}</p>
                         </div>
-                        {p.tag && <span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-white">{p.tag}</span>}
+                        {p.tag && <span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[12px] sm:text-[13px] font-medium text-white">{p.tag}</span>}
                       </Link>
-                      <Link href={`/products/${p.slug}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">View Detail</Link>
+                      <Link href={`/products/${p.slug}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#2D4A22]/15 py-2.5 text-[13px] tracking-[0.1em] text-[#2D4A22] transition group-hover:bg-[#2D4A22] group-hover:text-white">View Detail</Link>
                     </div>
                   </motion.div>
                 ))}

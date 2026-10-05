@@ -638,8 +638,12 @@ model CompanySetting {
   name        String
   logo        String?
   description String?  @db.Text
-  visi        String?  @db.Text
-  misi        String?  @db.Text
+  visiId      String?  @map("visi_id") @db.Text
+  visiEn      String?  @map("visi_en") @db.Text
+  visiZn      String?  @map("visi_zn") @db.Text
+  misiId      String?  @map("misi_id") @db.Text
+  misiEn      String?  @map("misi_en") @db.Text
+  misiZn      String?  @map("misi_zn") @db.Text
   visiBackground String? @map("visi_background")
   misiBackground String? @map("misi_background")
   visiPersonPhoto String? @map("visi_person_photo")
@@ -726,15 +730,15 @@ curl https://api-naturafoods.alvineitsolutions.com/api/v1/company-settings
 # create (409 if row exists)
 curl -X POST https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
-  -d '{"id":"default","name":"PT Natura Inti Sukses","logo":"/logo.png","visi":"...","misi":"..."}'
+  -d '{"id":"default","name":"PT Natura Inti Sukses","logo":"/logo.png","visi_id":"...","visi_en":"...","visi_zn":"...","misi_id":"...","misi_en":"...","misi_zn":"..."}'
 
 # full replace / partial / reset (next public GET recreates default)
 curl -X PUT https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
-  -d '{"id":"default","name":"PT Natura Inti Sukses","visi":"...","misi":"..."}'
+  -d '{"id":"default","name":"PT Natura Inti Sukses","visi_id":"...","visi_en":"...","visi_zn":"...","misi_id":"...","misi_en":"...","misi_zn":"..."}'
 curl -X PATCH https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
-  -d '{"misi":"Updated misi..."}'
+  -d '{"misi_id":"Misi diperbarui..."}'
 curl -X DELETE https://api-naturafoods.alvineitsolutions.com/api/v1/admin/company-settings \
   -H "Authorization: Bearer <token>"
 ```
@@ -743,7 +747,7 @@ curl -X DELETE https://api-naturafoods.alvineitsolutions.com/api/v1/admin/compan
 
 ## 18. Company Settings (singleton)
 
-Admin page `app/admin/settings/page.tsx` edits company name, logo, description, visi, misi, contact & social links. Public components (`SiteNav` logo, `SiteFooter`, About Visi/Misi) read the singleton via `app/lib/companySettings.ts` (`useCompanySettings()`, localStorage `nf_company_settings` cache).
+Admin page `app/admin/settings/page.tsx` edits company name, logo, description, locale-specific Visi/Misi (`visi_id`, `visi_en`, `visi_zn`, `misi_id`, `misi_en`, `misi_zn`), contact & social links. Public components (`SiteNav` logo, `SiteFooter`, About Visi/Misi) read the singleton via `app/lib/companySettings.ts` (`useCompanySettings()`, localStorage `nf_company_settings` cache).
 
 ### 18.1 SQL (MySQL)
 
@@ -753,8 +757,12 @@ CREATE TABLE IF NOT EXISTS `company_settings` (
   `name` varchar(200) NOT NULL,
   `logo` varchar(500) DEFAULT NULL,
   `description` mediumtext,
-  `visi` mediumtext,
-  `misi` mediumtext,
+  `visi_id` mediumtext,
+  `visi_en` mediumtext,
+  `visi_zn` mediumtext,
+  `misi_id` mediumtext,
+  `misi_en` mediumtext,
+  `misi_zn` mediumtext,
   `visi_background` varchar(500) DEFAULT NULL,
   `misi_background` varchar(500) DEFAULT NULL,
   `visi_person_photo` varchar(500) DEFAULT NULL,
@@ -790,8 +798,12 @@ Default row (created on first public GET when table is empty):
   "name": "PT Natura Inti Sukses",
   "logo": "/logo.png",
   "description": "PT Natura Inti Sukses is an importer & distributor of food and beverage ingredients in Indonesia — especially baking ingredients.",
-  "visi": "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
-  "misi": "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  "visi_id": "Menjadi Market Leader untuk Food Ingredient & Additives di Indonesia.",
+  "visi_en": "To be a Market Leader for Food Ingredient & Additives in Indonesia.",
+  "visi_zn": "成为印度尼西亚食品原料与添加剂的市场领导者。",
+  "misi_id": "Mencapai kepuasan pelanggan & pangsa pasar utama dengan produk berkualitas terseleksi & jaringan pemasaran yang didukung SDM berkualitas.",
+  "misi_en": "To achieve Customer's Satisfaction & Major Market Share with selected Quality Products & Marketing Network supported by qualified human resources.",
+  "misi_zn": "以精选优质产品与专业人才支持的营销网络，实现客户满意度与主要市场份额。",
   "visi_background": "",
   "misi_background": "",
   "visi_person_photo": "",
@@ -822,8 +834,12 @@ type CompanySettings = {
   name: string;      // required, 2-200 chars
   logo: string;      // URL or /logo.png, 0-500
   description: string;
-  visi: string;
-  misi: string;
+  visi_id: string;
+  visi_en: string;
+  visi_zn: string;
+  misi_id: string;
+  misi_en: string;
+  misi_zn: string;
   visi_background: string;      // optional image URL, empty uses the current cream background
   misi_background: string;      // optional image URL, empty keeps the plain white Misi card
   visi_person_photo: string;    // optional image URL
@@ -923,4 +939,3 @@ model PromoBanner {
 ```
 
 Add to OpenAPI paths: `/promo-banners: {get: {}}`, `/promo-banners/{id}: {get: {}}`, `/admin/promo-banners: {get: {}, post: {}}`, `/admin/promo-banners/{id}: {get: {}, put: {}, delete: {}}`.
-

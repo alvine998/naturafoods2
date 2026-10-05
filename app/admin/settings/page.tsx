@@ -42,6 +42,7 @@ export default function CompanySettingsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [visionMissionLocale, setVisionMissionLocale] = useState<"id" | "en" | "zh">("id");
 
   useEffect(() => { if (!isAuthed()) router.replace("/admin/login"); else setGate(true); }, [router]);
   useEffect(() => {
@@ -83,6 +84,9 @@ export default function CompanySettingsAdminPage() {
   const counts = [s.products.length, s.productCategories.length, s.masterBrands.length, s.homeBrands.length, s.officialPartners.length, s.articles.length, s.edu.length, s.innovation.length, s.jobs.length, s.inquiries.length, 0, 0, 0, s.salesContacts.length, s.socialMedia.length, 0, 0];
 
   const set = (k: keyof CompanySettings, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const localeSuffix = visionMissionLocale === "zh" ? "zn" : visionMissionLocale;
+  const visiLocaleKey: "visi_id" | "visi_en" | "visi_zn" = `visi_${localeSuffix}`;
+  const misiLocaleKey: "misi_id" | "misi_en" | "misi_zn" = `misi_${localeSuffix}`;
 
   const save = async () => {
     setErr(null);
@@ -92,6 +96,12 @@ export default function CompanySettingsAdminPage() {
     const payload: Partial<CompanySettings> & Record<string, unknown> = {
       ...form,
       name: form.name.trim() || DEFAULT_COMPANY_SETTINGS.name,
+      visiId: form.visi_id,
+      visiEn: form.visi_en,
+      visiZn: form.visi_zn,
+      misiId: form.misi_id,
+      misiEn: form.misi_en,
+      misiZn: form.misi_zn,
       visiBackground: form.visi_background,
       misiBackground: form.misi_background,
       visiPersonPhoto: form.visi_person_photo,
@@ -171,7 +181,7 @@ export default function CompanySettingsAdminPage() {
           <p className="text-[10px] tracking-[0.2em] text-[#8B6F47]">CMS · {tabLabel}</p>
           <h1 className="mt-1 font-[var(--font-display)] text-[22px] font-light leading-none text-[#2D4A22] sm:text-[26px]">Company settings</h1>
           <p className="mt-2 max-w-[64ch] text-[12px] leading-5 text-[#1a1a16]/60">
-            Company name, logo, description, visi, misi, contact &amp; social links. Saved to the <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">company_settings</code> singleton
+            Company name, logo, description, Visi &amp; Misi translations, contact &amp; social links. Saved to the <code className="rounded bg-white px-1 py-0.5 border border-[#2D4A22]/10">company_settings</code> singleton
             and applied site-wide (nav logo, footer, About Visi &amp; Misi).
             {exists === true ? " · Server row exists." : exists === false ? " · No server row yet — Save to create it." : ""}
           </p>
@@ -216,15 +226,42 @@ export default function CompanySettingsAdminPage() {
           </div>
         </Section>
 
-        <Section title="Visi & Misi" desc="Shown on the About page Vision & Mission cards. Overrides the per-language defaults when set.">
+        <Section title="Visi & Misi" desc="Enter each statement in English, Indonesian, and Chinese. The About page displays the matching language.">
           <div className="sm:col-span-2">
-            <Field label="Visi">
-              <TextArea value={form.visi} onChange={(e) => set("visi", e.target.value)} rows={3} placeholder={DEFAULT_COMPANY_SETTINGS.visi} />
-            </Field>
+            <div className="inline-flex gap-1 rounded-full border border-[#2D4A22]/10 bg-[#F7F8F5] p-1" role="tablist" aria-label="Vision and mission language">
+              {(["id", "en", "zh"] as const).map((locale) => {
+                const label = locale === "id" ? "ID" : locale === "en" ? "EN" : "ZN";
+                return (
+                  <button
+                    key={locale}
+                    type="button"
+                    role="tab"
+                    aria-selected={visionMissionLocale === locale}
+                    onClick={() => setVisionMissionLocale(locale)}
+                    className={`rounded-full px-4 py-2 text-[11px] font-medium tracking-[0.12em] transition ${visionMissionLocale === locale ? "bg-[#2D4A22] text-white shadow" : "text-[#2D4A22]/60 hover:bg-white hover:text-[#2D4A22]"}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="sm:col-span-2">
-            <Field label="Misi">
-              <TextArea value={form.misi} onChange={(e) => set("misi", e.target.value)} rows={3} placeholder={DEFAULT_COMPANY_SETTINGS.misi} />
+          <div className="sm:col-span-2 grid gap-3 sm:grid-cols-2" role="tabpanel">
+            <Field label={`Visi — ${localeSuffix.toUpperCase()}`}>
+              <TextArea
+                value={form[visiLocaleKey]}
+                onChange={(e) => set(visiLocaleKey, e.target.value)}
+                rows={3}
+                placeholder={visionMissionLocale === "en" ? DEFAULT_COMPANY_SETTINGS.visi_en : ""}
+              />
+            </Field>
+            <Field label={`Misi — ${localeSuffix.toUpperCase()}`}>
+              <TextArea
+                value={form[misiLocaleKey]}
+                onChange={(e) => set(misiLocaleKey, e.target.value)}
+                rows={3}
+                placeholder={visionMissionLocale === "en" ? DEFAULT_COMPANY_SETTINGS.misi_en : ""}
+              />
             </Field>
           </div>
           <div>

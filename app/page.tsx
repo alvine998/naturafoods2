@@ -44,7 +44,7 @@ export default function Home() {
     <>
       <LenisProvider enabled={entered} />
       <Splash onDone={() => setEntered(true)} sub={t.splashSub} foot={t.splashFoot} />
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: entered ? 1 : 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="bg-white overflow-x-hidden">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: entered ? 1 : 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="bg-white overflow-x-hidden text-[17px] leading-[1.65]">
         <SiteNav />
         <HeroSlider onCta={scrollTo} welcome={{ title: t.welcomeTitle, sub: t.welcomeSub }} play={entered} />
 
@@ -163,11 +163,11 @@ export default function Home() {
 
         <section id="contact" className="bg-[#2D4A22] px-4 py-10 sm:px-6 sm:py-14 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1280px] gap-8 sm:gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-start">
-            <div><h3 className="font-[var(--font-display)] text-[26px] sm:text-[30px] font-light leading-none text-white md:text-[36px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[13px] leading-6 text-white/65">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex items-center gap-1 rounded-full bg-white px-6 py-2.5 text-[11px] tracking-[0.14em] text-[#2D4A22]">{t.homeContactCta} <ArrowRight className="h-3 w-3" /></Link></div></div>
+            <div><h3 className="font-[var(--font-display)] text-[30px] sm:text-[34px] font-light leading-tight text-white md:text-[40px]">{t.contactTitle}</h3><p className="mt-3 max-w-[48ch] text-[16px] leading-7 text-white/75">{t.contactDesc}</p><div className="mt-6"><Link href="/contact" className="inline-flex items-center gap-1 rounded-full bg-white px-6 py-3 text-[14px] tracking-[0.08em] text-[#2D4A22]">{t.homeContactCta} <ArrowRight className="h-4 w-4" /></Link></div></div>
             <div className="rounded-[20px] bg-white p-5 sm:p-6 md:p-7 text-center">
-              <p className="text-[13px] leading-6 text-[#1a1a16]/60">{t.homeContactFormNote}</p>
-              <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[11px] tracking-[0.14em] text-white">{t.homeContactUs}</Link>
-              <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-[12px]"><a href="mailto:hello@naturafoods.id" className="underline text-[#2D4A22] break-all">hello@naturafoods.id</a></div>
+              <p className="text-[16px] leading-7 text-[#1a1a16]/70">{t.homeContactFormNote}</p>
+              <Link href="/contact" className="mt-3 inline-flex rounded-full bg-[#2D4A22] px-6 py-3 text-[14px] tracking-[0.08em] text-white">{t.homeContactUs}</Link>
+              <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-[14px]"><a href="mailto:hello@naturafoods.id" className="underline text-[#2D4A22] break-all">hello@naturafoods.id</a></div>
             </div>
           </div>
         </section>
