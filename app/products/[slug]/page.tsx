@@ -6,14 +6,14 @@ import Image from "../../components/SafeImage";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import SalesContactCard from "../../components/SalesContactCard";
 import { ArrowLeft, Download } from "lucide-react";
-import { SEED_PRODUCTS } from "../../lib/data";
+import { getLocalizedDescription, SEED_PRODUCTS } from "../../lib/data";
 import type { Product } from "../../lib/data";
 import { useLang } from "../../i18n";
 import { apiFetch } from "../../lib/api";
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const [product, setProduct] = useState<Product | null>(null);
   const [done, setDone] = useState(false);
   useEffect(() => {
@@ -32,6 +32,9 @@ export default function ProductDetailPage() {
             tag: String(raw.tag ?? ""),
             img: String(raw.img ?? raw.image ?? ""),
             desc: String(raw.desc ?? raw.description ?? ""),
+            descId: String(raw.descId ?? raw.desc_id ?? ""),
+            descEn: String(raw.descEn ?? raw.desc_en ?? ""),
+            descZh: String(raw.descZh ?? raw.descZn ?? raw.desc_zn ?? raw.desc_zh ?? ""),
             type: (raw.type as Product["type"]) ?? "general",
             isHighlight: Boolean(raw.isHighlight ?? false),
             file: (raw.file ?? raw.file ?? null) as string | null,
@@ -74,7 +77,7 @@ export default function ProductDetailPage() {
           </div>
           <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] font-light leading-none text-[#2D4A22] break-words">{product.title}</h1>
           <p className="mt-2 text-[12px] tracking-[0.06em] text-[#8B6F47]">{product.note}</p>
-          <p className="mt-3 max-w-[65ch] text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{product.desc}</p>
+          <p className="mt-3 max-w-[65ch] text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{getLocalizedDescription(product, locale)}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/contact" className="inline-flex rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white hover:bg-[#1e3317]">{t.productDetail.requestPrice}</Link>
             {product.file && (

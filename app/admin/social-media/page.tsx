@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
 import { normalizeSocialMedia, useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
+import { getLocalizedText } from "../../lib/data";
 import type { SocialMedia } from "../../lib/data";
 import AdminShell from "../AdminShell";
 import { Card, Field, FileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
@@ -31,7 +32,7 @@ function newId(): string {
 
 export default function SocialMediaAdminPage() {
   const router = useRouter();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const a = t.admin;
   const s = useStore();
   const [gate, setGate] = useState(false);
@@ -49,7 +50,7 @@ export default function SocialMediaAdminPage() {
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return sortedAll;
-    return sortedAll.filter((m) => `${m.name} ${m.description} ${m.instagram} ${m.facebook} ${m.tiktok}`.toLowerCase().includes(n));
+    return sortedAll.filter((m) => `${m.name} ${m.description} ${m.descriptionId} ${m.descriptionEn} ${m.descriptionZn} ${m.instagram} ${m.facebook} ${m.tiktok}`.toLowerCase().includes(n));
   }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -83,6 +84,12 @@ export default function SocialMediaAdminPage() {
     const payload = {
       name,
       description: String(f.description ?? ""),
+      descriptionId: String(f.descriptionId ?? ""),
+      descriptionEn: String(f.descriptionEn ?? ""),
+      descriptionZn: String(f.descriptionZn ?? ""),
+      description_id: String(f.descriptionId ?? ""),
+      description_en: String(f.descriptionEn ?? ""),
+      description_zn: String(f.descriptionZn ?? ""),
       image: String(f.image ?? ""),
       instagram: toUrl("instagram", String(f.instagram ?? "")),
       facebook: toUrl("facebook", String(f.facebook ?? "")),
@@ -146,7 +153,12 @@ export default function SocialMediaAdminPage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2"><Field label="name *"><Input value={f.name ?? ""} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Barry Callebaut" /></Field></div>
             {editIdx !== null && <div className="sm:col-span-2"><Field label="id (auto-generated)"><Input value={f.id ?? ""} readOnly className="bg-white/60 text-[#8B6F47]" /></Field></div>}
-            <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Short description shown under the logo" /></Field></div>
+            <div className="sm:col-span-2"><Field label="Legacy description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Fallback for existing records" /></Field></div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Description (Indonesian)"><TextArea value={f.descriptionId ?? ""} onChange={(e) => setF({ ...f, descriptionId: e.target.value })} rows={4} /></Field>
+              <Field label="Description (English)"><TextArea value={f.descriptionEn ?? ""} onChange={(e) => setF({ ...f, descriptionEn: e.target.value })} rows={4} /></Field>
+              <Field label="Description (Chinese)"><TextArea value={f.descriptionZn ?? ""} onChange={(e) => setF({ ...f, descriptionZn: e.target.value })} rows={4} /></Field>
+            </div>
             <div className="sm:col-span-2"><Field label="image (logo)"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="social-media" /></Field></div>
             <Field label="instagram"><Input value={f.instagram ?? ""} onChange={(e) => setF({ ...f, instagram: e.target.value })} placeholder="https://instagram.com/… or @handle" /></Field>
             <Field label="facebook"><Input value={f.facebook ?? ""} onChange={(e) => setF({ ...f, facebook: e.target.value })} placeholder="https://facebook.com/… or @handle" /></Field>
@@ -184,7 +196,7 @@ export default function SocialMediaAdminPage() {
                          ) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}
                        </td>
                       <td className="px-3 py-2 max-w-[220px]"><div className="truncate font-medium text-[#2D4A22]">{m.name}</div><div className="truncate text-[11px] text-[#8B6F47]">{m.id}</div></td>
-                      <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={m.description}>{m.description || "—"}</div></td>
+                       <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={getLocalizedText(locale, m.description, m.descriptionId, m.descriptionEn, m.descriptionZn)}>{getLocalizedText(locale, m.description, m.descriptionId, m.descriptionEn, m.descriptionZn) || "—"}</div></td>
                       <td className="px-3 py-2">
                         <div className="flex flex-wrap gap-1.5">
                           {links.length === 0 ? <span className="text-[#8B6F47]">—</span> : links.map((p) => (

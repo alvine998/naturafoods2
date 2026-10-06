@@ -158,6 +158,9 @@ export default function ProductsPage() {
       tag: String(f.tag ?? ""),
       img: String(f.img ?? ""),
       desc: String(f.desc ?? ""),
+      descId: String(f.descId ?? ""),
+      descEn: String(f.descEn ?? ""),
+      descZh: String(f.descZh ?? ""),
       type: (f.type as Product["type"]) ?? "general",
       isHighlight: Boolean(f.isHighlight),
       file: f.file ?? null,
@@ -178,6 +181,12 @@ export default function ProductsPage() {
         tag: item.tag,
         img: item.img,
         desc: item.desc,
+        descId: item.descId,
+        descEn: item.descEn,
+        descZh: item.descZh,
+        desc_id: item.descId,
+        desc_en: item.descEn,
+        desc_zn: item.descZh,
         isHighlight: item.isHighlight,
         file: item.file,
         sortIndex: item.sortIndex,
@@ -437,12 +446,23 @@ export default function ProductsPage() {
               </Field>
             </div>
             <div className="sm:col-span-2">
-              <Field label="desc">
+              <Field label="Legacy description">
                 <TextArea
                   value={f.desc ?? ""}
                   onChange={(e) => setF({ ...f, desc: e.target.value })}
                   rows={3}
                 />
+              </Field>
+            </div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Description (Indonesian)">
+                <TextArea value={f.descId ?? ""} onChange={(e) => setF({ ...f, descId: e.target.value })} rows={4} />
+              </Field>
+              <Field label="Description (English)">
+                <TextArea value={f.descEn ?? ""} onChange={(e) => setF({ ...f, descEn: e.target.value })} rows={4} />
+              </Field>
+              <Field label="Description (Chinese)">
+                <TextArea value={f.descZh ?? ""} onChange={(e) => setF({ ...f, descZh: e.target.value })} rows={4} />
               </Field>
             </div>
             <div className="sm:col-span-2">

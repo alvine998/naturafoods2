@@ -57,6 +57,9 @@ function normalizeProducts(raw: unknown): Product[] {
       tag: String(p.tag ?? ""),
       img: String(p.img ?? p.image ?? ""),
       desc: String(p.desc ?? p.description ?? ""),
+      descId: String(p.descId ?? p.desc_id ?? ""),
+      descEn: String(p.descEn ?? p.desc_en ?? ""),
+      descZh: String(p.descZh ?? p.descZn ?? p.desc_zn ?? p.desc_zh ?? ""),
       type: (p.type as Product["type"]) ?? "general",
       isHighlight: Boolean(p.isHighlight ?? p.is_highlight ?? false),
       file: String(p.file ?? p.file ?? "") || null,
@@ -102,17 +105,28 @@ export function normalizeSalesContacts(raw: unknown): SalesContact[] {
     return {
       id: String(c.id ?? c.slug ?? ""),
       name: String(c.name ?? ""),
-      gender: String(c.gender ?? ""),
+      gender: normalizeGender(c.gender),
       position: String(c.position ?? c.role ?? ""),
+      positionId: String(c.positionId ?? c.position_id ?? ""),
+      positionEn: String(c.positionEn ?? c.position_en ?? ""),
+      positionZn: String(c.positionZn ?? c.position_zn ?? ""),
       whatsapp: String(c.whatsapp ?? c.phone ?? ""),
       email: String(c.email ?? ""),
       photo: String(c.photo ?? c.image ?? c.avatar ?? ""),
       location: String(c.location ?? c.city ?? ""),
+      locationId: String(c.locationId ?? c.location_id ?? ""),
+      locationEn: String(c.locationEn ?? c.location_en ?? ""),
+      locationZn: String(c.locationZn ?? c.location_zn ?? ""),
       published,
       isPublished: published,
       sortIndex: toSortIndex(c.sortIndex ?? c.sort_index),
     };
   }).filter((c) => c.id && c.name);
+}
+
+function normalizeGender(value: unknown): "m" | "f" {
+  const gender = String(value ?? "").trim().toLowerCase();
+  return gender === "f" || gender === "female" ? "f" : "m";
 }
 
 export function normalizeSocialMedia(raw: unknown): SocialMedia[] {
@@ -121,6 +135,9 @@ export function normalizeSocialMedia(raw: unknown): SocialMedia[] {
     id: String(s.id ?? s.slug ?? ""),
     name: String(s.name ?? ""),
     description: String(s.description ?? s.desc ?? ""),
+    descriptionId: String(s.descriptionId ?? s.description_id ?? ""),
+    descriptionEn: String(s.descriptionEn ?? s.description_en ?? ""),
+    descriptionZn: String(s.descriptionZn ?? s.description_zn ?? ""),
     image: String(s.image ?? s.logo ?? s.img ?? ""),
     instagram: String(s.instagram ?? ""),
     facebook: String(s.facebook ?? ""),
@@ -184,6 +201,9 @@ function normalizeHomeBrands(raw: unknown): HomeBrand[] {
     name: String(h.name ?? ""),
     image: String(h.image ?? h.img ?? ""),
     desc: String(h.desc ?? h.description ?? ""),
+    descId: String(h.descId ?? h.desc_id ?? ""),
+    descEn: String(h.descEn ?? h.desc_en ?? ""),
+    descZh: String(h.descZh ?? h.descZn ?? h.desc_zn ?? h.desc_zh ?? ""),
     brandIds: parseBrandIds(h) ?? [],
     sortIndex: toSortIndex(h.sortIndex ?? h.sort_index),
     createdAt: h.createdAt as string | undefined,
@@ -235,12 +255,18 @@ function migrateSalesContacts(list: SalesContact[]): SalesContact[] {
     return {
       id: String(c.id ?? ""),
       name: String(c.name ?? ""),
-      gender: String(c.gender ?? ""),
+      gender: normalizeGender(c.gender),
       position: String(c.position ?? raw.role ?? ""),
+      positionId: String(c.positionId ?? raw.position_id ?? ""),
+      positionEn: String(c.positionEn ?? raw.position_en ?? ""),
+      positionZn: String(c.positionZn ?? raw.position_zn ?? ""),
       whatsapp: String(c.whatsapp ?? raw.phone ?? ""),
       email: String(c.email ?? ""),
       photo: String(c.photo ?? raw.image ?? raw.avatar ?? ""),
       location: String(c.location ?? raw.city ?? ""),
+      locationId: String(c.locationId ?? raw.location_id ?? ""),
+      locationEn: String(c.locationEn ?? raw.location_en ?? ""),
+      locationZn: String(c.locationZn ?? raw.location_zn ?? ""),
       published,
       isPublished: published,
       sortIndex: toSortIndex(raw.sortIndex ?? raw.sort_index),
@@ -266,6 +292,9 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
       id: String(p.id ?? ""),
       name: String(p.name ?? ""),
       description: String(p.description ?? p.desc ?? ""),
+      descriptionId: String(p.descriptionId ?? p.description_id ?? ""),
+      descriptionEn: String(p.descriptionEn ?? p.description_en ?? ""),
+      descriptionZn: String(p.descriptionZn ?? p.description_zn ?? ""),
       image,
       background,
       ...(images && images.length ? { images } : {}),

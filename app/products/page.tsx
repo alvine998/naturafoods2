@@ -6,6 +6,7 @@ import Image from "../components/SafeImage";
 import PageShell, { PageHeader, Breadcrumbs } from "../components/PageShell";
 import SalesContactCard from "../components/SalesContactCard";
 import { useLang } from "../i18n";
+import { getLocalizedDescription } from "../lib/data";
 import type { Product } from "../lib/data";
 import { apiFetch, buildQuery } from "../lib/api";
 import { sortByLandingOrder, useStore } from "../lib/store";
@@ -63,7 +64,7 @@ function loadProducts(): Product[] {
 }
 
 function ProductsInner() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const p = t.productsPage;
   const sp = useSearchParams();
   const { productCategories, masterBrands } = useStore();
@@ -104,6 +105,9 @@ function ProductsInner() {
               tag: String(raw.tag ?? ""),
               img: String(raw.img ?? raw.image ?? ""),
               desc: String(raw.desc ?? raw.description ?? ""),
+              descId: String(raw.descId ?? raw.desc_id ?? ""),
+              descEn: String(raw.descEn ?? raw.desc_en ?? ""),
+              descZh: String(raw.descZh ?? raw.descZn ?? raw.desc_zn ?? raw.desc_zh ?? ""),
               type: (raw.type as Product["type"]) ?? "general",
               isHighlight: Boolean(raw.isHighlight ?? false),
               brandId: (raw.brandId as string) ?? ((raw.brand as Record<string, unknown>)?.id as string) ?? null,
@@ -249,7 +253,7 @@ function ProductsInner() {
           <Link key={pr.slug} href={`/products/${pr.slug}`} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white transition hover:border-[#2D4A22]/20 hover:shadow-[0_8px_24px_rgba(45,74,34,0.08)]">
             <div className="aspect-[4/3] overflow-hidden bg-[#F5EFE0]">{src ? (isVideo ? <video src={src} autoPlay muted loop playsInline className="h-full w-full object-cover" /> : <Image src={src} alt={pr.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" width={400} height={300} />) : <div className="grid h-full w-full place-items-center bg-[#F5EFE0] text-[11px] tracking-[0.14em] text-[#8B6F47]">No image</div>}</div>
             <div className="p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="font-medium text-[#2D4A22] text-[14px] sm:text-[15px] break-words group-hover:underline decoration-[#2D4A22]/20 underline-offset-4">{pr.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{pr.note}</p><p className="mt-2 text-[12px] leading-5 text-[#1a1a16]/60">{pr.desc}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] font-medium text-white">{pr.tag}</span></div>
+              <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="font-medium text-[#2D4A22] text-[14px] sm:text-[15px] break-words group-hover:underline decoration-[#2D4A22]/20 underline-offset-4">{pr.title}</h3><p className="mt-1 text-[12px] text-[#8B6F47]">{pr.note}</p><p className="mt-2 text-[12px] leading-5 text-[#1a1a16]/60">{getLocalizedDescription(pr, locale)}</p></div><span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[10px] font-medium text-white">{pr.tag}</span></div>
             </div>
           </Link>
           );

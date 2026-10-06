@@ -8,7 +8,7 @@ import ContactInfoSection from "./ContactInfoSection";
 import YouTubeEmbed from "./YouTubeEmbed";
 import { sortByLandingOrder, sortOfficialPartners, useStore } from "../lib/store";
 import { useLang } from "../i18n";
-import { SEED_OFFICIAL_PARTNERS } from "../lib/data";
+import { getLocalizedText, SEED_OFFICIAL_PARTNERS } from "../lib/data";
 import type { OfficialPartner } from "../lib/data";
 
 type PartnerBrand = { id: string; name: string; logo: string };
@@ -641,7 +641,7 @@ const findPartnerCategory = (
 };
 
 export default function OfficialPartnersSection() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const { officialPartners, masterBrands, homeBrands, productCategories, products } = useStore();
   const sourcePartners = officialPartners ?? SEED_OFFICIAL_PARTNERS;
   const publishedPartners = sortOfficialPartners(
@@ -721,7 +721,7 @@ export default function OfficialPartnersSection() {
         const bottomLogos = brandLogos.length > 0 ? brandLogos : fallbackLogos;
         return {
           title: p.name,
-          description: p.description,
+          description: getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn),
           link: partnerLink(p, brands),
           brands,
           color:

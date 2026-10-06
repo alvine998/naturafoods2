@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Image from "./SafeImage";
 import { useLang } from "../i18n";
 import { useStore } from "../lib/store";
+import { getLocalizedText } from "../lib/data";
 
 export type ContactPerson = {
   region: string;
@@ -22,7 +23,7 @@ function ContactCard({
   contact: ContactPerson;
   index: number;
 }) {
-  const prefix = contact.gender?.toLowerCase() === "female" ? "Ms." : "Mr.";
+  const prefix = contact.gender?.toLowerCase() === "f" || contact.gender?.toLowerCase() === "female" ? "Ms." : "Mr.";
   const displayName = contact.name
     .replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, "")
     .trim();
@@ -86,15 +87,15 @@ function ContactCard({
 }
 
 export default function ContactInfoSection() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const { salesContacts } = useStore();
 
   const contacts: ContactPerson[] = (salesContacts ?? [])
     .filter((c) => c.published !== false)
     .map((s) => ({
-      region: String(s.location ?? ""),
+       region: getLocalizedText(locale, s.location, s.locationId, s.locationEn, s.locationZn),
       name: String(s.name ?? ""),
-      title: String(s.position ?? ""),
+       title: getLocalizedText(locale, s.position, s.positionId, s.positionEn, s.positionZn),
       whatsapp: String(s.whatsapp ?? ""),
       email: String(s.email ?? ""),
       avatar: String(s.photo ?? ""),

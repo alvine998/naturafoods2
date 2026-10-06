@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "../components/SafeImage";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getLocalizedText } from "../lib/data";
 import type { SocialMedia } from "../lib/data";
 import { fetchPublicSocialMedia, getSeedSocialMedia } from "../lib/store";
 import SiteNav from "../components/SiteNav";
@@ -33,7 +34,7 @@ function Reveal({
 }
 
 export default function SocialMediaPage() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const [brands, setBrands] = useState<SocialMedia[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -160,7 +161,7 @@ export default function SocialMediaPage() {
                       )}
                     </div>
                     <p className="text-gray-600 text-sm leading-relaxed mb-6 min-h-[48px]">
-                      {brand.description}
+                      {getLocalizedText(locale, brand.description, brand.descriptionId, brand.descriptionEn, brand.descriptionZn)}
                     </p>
                     <div className="flex justify-center gap-4">
                       {brand.instagram && (

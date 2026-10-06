@@ -3,11 +3,12 @@ import { MessageCircle, Mail, Phone } from "lucide-react";
 import Image from "./SafeImage";
 import { useLang } from "../i18n";
 import { salesInitials, sortSalesContacts, useStore } from "../lib/store";
+import { getLocalizedText } from "../lib/data";
 
-const copy: Record<string, { title: string; desc: string; chat: string; email: string; foot: string }> = {
-  en: { title: "Need help choosing?", desc: "Talk to our Sales & Marketing team — price list, samples and menu advice. Response within 24h.", chat: "Chat on WhatsApp", email: "Email", foot: "Mon–Sat 09:00–18:00 WIB · Jakarta" },
-  id: { title: "Butuh bantuan memilih?", desc: "Hubungi tim Sales & Marketing kami — daftar harga, sampel dan saran menu. Respon dalam 24 jam.", chat: "Chat WhatsApp", email: "Email", foot: "Senin–Sabtu 09:00–18:00 WIB · Jakarta" },
-  zh: { title: "需要选品帮助？", desc: "联系我们的销售与市场团队 — 报价单、样品与菜单建议，24小时内回复。", chat: "WhatsApp 咨询", email: "邮件", foot: "周一至周六 09:00–18:00 WIB · 雅加达" },
+const copy: Record<string, { team: string; title: string; desc: string; chat: string; email: string; foot: string }> = {
+  en: { team: "SALES & MARKETING", title: "Need help choosing?", desc: "Talk to our Sales & Marketing team — price list, samples and menu advice. Response within 24h.", chat: "Chat on WhatsApp", email: "Email", foot: "Mon–Sat 09:00–18:00 WIB · Jakarta" },
+  id: { team: "PENJUALAN & PEMASARAN", title: "Butuh bantuan memilih?", desc: "Hubungi tim Sales & Marketing kami — daftar harga, sampel dan saran menu. Respon dalam 24 jam.", chat: "Chat WhatsApp", email: "Email", foot: "Senin–Sabtu 09:00–18:00 WIB · Jakarta" },
+  zh: { team: "销售与市场", title: "需要选品帮助？", desc: "联系我们的销售与市场团队 — 报价单、样品与菜单建议，24小时内回复。", chat: "WhatsApp 咨询", email: "邮件", foot: "周一至周六 09:00–18:00 WIB · 雅加达" },
 };
 
 export default function SalesContactCard({ productTitle }: { productTitle?: string }) {
@@ -20,7 +21,7 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
     <div className="mt-10 sm:mt-12 rounded-[20px] sm:rounded-[24px] border border-[#2D4A22]/10 bg-white p-5 sm:p-6 md:p-7">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[12px] tracking-[0.16em] text-[#8B6F47]">SALES & MARKETING</p>
+          <p className="text-[12px] tracking-[0.16em] text-[#8B6F47]">{t.team}</p>
           <h3 className="mt-1 font-[var(--font-display)] text-[24px] sm:text-[26px] font-light leading-tight text-[#2D4A22]">{t.title}</h3>
           <p className="mt-2 max-w-[55ch] text-[14px] sm:text-[15px] leading-6 text-[#1a1a16]/60">{t.desc}</p>
         </div>
@@ -44,7 +45,7 @@ export default function SalesContactCard({ productTitle }: { productTitle?: stri
               )}
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-medium text-[#2D4A22]">{c.name}</p>
-                <p className="text-[13px] tracking-[0.04em] text-[#8B6F47]">{[c.position, c.location].filter(Boolean).join(" · ")}</p>
+                 <p className="text-[13px] tracking-[0.04em] text-[#8B6F47]">{[getLocalizedText(locale, c.position, c.positionId, c.positionEn, c.positionZn), getLocalizedText(locale, c.location, c.locationId, c.locationEn, c.locationZn)].filter(Boolean).join(" · ")}</p>
                 {c.whatsapp ? <a href={`tel:${digits}`} className="mt-2 inline-flex items-center gap-1.5 text-[14px] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"><Phone className="h-3.5 w-3.5" />{c.whatsapp}</a> : null}
                 {c.email ? <a href={`mailto:${c.email}`} className="mt-1 inline-flex items-center gap-1.5 truncate text-[14px] text-[#2D4A22]/70 underline decoration-[#2D4A22]/15 underline-offset-4"><Mail className="h-3.5 w-3.5" />{c.email}</a> : null}
                 <div className="mt-3 flex gap-2">

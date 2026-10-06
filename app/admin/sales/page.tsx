@@ -6,6 +6,7 @@ import { useLang } from "../../i18n";
 import { normalizeSalesContacts, useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { SalesContact } from "../../lib/data";
+import { getLocalizedText } from "../../lib/data";
 import AdminShell from "../AdminShell";
 import { Card, Field, FileUpload, Input, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexField, toSortIndex, sortBySortIndex, renumberByMove, persistSortIndexDiff, patchSortIndex, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
@@ -36,7 +37,7 @@ function initials(name: string): string {
 
 export default function SalesPage() {
   const router = useRouter();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const a = t.admin;
   const s = useStore();
   const [gate, setGate] = useState(false);
@@ -55,7 +56,7 @@ export default function SalesPage() {
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return ordered;
-    return ordered.filter((c) => `${c.name} ${c.position} ${c.whatsapp} ${c.email} ${c.location}`.toLowerCase().includes(n));
+    return ordered.filter((c) => `${c.name} ${c.position} ${c.positionId} ${c.positionEn} ${c.positionZn} ${c.whatsapp} ${c.email} ${c.location} ${c.locationId} ${c.locationEn} ${c.locationZn}`.toLowerCase().includes(n));
   }, [ordered, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -78,7 +79,7 @@ export default function SalesPage() {
     reorder(from, from + dir);
   };
   const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
-  const openAdd = () => { setF({ gender: "", published: true }); setEditIdx(null); setFormOpen(true); setErr(null); setIdTouched(false); };
+  const openAdd = () => { setF({ gender: "m", published: true }); setEditIdx(null); setFormOpen(true); setErr(null); setIdTouched(false); };
   const openEdit = (c: SalesContact) => {
     const realIdx = (s.salesContacts as SalesContact[]).indexOf(c);
     setF({ ...c }); setEditIdx(realIdx); setFormOpen(true); setErr(null); setIdTouched(true);
@@ -102,12 +103,18 @@ export default function SalesPage() {
     const item: SalesContact = {
       id,
       name: String(f.name).trim(),
-      gender: String(f.gender ?? ""),
-      position: String(f.position ?? ""),
+      gender: f.gender === "f" ? "f" : "m",
+      position: String(f.positionId ?? f.positionEn ?? f.positionZn ?? f.position ?? ""),
+      positionId: String(f.positionId ?? ""),
+      positionEn: String(f.positionEn ?? ""),
+      positionZn: String(f.positionZn ?? ""),
       whatsapp: String(f.whatsapp ?? ""),
       email: String(f.email ?? ""),
       photo: String(f.photo ?? ""),
-      location: String(f.location ?? ""),
+      location: String(f.locationId ?? f.locationEn ?? f.locationZn ?? f.location ?? ""),
+      locationId: String(f.locationId ?? ""),
+      locationEn: String(f.locationEn ?? ""),
+      locationZn: String(f.locationZn ?? ""),
       published,
       isPublished: published,
       sortIndex: toSortIndex(f.sortIndex),
@@ -116,15 +123,29 @@ export default function SalesPage() {
     // isPublished or published alias; send both. Sync local state from the
     // server response so it always matches server truth (e.g. id rename is
     // accepted but not persisted by the backend — local keeps server id).
-    const fromServer = (data: unknown): SalesContact => normalizeSalesContacts([data])[0] ?? item;
+    const fromServer = (data: unknown): SalesContact => {
+      const saved = normalizeSalesContacts([data])[0];
+      if (!saved) return item;
+      const raw = data && typeof data === "object" ? data as Record<string, unknown> : {};
+      return {
+        ...item,
+        ...saved,
+        positionId: raw.positionId == null && raw.position_id == null ? item.positionId : saved.positionId,
+        positionEn: raw.positionEn == null && raw.position_en == null ? item.positionEn : saved.positionEn,
+        positionZn: raw.positionZn == null && raw.position_zn == null ? item.positionZn : saved.positionZn,
+        locationId: raw.locationId == null && raw.location_id == null ? item.locationId : saved.locationId,
+        locationEn: raw.locationEn == null && raw.location_en == null ? item.locationEn : saved.locationEn,
+        locationZn: raw.locationZn == null && raw.location_zn == null ? item.locationZn : saved.locationZn,
+      };
+    };
     setSaving(true); setErr(null);
     try {
       if (isEdit) {
-        const json = await apiFetch<SalesContact>(`/admin/sales/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(item) });
+        const json = await apiFetch<SalesContact>(`/admin/sales/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify({ ...item, position_id: item.positionId, position_en: item.positionEn, position_zn: item.positionZn, location_id: item.locationId, location_en: item.locationEn, location_zn: item.locationZn }) });
         const saved = json.success && json.data ? fromServer(json.data) : item;
         s.setSalesContacts((prev: SalesContact[]) => prev.map((x, i) => i === editIdx ? saved : x));
       } else {
-        const json = await apiFetch<SalesContact>("/admin/sales", { method: "POST", body: JSON.stringify(item) });
+        const json = await apiFetch<SalesContact>("/admin/sales", { method: "POST", body: JSON.stringify({ ...item, position_id: item.positionId, position_en: item.positionEn, position_zn: item.positionZn, location_id: item.locationId, location_en: item.locationEn, location_zn: item.locationZn }) });
         const saved = json.success && json.data ? fromServer(json.data) : item;
         s.setSalesContacts((prev: SalesContact[]) => [...prev, saved]);
       }
@@ -191,17 +212,20 @@ export default function SalesPage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => handleNameChange(e.target.value)} placeholder="Andi Wijaya" /></Field>
             <Field label="id (auto from name — editable)"><Input value={f.id ?? ""} onChange={(e) => handleIdChange(e.target.value)} placeholder="andi-wijaya" /></Field>
-            <Field label="position"><Input value={f.position ?? ""} onChange={(e) => setF({ ...f, position: e.target.value })} placeholder="Sales — HORECA" /></Field>
+              <Field label="Position (Indonesian)"><Input value={f.positionId ?? f.position ?? ""} onChange={(e) => setF({ ...f, positionId: e.target.value })} placeholder="Sales — HORECA" /></Field>
             <Field label="gender">
-              <select value={f.gender ?? ""} onChange={(e) => setF({ ...f, gender: e.target.value })} className="w-full rounded-xl border border-[#2D4A22]/15 bg-white px-3 py-2 text-[13px] text-[#1a1a16] outline-none focus:border-[#2D4A22]/40">
-                <option value="">— Select —</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+              <select value={f.gender ?? "m"} onChange={(e) => setF({ ...f, gender: e.target.value as "m" | "f" })} className="w-full rounded-xl border border-[#2D4A22]/15 bg-white px-3 py-2 text-[13px] text-[#1a1a16] outline-none focus:border-[#2D4A22]/40">
+                <option value="m">Male</option>
+                <option value="f">Female</option>
               </select>
             </Field>
+            <Field label="Position (English)"><Input value={f.positionEn ?? ""} onChange={(e) => setF({ ...f, positionEn: e.target.value })} placeholder="Sales — HORECA" /></Field>
+            <Field label="Position (Chinese)"><Input value={f.positionZn ?? ""} onChange={(e) => setF({ ...f, positionZn: e.target.value })} placeholder="销售 — 餐饮渠道" /></Field>
             <Field label="whatsapp"><Input value={f.whatsapp ?? ""} onChange={(e) => setF({ ...f, whatsapp: e.target.value })} placeholder="+62 812-3456-7890" /></Field>
             <Field label="email"><Input type="email" value={f.email ?? ""} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="sales@naturafoods.id" /></Field>
-            <div className="sm:col-span-2"><Field label="location"><Input value={f.location ?? ""} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Jakarta" /></Field></div>
+            <Field label="Location (Indonesian)"><Input value={f.locationId ?? f.location ?? ""} onChange={(e) => setF({ ...f, locationId: e.target.value })} placeholder="Jakarta" /></Field>
+            <Field label="Location (English)"><Input value={f.locationEn ?? ""} onChange={(e) => setF({ ...f, locationEn: e.target.value })} placeholder="Jakarta" /></Field>
+            <div className="sm:col-span-2"><Field label="Location (Chinese)"><Input value={f.locationZn ?? ""} onChange={(e) => setF({ ...f, locationZn: e.target.value })} placeholder="雅加达" /></Field></div>
             <div className="sm:col-span-2"><Field label="photo"><FileUpload value={f.photo ?? ""} onChange={(v) => setF({ ...f, photo: v })} accept="image/*" folder="sales" /></Field></div>
             <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <label className="flex items-center gap-2 text-[12px] text-[#2D4A22]"><input type="checkbox" checked={f.published !== false} onChange={(e) => setF({ ...f, published: e.target.checked })} className="h-4 w-4 accent-[#2D4A22]" /> Published (shown on site)</label>
@@ -241,10 +265,10 @@ export default function SalesPage() {
                             <div className="min-w-0"><p className="truncate font-medium text-[#2D4A22]">{c.name}</p><p className="truncate text-[11px] text-[#8B6F47]">{c.id}{c.gender ? ` · ${c.gender}` : ""}</p></div>
                           </div>
                         </td>
-                        <td className="px-3 py-2">{c.position || <span className="text-[#8B6F47]">—</span>}</td>
+                         <td className="px-3 py-2">{getLocalizedText(locale, c.position, c.positionId, c.positionEn, c.positionZn) || <span className="text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2">{c.whatsapp || <span className="text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2 max-w-[220px] truncate text-[#2D4A22]/80">{c.email || <span className="text-[#8B6F47]">—</span>}</td>
-                        <td className="px-3 py-2">{c.location || <span className="text-[#8B6F47]">—</span>}</td>
+                         <td className="px-3 py-2">{getLocalizedText(locale, c.location, c.locationId, c.locationEn, c.locationZn) || <span className="text-[#8B6F47]">—</span>}</td>
                         <td className="px-3 py-2"><button onClick={() => togglePublished(c)} title="Toggle published" className={`rounded-full border px-2.5 py-1 text-[11px] ${c.published !== false ? "border-[#2D4A22]/20 bg-[#E8F0E2] text-[#2D4A22]" : "border-[#2D4A22]/10 bg-white text-[#8B6F47]"}`}>{c.published !== false ? "Published" : "Hidden"}</button></td>
                         <td className="px-3 py-2 text-right"><div className="inline-flex gap-1.5"><button onClick={() => openEdit(c)} className="rounded-full border bg-white px-3 py-1 text-[11px]">{a.edit}</button><button onClick={() => remove(c)} className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] text-red-700">{a.delete}</button></div></td>
                       </tr>

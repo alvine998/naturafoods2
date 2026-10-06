@@ -6,6 +6,7 @@ import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
 import type { OfficialPartner } from "../../lib/data";
+import { getLocalizedText } from "../../lib/data";
 import AdminShell from "../AdminShell";
 import { Card, Field, FileUpload, MultiFileUpload, Input, TextArea, TableWrap, Pagination, Toolbar, Empty, PAGE_SIZE, confirmAdminDelete, SortIndexCell, useDragSort } from "../_components";
 import { apiFetch } from "../../lib/api";
@@ -16,7 +17,7 @@ function slugify(input: string): string {
 
 export default function OfficialPartnersPage() {
   const router = useRouter();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const a = t.admin;
   const s = useStore();
   const [gate, setGate] = useState(false);
@@ -36,7 +37,7 @@ export default function OfficialPartnersPage() {
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return sortedAll;
-    return sortedAll.filter((p) => `${p.id} ${p.name} ${p.description}`.toLowerCase().includes(n));
+    return sortedAll.filter((p) => `${p.id} ${p.name} ${p.description} ${p.descriptionId} ${p.descriptionEn} ${p.descriptionZn}`.toLowerCase().includes(n));
   }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -122,6 +123,9 @@ export default function OfficialPartnersPage() {
       id: String(f.id),
       name: String(f.name),
       description: String(f.description ?? ""),
+      descriptionId: String(f.descriptionId ?? ""),
+      descriptionEn: String(f.descriptionEn ?? ""),
+      descriptionZn: String(f.descriptionZn ?? ""),
       image,
       background,
       ...(images.length ? { images } : {}),
@@ -132,7 +136,7 @@ export default function OfficialPartnersPage() {
       link: String(f.link ?? ""),
     };
     // backend uses snake_case `brand_ids` — send both spellings
-    const payload = { ...item, brand_ids: brandIds };
+    const payload = { ...item, description_id: item.descriptionId, description_en: item.descriptionEn, description_zn: item.descriptionZn, brand_ids: brandIds };
     // local duplicate check (optimistic)
     if (editIdx === null) {
       const exists = (s.officialPartners as OfficialPartner[]).some((p) => p.id === item.id);
@@ -212,7 +216,12 @@ export default function OfficialPartnersPage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="id *"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="bensdorp" /></Field>
             <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Bens Dorp" /></Field>
-            <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Short description for the partner card" /></Field></div>
+            <div className="sm:col-span-2"><Field label="Legacy description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Fallback for existing records" /></Field></div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Description (Indonesian)"><TextArea value={f.descriptionId ?? ""} onChange={(e) => setF({ ...f, descriptionId: e.target.value })} rows={4} /></Field>
+              <Field label="Description (English)"><TextArea value={f.descriptionEn ?? ""} onChange={(e) => setF({ ...f, descriptionEn: e.target.value })} rows={4} /></Field>
+              <Field label="Description (Chinese)"><TextArea value={f.descriptionZn ?? ""} onChange={(e) => setF({ ...f, descriptionZn: e.target.value })} rows={4} /></Field>
+            </div>
             <div className="sm:col-span-2"><Field label="link — internal override (e.g. /products?brand=<id>). Empty = use Brands above, else /products"><Input value={f.link ?? ""} onChange={(e) => setF({ ...f, link: e.target.value })} placeholder="/products?brand=…" /></Field></div>
             <Field label="card background color"><div className="flex flex-wrap items-center gap-2">
                 <input
@@ -341,7 +350,7 @@ export default function OfficialPartnersPage() {
                           ) : <span className="text-[11px] text-[#8B6F47]">auto</span>}
                         </td>
                         <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{p.name}</div><div className="text-[11px] text-[#8B6F47]">{p.id}</div></td>
-                        <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={p.description}>{p.description || "—"}</div></td>
+                        <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn)}>{getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn) || "—"}</div></td>
                         <td className="px-3 py-2">
                           {(p.brandIds ?? []).length > 0 ? (
                             <div className="flex flex-wrap gap-1">
