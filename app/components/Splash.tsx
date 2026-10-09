@@ -46,14 +46,14 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
                  width={335}
                  height={102}
                  style={{ width: "auto" }}
-                 className="h-12 w-auto max-w-[72vw] object-contain sm:h-14 sm:max-w-none md:h-[80px] lg:h-[100px] [@media(max-height:500px)]:h-10"
+                 className="h-16 w-auto max-w-[80vw] object-contain sm:h-14 sm:max-w-none md:h-[100px] lg:h-[120px] [@media(max-height:500px)]:h-12"
                />
             </motion.div>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="mt-3 sm:mt-4 max-w-[22ch] sm:max-w-none px-4 text-center text-[12px] leading-relaxed tracking-[0.16em] text-[#8B6F47] [text-wrap:balance] sm:text-[13px] sm:tracking-[0.22em] [@media(max-height:500px)]:mt-2 [@media(max-height:500px)]:text-[11px]"
+              className="mt-3 sm:mt-4 max-w-[24ch] sm:max-w-none px-4 text-center text-[14px] leading-relaxed tracking-[0.16em] text-[#8B6F47] [text-wrap:balance] sm:text-[13px] sm:tracking-[0.22em] [@media(max-height:500px)]:mt-2 [@media(max-height:500px)]:text-[11px]"
             >
               {sub ?? "CHOCO & MATCHA DISTRIBUTION"}
             </motion.p>
@@ -72,7 +72,7 @@ export default function Splash({ onDone, sub, foot }: { onDone: () => void; sub?
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.1 }}
-            className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 w-full max-w-[92vw] -translate-x-1/2 px-6 text-center text-[11px] leading-relaxed tracking-[0.1em] text-[#C4B5A0] [text-wrap:balance] sm:bottom-8 sm:max-w-none sm:px-0 sm:text-[12px] sm:tracking-[0.14em]"
+            className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 w-full max-w-[92vw] -translate-x-1/2 px-6 text-center text-[13px] leading-relaxed tracking-[0.1em] text-[#C4B5A0] [text-wrap:balance] sm:bottom-8 sm:max-w-none sm:px-0 sm:text-[12px] sm:tracking-[0.14em]"
           >
             {foot ?? "EST. 2019 — JAKARTA · TOKYO · MELBOURNE"}
           </motion.p>

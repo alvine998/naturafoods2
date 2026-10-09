@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  font-size: calc(100% + 2px);
   --background: #FFFFFF;
   --foreground: #1a1a16;
   --cream: #FFFFFF;
@@ -10,6 +11,10 @@
   --sage-light: #4A6741;
   --earth: #8B6F47;
   --stone: #C4B5A0;
+}
+
+:root:has([data-admin-layout]) {
+  font-size: 100%;
 }
 
 @theme inline {

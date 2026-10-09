@@ -8,59 +8,143 @@ import { baseMetadata } from "./lib/seo";
 import { OrgJsonLd } from "./components/JsonLd";
 import ScrollToTopOnNav from "./components/ScrollToTopOnNav";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
-const display = Cormorant_Garamond({ variable: "--font-display", subsets: ["latin"], weight: ["300", "400", "500", "600"], display: "swap" });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+const display = Cormorant_Garamond({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+});
 // Local Poppins from public/fonts/Poppins (self-hosted, no Google download)
 const poppins = localFont({
   src: [
-    { path: "../public/fonts/Poppins/Poppins-Regular.ttf", weight: "400", style: "normal" },
-    { path: "../public/fonts/Poppins/Poppins-Medium.ttf", weight: "500", style: "normal" },
-    { path: "../public/fonts/Poppins/Poppins-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "../public/fonts/Poppins/Poppins-Bold.ttf", weight: "700", style: "normal" },
+    {
+      path: "../public/fonts/Poppins/Poppins-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins/Poppins-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins/Poppins-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins/Poppins-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
   ],
   variable: "--font-poppins",
   display: "swap",
 });
 const louisGeorgeCafe = localFont({
   src: [
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light.ttf", weight: "300", style: "normal" },
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light Italic.ttf", weight: "300", style: "italic" },
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe.ttf", weight: "400", style: "normal" },
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Italic.ttf", weight: "400", style: "italic" },
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold.ttf", weight: "700", style: "normal" },
-    { path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold Italic.ttf", weight: "700", style: "italic" },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe Light Italic.ttf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe Italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Louis_george_cafe/Louis George Cafe Bold Italic.ttf",
+      weight: "700",
+      style: "italic",
+    },
   ],
   variable: "--font-louis-george-cafe",
   display: "swap",
 });
 const newake = localFont({
-  src: [{ path: "../public/fonts/Newake/NewakeFont-Demo.otf", weight: "400", style: "normal" }],
+  src: [
+    {
+      path: "../public/fonts/Newake/NewakeFont-Demo.otf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
   variable: "--font-newake",
   display: "swap",
 });
 const nexa = localFont({
   src: [
-    { path: "../public/fonts/Nexa/Nexa-ExtraLight.ttf", weight: "200", style: "normal" },
-    { path: "../public/fonts/Nexa/Nexa-Heavy.ttf", weight: "800", style: "normal" },
+    {
+      path: "../public/fonts/Nexa/Nexa-ExtraLight.ttf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Nexa/Nexa-Heavy.ttf",
+      weight: "800",
+      style: "normal",
+    },
   ],
   variable: "--font-nexa",
   display: "swap",
 });
 const montserrat = localFont({
-  src: [{ path: "../public/fonts/Montserrat/Montserrat-VariableFont_wght.ttf", weight: "100 900", style: "normal" }],
+  src: [
+    {
+      path: "../public/fonts/Montserrat/Montserrat-VariableFont_wght.ttf",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-montserrat",
   display: "swap",
 });
 
 export const metadata: Metadata = baseMetadata();
-export const viewport: Viewport = { themeColor: "#2D4A22", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  themeColor: "#2D4A22",
+  width: "device-width",
+  initialScale: 1,
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} ${louisGeorgeCafe.variable} ${newake.variable} ${nexa.variable} ${montserrat.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${display.variable} ${poppins.variable} ${louisGeorgeCafe.variable} ${newake.variable} ${nexa.variable} ${montserrat.variable} h-full antialiased`}
+    >
       <body className="min-h-full bg-white text-[#1a1a16]">
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-8VQMTMC3D1" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-8VQMTMC3D1"
+          strategy="afterInteractive"
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
