@@ -372,7 +372,7 @@ function RetailBrandSection() {
 type SmallPackTile = { slug: string; title: string; img: string };
 
 function SmallPackSection() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const { products } = useStore();
 
   const tiles: SmallPackTile[] = sortByLandingOrder(
@@ -380,7 +380,7 @@ function SmallPackSection() {
   )
     .map((p) => ({
       slug: p.slug,
-      title: p.title,
+       title: getLocalizedText(locale, p.title, p.titleId, p.titleEn, p.titleZn),
       img: p.img,
     }))
     .filter((p) => p.slug && p.img?.trim());
@@ -720,7 +720,7 @@ export default function OfficialPartnersSection() {
               : [];
         const bottomLogos = brandLogos.length > 0 ? brandLogos : fallbackLogos;
         return {
-          title: p.name,
+          title: getLocalizedText(locale, p.name, p.nameId, p.nameEn, p.nameZn),
           description: getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn),
           link: partnerLink(p, brands),
           brands,

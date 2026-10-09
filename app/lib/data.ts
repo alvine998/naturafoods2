@@ -1,18 +1,18 @@
 export type ProductType = "home-brand" | "small-pack" | "general";
 export type ProductCategory = { id: string; slug: string; name: string; description?: string; isActive: boolean; isHighlight?: boolean; sortIndex?: number };
-export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; brandId?: string | null; brand?: { id: string; slug: string; name: string }; title: string; note: string; tag: string; img: string; desc: string; descId?: string; descEn?: string; descZh?: string; type?: ProductType; isHighlight?: boolean; file?: string | null; sortIndex?: number };
+export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; brandId?: string | null; brand?: { id: string; slug: string; name: string }; title: string; titleId?: string; titleEn?: string; titleZn?: string; note: string; tag: string; img: string; desc: string; descId?: string; descEn?: string; descZh?: string; type?: ProductType; isHighlight?: boolean; file?: string | null; sortIndex?: number };
 export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string; keywords?: string[]; sortIndex?: number };
-export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
-export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
+export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; imgId?: string; imgEn?: string; imgZn?: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
+export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; imgId?: string; imgEn?: string; imgZn?: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
 export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string; sortIndex?: number };
 export type Inquiry = { id: string; name: string; city: string; whatsapp: string; interest: string; date: string };
-export type OfficialPartner = { id: string; name: string; description: string; descriptionId?: string; descriptionEn?: string; descriptionZn?: string; image: string; background: string; images?: string[]; color?: string; order?: number; sortIndex?: number; isPublished: boolean; brandIds?: string[]; link?: string };
+export type OfficialPartner = { id: string; name: string; nameId?: string; nameEn?: string; nameZn?: string; description: string; descriptionId?: string; descriptionEn?: string; descriptionZn?: string; image: string; background: string; images?: string[]; color?: string; order?: number; sortIndex?: number; isPublished: boolean; brandIds?: string[]; link?: string };
 export type SalesContact = { id: string; name: string; gender: "m" | "f"; position: string; positionId?: string; positionEn?: string; positionZn?: string; whatsapp: string; email: string; photo: string; location: string; locationId?: string; locationEn?: string; locationZn?: string; published: boolean; isPublished?: boolean; sortIndex?: number };
 export type HomeBrand = { id: string; name: string; image: string; desc: string; descId?: string; descEn?: string; descZh?: string; brandIds?: string[]; createdAt?: string; updatedAt?: string; sortIndex?: number };
 export type SocialMedia = { id: string; name: string; description: string; descriptionId?: string; descriptionEn?: string; descriptionZn?: string; image: string; instagram: string; facebook: string; tiktok: string; createdAt?: string; updatedAt?: string; sortIndex?: number };
 export type MasterBrand = { id: string; slug: string; name: string; description: string; logo: string; isActive: boolean; sortIndex?: number };
 export type PromoBannerStatus = "active" | "inactive";
-export type PromoBanner = { id: string; name: string; description: string; status: PromoBannerStatus; image: string; url?: string; sortIndex?: number; createdAt?: string; updatedAt?: string };
+export type PromoBanner = { id: string; name: string; description: string; status: PromoBannerStatus; image: string; imageId?: string; imageEn?: string; imageZn?: string; url?: string; sortIndex?: number; createdAt?: string; updatedAt?: string };
 
 export const SEED_PRODUCTS: Product[] = [];
 
@@ -81,4 +81,14 @@ export function getLocalizedText(
       ? [zh, base, en, id]
       : [en, base, id, zh];
   return localized.find((value) => typeof value === "string" && value.trim()) ?? "";
+}
+
+export function getLocalizedImage(
+  locale: string,
+  base?: string,
+  id?: string,
+  en?: string,
+  zh?: string,
+): string {
+  return getLocalizedText(locale, undefined, id, en, zh) || base || "";
 }

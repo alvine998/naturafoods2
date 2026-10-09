@@ -37,7 +37,7 @@ export default function OfficialPartnersPage() {
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return sortedAll;
-    return sortedAll.filter((p) => `${p.id} ${p.name} ${p.description} ${p.descriptionId} ${p.descriptionEn} ${p.descriptionZn}`.toLowerCase().includes(n));
+    return sortedAll.filter((p) => `${p.id} ${p.name} ${p.nameId} ${p.nameEn} ${p.nameZn} ${p.description} ${p.descriptionId} ${p.descriptionEn} ${p.descriptionZn}`.toLowerCase().includes(n));
   }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -101,6 +101,9 @@ export default function OfficialPartnersPage() {
       .filter((v, idx, arr) => arr.indexOf(v) === idx);
     setF({
       ...p,
+      nameId: p.nameId || p.name,
+      nameEn: p.nameEn || p.name,
+      nameZn: p.nameZn || p.name,
       brandIds,
       images: baseImages.length ? baseImages : legacyLogos.length ? legacyLogos : p.image ? [p.image] : [],
     });
@@ -108,7 +111,7 @@ export default function OfficialPartnersPage() {
   };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
-    if (!f.id || !f.name) return;
+    if (!f.id || !f.nameId || !f.nameEn || !f.nameZn) return;
     // images[] = bottom-bar logos (more than one), background = single right-side visual
     const images = (Array.isArray(f.images) ? f.images : []).map((v) => String(v ?? "")).filter(Boolean);
     let image = String(f.image ?? "");
@@ -121,7 +124,10 @@ export default function OfficialPartnersPage() {
     const brandIds = (Array.isArray(f.brandIds) ? f.brandIds : []).map((v) => String(v ?? "")).filter(Boolean);
     const item: OfficialPartner = {
       id: String(f.id),
-      name: String(f.name),
+      name: String(f.nameEn || f.nameId || f.nameZn),
+      nameId: String(f.nameId ?? ""),
+      nameEn: String(f.nameEn ?? ""),
+      nameZn: String(f.nameZn ?? ""),
       description: String(f.description ?? ""),
       descriptionId: String(f.descriptionId ?? ""),
       descriptionEn: String(f.descriptionEn ?? ""),
@@ -136,7 +142,7 @@ export default function OfficialPartnersPage() {
       link: String(f.link ?? ""),
     };
     // backend uses snake_case `brand_ids` — send both spellings
-    const payload = { ...item, description_id: item.descriptionId, description_en: item.descriptionEn, description_zn: item.descriptionZn, brand_ids: brandIds };
+    const payload = { ...item, name_id: item.nameId, name_en: item.nameEn, name_zn: item.nameZn, description_id: item.descriptionId, description_en: item.descriptionEn, description_zn: item.descriptionZn, brand_ids: brandIds };
     // local duplicate check (optimistic)
     if (editIdx === null) {
       const exists = (s.officialPartners as OfficialPartner[]).some((p) => p.id === item.id);
@@ -215,7 +221,11 @@ export default function OfficialPartnersPage() {
           <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[3]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="id *"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="bensdorp" /></Field>
-            <Field label="name *"><Input value={f.name ?? ""} onChange={(e) => { const name = e.target.value; setF((prev) => ({ ...prev, name, ...(!slugTouched ? { id: slugify(name) } : {}) })); }} placeholder="Bens Dorp" /></Field>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Name (Indonesian) *"><Input value={f.nameId ?? ""} onChange={(e) => setF({ ...f, nameId: e.target.value })} required /></Field>
+              <Field label="Name (English) *"><Input value={f.nameEn ?? ""} onChange={(e) => setF({ ...f, nameEn: e.target.value })} required /></Field>
+              <Field label="Name (Chinese) *"><Input value={f.nameZn ?? ""} onChange={(e) => setF({ ...f, nameZn: e.target.value })} required /></Field>
+            </div>
             <div className="sm:col-span-2"><Field label="Legacy description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} placeholder="Fallback for existing records" /></Field></div>
             <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
               <Field label="Description (Indonesian)"><TextArea value={f.descriptionId ?? ""} onChange={(e) => setF({ ...f, descriptionId: e.target.value })} rows={4} /></Field>
@@ -299,8 +309,8 @@ export default function OfficialPartnersPage() {
               </label>
             </Field>
           </div>
-          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.id || !f.name || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
-          {(!f.id || !f.name) && <p className="mt-2 text-[11px] text-[#8B6F47]">ID & name required. ID must be unique.</p>}
+          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.id || !f.nameId || !f.nameEn || !f.nameZn || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
+          {(!f.id || !f.nameId || !f.nameEn || !f.nameZn) && <p className="mt-2 text-[11px] text-[#8B6F47]">ID and names in Indonesian, English, and Chinese are required.</p>}
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">
@@ -349,7 +359,7 @@ export default function OfficialPartnersPage() {
                             </span>
                           ) : <span className="text-[11px] text-[#8B6F47]">auto</span>}
                         </td>
-                        <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{p.name}</div><div className="text-[11px] text-[#8B6F47]">{p.id}</div></td>
+                        <td className="px-3 py-2"><div className="font-medium text-[#2D4A22]">{getLocalizedText(locale, p.name, p.nameId, p.nameEn, p.nameZn)}</div><div className="text-[11px] text-[#8B6F47]">{p.id}</div></td>
                         <td className="px-3 py-2 max-w-[280px]"><div className="truncate text-[#1a1a16]/70" title={getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn)}>{getLocalizedText(locale, p.description, p.descriptionId, p.descriptionEn, p.descriptionZn) || "—"}</div></td>
                         <td className="px-3 py-2">
                           {(p.brandIds ?? []).length > 0 ? (

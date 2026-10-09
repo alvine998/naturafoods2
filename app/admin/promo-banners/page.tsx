@@ -28,7 +28,13 @@ function toPayload(v: Partial<PromoBanner>) {
     name: String(v.name ?? "").trim(),
     description: String(v.description ?? ""),
     status: (v.status === "inactive" ? "inactive" : "active") as PromoBannerStatus,
-    image: String(v.image ?? ""),
+    image: String(v.imageEn?.trim() ? v.imageEn : v.imageId?.trim() ? v.imageId : v.imageZn ?? ""),
+    imageId: String(v.imageId ?? ""),
+    imageEn: String(v.imageEn ?? ""),
+    imageZn: String(v.imageZn ?? ""),
+    image_id: String(v.imageId ?? ""),
+    image_en: String(v.imageEn ?? ""),
+    image_zn: String(v.imageZn ?? ""),
     url: safeHttpUrl(v.url),
   };
 }
@@ -85,8 +91,8 @@ export default function PromoBannersPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const pathFor = (id: string) => `/admin/promo-banners/${encodeURIComponent(id)}`;
-  const openAdd = () => { setF({ status: "active" }); setFormOpen(true); setErr(null); };
-  const openEdit = (b: PromoBanner) => { setF({ ...b }); setFormOpen(true); setErr(null); };
+  const openAdd = () => { setF({ status: "active", imageId: "", imageEn: "", imageZn: "" }); setFormOpen(true); setErr(null); };
+  const openEdit = (b: PromoBanner) => { setF({ ...b, imageId: b.imageId || b.image, imageEn: b.imageEn || b.image, imageZn: b.imageZn || b.image }); setFormOpen(true); setErr(null); };
   const closeForm = () => { setF({ status: "active" }); setFormOpen(false); setErr(null); };
 
   const toggleStatus = async (id: string) => {
@@ -111,17 +117,18 @@ export default function PromoBannersPage() {
 
   const save = async () => {
     const payload = toPayload(f);
-    if (!payload.name || !payload.image) { setErr("Name and image are required."); return; }
+    if (!payload.name || !payload.image) { setErr("Name and at least one image are required."); return; }
     if (f.url?.trim() && !payload.url) { setErr("URL must start with http:// or https://."); return; }
     setSaving(true); setErr(null);
     try {
       if (isEdit) {
         const json = await apiFetch<unknown>(pathFor(f.id!), { method: "PUT", body: JSON.stringify(payload) });
-        const updated = pickServerBanner(json) ?? { ...payload, id: f.id! };
-        s.setPromoBanners((prev: PromoBanner[]) => prev.map((x) => (x.id === f.id ? { ...updated, id: f.id! } : x)));
+        const updated = { ...pickServerBanner(json), ...payload, id: f.id! } as PromoBanner;
+        s.setPromoBanners((prev: PromoBanner[]) => prev.map((x) => (x.id === f.id ? updated : x)));
       } else {
         const json = await apiFetch<unknown>("/admin/promo-banners", { method: "POST", body: JSON.stringify(payload) });
-        const created = pickServerBanner(json) ?? { ...payload, id: newLocalId() };
+        const serverBanner = pickServerBanner(json);
+        const created = { ...serverBanner, ...payload, id: serverBanner?.id ?? newLocalId() } as PromoBanner;
         s.setPromoBanners((prev: PromoBanner[]) => [...prev, created]);
       }
       closeForm();
@@ -166,7 +173,11 @@ export default function PromoBannersPage() {
             {isEdit && <div className="sm:col-span-2"><Field label="id (UUID, assigned by server)"><Input value={f.id ?? ""} disabled readOnly /></Field></div>}
             <div className="sm:col-span-2"><Field label="name"><Input value={f.name ?? ""} maxLength={150} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Ramadhan Promo" /></Field></div>
             <div className="sm:col-span-2"><Field label="description"><TextArea value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} rows={2} placeholder="Short promo description shown on the banner caption" /></Field></div>
-            <div className="sm:col-span-2"><Field label="banner image (upload — max 10MB)"><FileUpload value={f.image ?? ""} onChange={(v) => setF({ ...f, image: v })} accept="image/*" folder="promo-banners" maxImageMB={10} /></Field></div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Banner image (Indonesian)"><FileUpload value={f.imageId ?? ""} onChange={(v) => setF({ ...f, imageId: v })} accept="image/*" folder="promo-banners" maxImageMB={10} /></Field>
+              <Field label="Banner image (English)"><FileUpload value={f.imageEn ?? ""} onChange={(v) => setF({ ...f, imageEn: v })} accept="image/*" folder="promo-banners" maxImageMB={10} /></Field>
+              <Field label="Banner image (Chinese)"><FileUpload value={f.imageZn ?? ""} onChange={(v) => setF({ ...f, imageZn: v })} accept="image/*" folder="promo-banners" maxImageMB={10} /></Field>
+            </div>
             <div className="sm:col-span-2"><Field label="link url (optional — banner image becomes a link)"><Input type="url" inputMode="url" value={f.url ?? ""} onChange={(e) => setF({ ...f, url: e.target.value })} placeholder="https://…" /></Field>{f.url?.trim() && !safeHttpUrl(f.url) && <p className="mt-1 text-[11px] text-red-600">Must start with http:// or https://</p>}</div>
             <Field label="status">
               <div className="flex gap-2">
@@ -183,7 +194,7 @@ export default function PromoBannersPage() {
               </div>
             </Field>
           </div>
-          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.name?.trim() || !f.image?.trim() || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
+          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.name?.trim() || !(f.image?.trim() || f.imageId?.trim() || f.imageEn?.trim() || f.imageZn?.trim()) || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
         </Card>
       ) : (
         <div className="mt-4 grid gap-3">
@@ -199,7 +210,7 @@ export default function PromoBannersPage() {
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-3">
                             <div className="h-12 w-20 shrink-0 overflow-hidden rounded-lg border border-[#2D4A22]/10 bg-[#F5EFE0]">
-                              {b.image ? <Image src={b.image} alt={b.name} width={160} height={96} className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-[10px] text-[#8B6F47]">No image</div>}
+                              {(b.image || b.imageEn || b.imageId || b.imageZn) ? <Image src={b.image || b.imageEn || b.imageId || b.imageZn || ""} alt={b.name} width={160} height={96} className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-[10px] text-[#8B6F47]">No image</div>}
                             </div>
                             <div className="min-w-0">
                               <p className="truncate font-medium text-[#2D4A22]">{b.name}</p>

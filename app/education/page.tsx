@@ -4,21 +4,21 @@ import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
 import FullHeightSlider from "../components/FullHeightSlider";
 import { useLang } from "../i18n";
-import { SEED_EDU } from "../lib/data";
+import { getLocalizedImage, SEED_EDU } from "../lib/data";
 import type { Edu } from "../lib/data";
 
 export default function EducationPage() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const p = t.eduPage;
   const [items, setItems] = useState<Edu[]>(SEED_EDU);
-  useEffect(() => { try { const v = localStorage.getItem("nf_edu"); if (v) setItems(JSON.parse(v)); } catch {} }, []);
+  useEffect(() => { try { const v = localStorage.getItem("nf_edu"); if (v) setItems((JSON.parse(v) as (Edu & { img_id?: string; img_en?: string; img_zn?: string })[]).map((e) => ({ ...e, imgId: e.imgId ?? e.img_id, imgEn: e.imgEn ?? e.img_en, imgZn: e.imgZn ?? e.img_zn }))); } catch {} }, []);
   const slides = items.map((e) => ({
     id: e.id,
     eyebrow: e.eyebrow ?? `${e.level} · ${e.duration}`,
     title: e.title,
     desc: e.desc,
     meta: `${p.level}: ${e.level}  ·  ${e.duration}`,
-    img: e.img,
+    img: getLocalizedImage(locale, e.img, e.imgId, e.imgEn, e.imgZn),
     link: e.link,
     cta: e.cta,
   }));

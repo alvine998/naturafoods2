@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLang } from "../../i18n";
 import { useStore } from "../../lib/store";
 import { isAuthed } from "../../lib/auth";
-import type { Product } from "../../lib/data";
+import { getLocalizedText, type Product } from "../../lib/data";
 import AdminShell from "../AdminShell";
 import {
   Card,
@@ -51,7 +51,7 @@ function slugify(input: string): string {
 
 export default function ProductsPage() {
   const router = useRouter();
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const a = t.admin;
   const s = useStore();
   const [gate, setGate] = useState(false);
@@ -91,7 +91,7 @@ export default function ProductsPage() {
     if (catFilter !== "all") list = list.filter((p) => p.cat === catFilter);
     if (needle)
       list = list.filter((p) =>
-        `${p.title} ${p.slug} ${p.cat} ${p.tag} ${p.type ?? ""} ${p.isHighlight ? "highlight" : ""}`
+        `${p.title} ${p.titleId} ${p.titleEn} ${p.titleZn} ${p.slug} ${p.cat} ${p.tag} ${p.type ?? ""} ${p.isHighlight ? "highlight" : ""}`
           .toLowerCase()
           .includes(needle),
       );
@@ -132,7 +132,13 @@ export default function ProductsPage() {
   };
   const openEdit = (i: number) => {
     console.log("openEdit", i, s.products[i]);
-    setF(s.products[i]);
+    const product = s.products[i];
+    setF({
+      ...product,
+      titleId: product.titleId || product.title,
+      titleEn: product.titleEn || product.title,
+      titleZn: product.titleZn || product.title,
+    });
     setEditIdx(i);
     setFormOpen(true);
     setErr(null);
@@ -146,14 +152,18 @@ export default function ProductsPage() {
     setSlugTouched(false);
   };
   const save = async () => {
-    if (!f.title || !f.slug) return;
+    if (!f.titleId || !f.titleEn || !f.titleZn || !f.slug) return;
     const selectedCat = s.productCategories.find((c) => c.slug === f.cat);
+    const title = String(f.titleEn || f.titleId || f.titleZn);
     const item: Product = {
       slug: String(f.slug),
       cat: (f.cat as string) ?? "choco",
       categoryId: selectedCat?.id,
       brandId: f.brandId ?? null,
-      title: String(f.title),
+      title,
+      titleId: String(f.titleId ?? ""),
+      titleEn: String(f.titleEn ?? ""),
+      titleZn: String(f.titleZn ?? ""),
       note: String(f.note ?? ""),
       tag: String(f.tag ?? ""),
       img: String(f.img ?? ""),
@@ -177,6 +187,12 @@ export default function ProductsPage() {
         brandId: item.brandId,
         type: item.type,
         title: item.title,
+        titleId: item.titleId,
+        titleEn: item.titleEn,
+        titleZn: item.titleZn,
+        title_id: item.titleId,
+        title_en: item.titleEn,
+        title_zn: item.titleZn,
         note: item.note,
         tag: item.tag,
         img: item.img,
@@ -366,20 +382,17 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="title">
-              <Input
-                value={f.title ?? ""}
-                onChange={(e) => {
-                  const title = e.target.value;
-                  setF((prev) => ({
-                    ...prev,
-                    title,
-                    ...(!slugTouched ? { slug: slugify(title) } : {}),
-                  }));
-                }}
-                placeholder="Belgian Dark 72%"
-              />
-            </Field>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Title (Indonesian)">
+                <Input value={f.titleId ?? ""} onChange={(e) => { const titleId = e.target.value; setF((prev) => ({ ...prev, titleId, title: prev.titleEn || titleId || prev.titleZn || "", ...(!slugTouched ? { slug: slugify(titleId) } : {}) })); }} required />
+              </Field>
+              <Field label="Title (English)">
+                <Input value={f.titleEn ?? ""} onChange={(e) => { const titleEn = e.target.value; setF((prev) => ({ ...prev, titleEn, title: titleEn || prev.titleId || prev.titleZn || "" })); }} required />
+              </Field>
+              <Field label="Title (Chinese)">
+                <Input value={f.titleZn ?? ""} onChange={(e) => { const titleZn = e.target.value; setF((prev) => ({ ...prev, titleZn, title: prev.titleEn || prev.titleId || titleZn || "" })); }} required />
+              </Field>
+            </div>
             <Field label="type">
               <Select
                 value={f.type ?? "general"}
@@ -479,7 +492,7 @@ export default function ProductsPage() {
           <div className="mt-4 flex gap-2">
             <button
               onClick={save}
-              disabled={!f.title || !f.slug || saving}
+              disabled={!f.titleId || !f.titleEn || !f.titleZn || !f.slug || saving}
               className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50"
             >
               {saving ? "Saving…" : a.save}
@@ -492,7 +505,7 @@ export default function ProductsPage() {
               {a.cancel}
             </button>
           </div>
-          {(!f.title || !f.slug) && (
+          {(!f.titleId || !f.titleEn || !f.titleZn || !f.slug) && (
             <p className="mt-2 text-[11px] text-[#8B6F47]">
               Title & slug required.
             </p>
@@ -608,7 +621,7 @@ export default function ProductsPage() {
                           )}
                         </td>
                         <td className="px-3 py-2 font-medium text-[#2D4A22]">
-                          {p.title}
+                          {getLocalizedText(locale, p.title, p.titleId, p.titleEn, p.titleZn)}
                           <div className="text-[11px] font-normal text-[#8B6F47] line-clamp-1">
                             {p.note}
                           </div>

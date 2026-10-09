@@ -11,6 +11,8 @@ import {
 import { safeHttpUrl } from "../lib/safe-url";
 import type { PromoBanner } from "../lib/data";
 import BannerSkeleton from "./BannerSkeleton";
+import { getLocalizedImage } from "../lib/data";
+import { useLang } from "../i18n";
 
 function PromoCaption({ banner }: { banner: PromoBanner }) {
   const name = banner.name?.trim() ?? "";
@@ -35,7 +37,9 @@ function PromoCaption({ banner }: { banner: PromoBanner }) {
 }
 
 function PromoMedia({ banner }: { banner: PromoBanner }) {
-  const src = banner.image?.trim() ? banner.image.trim() : null;
+  const { locale } = useLang();
+  const localizedImage = getLocalizedImage(locale, banner.image, banner.imageId, banner.imageEn, banner.imageZn);
+  const src = localizedImage?.trim() ? localizedImage.trim() : null;
   const href = safeHttpUrl(banner.url);
   if (!src) {
     return (

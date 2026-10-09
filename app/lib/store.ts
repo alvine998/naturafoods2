@@ -52,7 +52,10 @@ function normalizeProducts(raw: unknown): Product[] {
       cat: catSlug,
       categoryId: catId || undefined,
       category: catObj ? { id: String(catObj.id ?? ""), slug: String(catObj.slug ?? catSlug), name: String(catObj.name ?? catSlug), description: String(catObj.description ?? ""), isActive: Boolean(catObj.isActive ?? true) } : undefined,
-      title: String(p.title ?? ""),
+      title: String(p.title ?? p.title_id ?? p.titleId ?? p.title_en ?? p.titleEn ?? p.title_zn ?? p.titleZn ?? ""),
+      titleId: String(p.titleId ?? p.title_id ?? ""),
+      titleEn: String(p.titleEn ?? p.title_en ?? ""),
+      titleZn: String(p.titleZn ?? p.title_zn ?? ""),
       note: String(p.note ?? ""),
       tag: String(p.tag ?? ""),
       img: String(p.img ?? p.image ?? ""),
@@ -171,7 +174,10 @@ function normalizeEdu(raw: unknown): Edu[] {
     desc: String(e.desc ?? e.description ?? ""),
     duration: e.duration != null ? String(e.duration) : undefined,
     level: e.level != null ? String(e.level) : undefined,
-    img: String(e.img ?? e.image ?? ""),
+    img: String(e.img ?? e.image ?? e.img_en ?? e.imgEn ?? e.img_id ?? e.imgId ?? e.img_zn ?? e.imgZn ?? ""),
+    imgId: String(e.imgId ?? e.img_id ?? ""),
+    imgEn: String(e.imgEn ?? e.img_en ?? ""),
+    imgZn: String(e.imgZn ?? e.img_zn ?? ""),
     link: e.link != null ? String(e.link) : undefined,
     cta: e.cta != null ? String(e.cta) : undefined,
     eyebrow: e.eyebrow != null ? String(e.eyebrow) : undefined,
@@ -186,7 +192,10 @@ function normalizeInnovation(raw: unknown): Innovation[] {
     title: String(x.title ?? ""),
     desc: String(x.desc ?? x.description ?? ""),
     tag: String(x.tag ?? ""),
-    img: String(x.img ?? x.image ?? ""),
+    img: String(x.img ?? x.image ?? x.img_en ?? x.imgEn ?? x.img_id ?? x.imgId ?? x.img_zn ?? x.imgZn ?? ""),
+    imgId: String(x.imgId ?? x.img_id ?? ""),
+    imgEn: String(x.imgEn ?? x.img_en ?? ""),
+    imgZn: String(x.imgZn ?? x.img_zn ?? ""),
     link: x.link != null ? String(x.link) : undefined,
     cta: x.cta != null ? String(x.cta) : undefined,
     eyebrow: x.eyebrow != null ? String(x.eyebrow) : undefined,
@@ -231,7 +240,10 @@ export function normalizePromoBanners(raw: unknown): PromoBanner[] {
       name: String(b.name ?? b.title ?? ""),
       description: String(b.description ?? b.desc ?? ""),
       status,
-      image: String(b.image ?? b.img ?? ""),
+      image: String(b.image ?? b.img ?? b.image_en ?? b.imageEn ?? b.image_id ?? b.imageId ?? b.image_zn ?? b.imageZn ?? ""),
+      imageId: String(b.imageId ?? b.image_id ?? ""),
+      imageEn: String(b.imageEn ?? b.image_en ?? ""),
+      imageZn: String(b.imageZn ?? b.image_zn ?? ""),
       url: safeHttpUrl(b.url ?? b.link ?? b.targetUrl),
       sortIndex: toSortIndex(b.sortIndex ?? b.sort_index),
       createdAt: b.createdAt as string | undefined,
@@ -290,7 +302,10 @@ function normalizeOfficialPartners(raw: unknown): OfficialPartner[] {  if (!Arra
     const link = typeof p.link === "string" && p.link.trim() ? p.link.trim() : undefined;
     return {
       id: String(p.id ?? ""),
-      name: String(p.name ?? ""),
+      name: String(p.name ?? p.name_id ?? p.nameId ?? p.name_en ?? p.nameEn ?? p.name_zn ?? p.nameZn ?? ""),
+      nameId: String(p.nameId ?? p.name_id ?? ""),
+      nameEn: String(p.nameEn ?? p.name_en ?? ""),
+      nameZn: String(p.nameZn ?? p.name_zn ?? ""),
       description: String(p.description ?? p.desc ?? ""),
       descriptionId: String(p.descriptionId ?? p.description_id ?? ""),
       descriptionEn: String(p.descriptionEn ?? p.description_en ?? ""),
@@ -367,7 +382,7 @@ function migrateOfficialPartners(list: OfficialPartner[]): OfficialPartner[] {
     void _drop;
     void _drop2;
     void _drop3;
-    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: sortVal, sortIndex: sortVal, ...(brandIds ? { brandIds } : {}) } as OfficialPartner;
+    return { ...rest, id: String(p.id ?? ""), name: String(p.name ?? raw.name_id ?? raw.nameId ?? raw.name_en ?? raw.nameEn ?? raw.name_zn ?? raw.nameZn ?? ""), nameId: String(raw.nameId ?? raw.name_id ?? ""), nameEn: String(raw.nameEn ?? raw.name_en ?? ""), nameZn: String(raw.nameZn ?? raw.name_zn ?? ""), description: String(p.description ?? ""), image, background: String(p.background ?? ""), ...(images ? { images } : {}), ...(isValidHexColor(p.color) ? { color: (p.color as string).trim() } : {}), order: sortVal, sortIndex: sortVal, ...(brandIds ? { brandIds } : {}) } as OfficialPartner;
   });
 }
 

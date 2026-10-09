@@ -56,21 +56,22 @@ export default function EducationPage() {
     reorder(from, from + dir);
   };
   const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
-  const openAdd = () => { setF({}); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
-  const openEdit = (i: number) => { setF(s.edu[i]); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const openAdd = () => { setF({ imgId: "", imgEn: "", imgZn: "" }); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
+  const openEdit = (i: number) => { const item = s.edu[i]; setF({ ...item, imgId: item.imgId || item.img, imgEn: item.imgEn || item.img, imgZn: item.imgZn || item.img }); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
   const closeForm = () => { setF({}); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const save = async () => {
     if (!f.title) return;
-    const item: Edu = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), img: String(f.img ?? ""), link: String(f.link ?? ""), sortIndex: toSortIndex(f.sortIndex) };
+    const item: Edu = { id: String(f.id ?? Date.now().toString()), title: String(f.title), desc: String(f.desc ?? ""), img: String(f.imgEn || f.imgId || f.imgZn || ""), imgId: String(f.imgId ?? ""), imgEn: String(f.imgEn ?? ""), imgZn: String(f.imgZn ?? ""), link: String(f.link ?? ""), sortIndex: toSortIndex(f.sortIndex) };
+    const payload = { ...item, img_id: item.imgId, img_en: item.imgEn, img_zn: item.imgZn };
     setSaving(true); setErr(null);
     const isEdit = editIdx !== null;
     const originalId = isEdit ? s.edu[editIdx!]?.id : null;
     try {
       if (isEdit) {
-        await apiFetch(`/admin/education/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(item) });
+        await apiFetch(`/admin/education/${encodeURIComponent(originalId!)}`, { method: "PUT", body: JSON.stringify(payload) });
         s.setEdu((prev: Edu[]) => prev.map((x, i) => i === editIdx ? item : x));
       } else {
-        await apiFetch("/admin/education", { method: "POST", body: JSON.stringify(item) });
+        await apiFetch("/admin/education", { method: "POST", body: JSON.stringify(payload) });
         s.setEdu((prev: Edu[]) => [...prev, item]);
       }
       closeForm();
@@ -118,7 +119,11 @@ export default function EducationPage() {
             <Field label="id"><Input value={f.id ?? ""} onChange={(e) => { setSlugTouched(true); setF({ ...f, id: slugify(e.target.value) }); }} placeholder="edu-001" /></Field>
             <Field label="title"><Input value={f.title ?? ""} onChange={(e) => { const title = e.target.value; setF((prev) => ({ ...prev, title, ...(!slugTouched ? { id: slugify(title) } : {}) })); }} placeholder="Barista Matcha Essentials" /></Field>
             <div className="sm:col-span-2"><Field label="desc"><TextArea value={f.desc ?? ""} onChange={(e) => setF({ ...f, desc: e.target.value })} rows={2} /></Field></div>
-            <div className="sm:col-span-2"><Field label="image / video (max 10MB image · 20MB video)"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" maxImageMB={10} /></Field></div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Image / video (Indonesian)"><FileUpload value={f.imgId ?? ""} onChange={(v) => setF({ ...f, imgId: v })} accept="image/*,video/*" maxImageMB={10} folder="education" /></Field>
+              <Field label="Image / video (English)"><FileUpload value={f.imgEn ?? ""} onChange={(v) => setF({ ...f, imgEn: v })} accept="image/*,video/*" maxImageMB={10} folder="education" /></Field>
+              <Field label="Image / video (Chinese)"><FileUpload value={f.imgZn ?? ""} onChange={(v) => setF({ ...f, imgZn: v })} accept="image/*,video/*" maxImageMB={10} folder="education" /></Field>
+            </div>
             <div className="sm:col-span-2"><Field label="link"><Input value={f.link ?? ""} onChange={(e) => setF({ ...f, link: e.target.value })} placeholder="https://youtube.com/watch?v=..." /></Field></div>
             <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
           </div>

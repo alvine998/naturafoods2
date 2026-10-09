@@ -6,7 +6,7 @@ import Image from "../../components/SafeImage";
 import PageShell, { Breadcrumbs } from "../../components/PageShell";
 import SalesContactCard from "../../components/SalesContactCard";
 import { ArrowLeft, Download } from "lucide-react";
-import { getLocalizedDescription, SEED_PRODUCTS } from "../../lib/data";
+import { getLocalizedDescription, getLocalizedText, SEED_PRODUCTS } from "../../lib/data";
 import type { Product } from "../../lib/data";
 import { useLang } from "../../i18n";
 import { apiFetch } from "../../lib/api";
@@ -27,7 +27,10 @@ export default function ProductDetailPage() {
           const norm: Product = {
             slug: String(raw.slug ?? raw.id ?? slug),
             cat: (raw.cat as Product["cat"]) ?? "choco",
-            title: String(raw.title ?? ""),
+            title: String(raw.title ?? raw.title_id ?? raw.titleId ?? raw.title_en ?? raw.titleEn ?? raw.title_zn ?? raw.titleZn ?? ""),
+            titleId: String(raw.titleId ?? raw.title_id ?? ""),
+            titleEn: String(raw.titleEn ?? raw.title_en ?? ""),
+            titleZn: String(raw.titleZn ?? raw.title_zn ?? ""),
             note: String(raw.note ?? ""),
             tag: String(raw.tag ?? ""),
             img: String(raw.img ?? raw.image ?? ""),
@@ -59,14 +62,15 @@ export default function ProductDetailPage() {
   if (!done) return <PageShell><p className="py-12 text-center text-[#8B6F47]">…</p></PageShell>;
   if (!product) return <PageShell><Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: t.productDetail.notFound }]} /><p className="py-12 text-center text-[#8B6F47]">{t.productDetail.notFound}</p><Link href="/products" className="mx-auto mt-4 block w-fit rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] tracking-[0.14em] text-white">{t.productDetail.back}</Link></PageShell>;
   const img = product.img?.trim() ? product.img : null;
+  const productTitle = getLocalizedText(locale, product.title, product.titleId, product.titleEn, product.titleZn);
   const isVideo = !!img && (img.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(img));
   return (
     <PageShell>
-      <Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: product.title }]} />
+      <Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: productTitle }]} />
       <Link href="/products" className="inline-flex items-center gap-1 text-[11px] tracking-[0.14em] text-[#2D4A22] hover:underline"><ArrowLeft className="h-3 w-3" /> {t.productsPage.title}</Link>
       <div className="mt-4 sm:mt-6 overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-[#2D4A22]/10">
         {img ? (
-          <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{isVideo ? <video src={img} controls className="h-full w-full object-cover" /> : <Image src={img} alt={product.title} className="h-full w-full object-cover" width={1000} height={500} />}</div>
+          <div className="aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-[#F5EFE0]">{isVideo ? <video src={img} controls className="h-full w-full object-cover" /> : <Image src={img} alt={productTitle} className="h-full w-full object-cover" width={1000} height={500} />}</div>
         ) : null}
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2">
@@ -75,7 +79,7 @@ export default function ProductDetailPage() {
             {product.isHighlight && <span className="rounded-full bg-[#2D4A22] px-2 py-1 text-[10px] text-white">★ Highlight</span>}
             {product.type && <span className="rounded-full border border-[#2D4A22]/10 bg-white px-2 py-1 text-[10px] text-[#2D4A22]">{product.type}</span>}
           </div>
-          <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] font-light leading-none text-[#2D4A22] break-words">{product.title}</h1>
+          <h1 className="mt-3 sm:mt-4 font-[var(--font-display)] text-[24px] sm:text-[28px] md:text-[36px] font-light leading-none text-[#2D4A22] break-words">{productTitle}</h1>
           <p className="mt-2 text-[12px] tracking-[0.06em] text-[#8B6F47]">{product.note}</p>
           <p className="mt-3 max-w-[65ch] text-[13px] sm:text-[14px] leading-6 text-[#1a1a16]/60">{getLocalizedDescription(product, locale)}</p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -87,7 +91,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
-      <SalesContactCard productTitle={product.title} />
+      <SalesContactCard productTitle={productTitle} />
     </PageShell>
   );
 }

@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { sortByLandingOrder, useStore } from "../lib/store";
 import PromoBannerSlider from "./PromoBannerSlider";
 import BannerSkeleton from "./BannerSkeleton";
+import { getLocalizedImage } from "../lib/data";
+import { useLang } from "../i18n";
 
 type SlideItem = {
   id: string;
@@ -134,19 +136,20 @@ function HeroSlider({ items, ready }: { items: SlideItem[]; ready: boolean }) {
 }
 
 export default function EduInnoSliderBanner() {
+  const { locale } = useLang();
   const { ready, edu, innovation } = useStore();
 
   const eduSlides: SlideItem[] = sortByLandingOrder(edu).map((e) => ({
     id: `edu-${e.id}`,
     title: e.title,
-    img: e.img,
+    img: getLocalizedImage(locale, e.img, e.imgId, e.imgEn, e.imgZn),
     link: e.link,
   }));
 
   const innoSlides: SlideItem[] = sortByLandingOrder(innovation).map((i) => ({
     id: `inno-${i.id}`,
     title: i.title,
-    img: i.img,
+    img: getLocalizedImage(locale, i.img, i.imgId, i.imgEn, i.imgZn),
     link: i.link,
   }));
 

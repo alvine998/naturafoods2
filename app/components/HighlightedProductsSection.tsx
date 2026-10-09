@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useMemo } from "react";
 import { sortByLandingOrder, useStore } from "../lib/store";
+import { useLang } from "../i18n";
+import { getLocalizedText } from "../lib/data";
 import type { Product, ProductCategory } from "../lib/data";
 
 function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -18,6 +20,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 const MAX_PRODUCTS = 4;
 
 export default function HighlightedProductsSection() {
+  const { locale } = useLang();
   const { products, productCategories } = useStore();
 
   const sections = useMemo(() => {
@@ -56,7 +59,7 @@ export default function HighlightedProductsSection() {
                   <motion.div key={p.slug} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -6, transition: { duration: 0.22 } }} className="group overflow-hidden rounded-[20px] border border-[#2D4A22]/[0.07] bg-white">
                     <Link href={`/products/${p.slug}`} className="block aspect-[4/3] overflow-hidden bg-[#F5EFE0]">
                       {p.img?.trim() ? (
-                        <Image src={p.img} alt={p.title} width={400} height={300} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]" />
+                        <Image src={p.img} alt={getLocalizedText(locale, p.title, p.titleId, p.titleEn, p.titleZn)} width={400} height={300} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]" />
                       ) : (
                         <div className="grid h-full w-full place-items-center text-[11px] tracking-[0.14em] text-[#8B6F47]">No image</div>
                       )}
@@ -64,7 +67,7 @@ export default function HighlightedProductsSection() {
                     <div className="p-4 sm:p-5">
                       <Link href={`/products/${p.slug}`} className="flex items-start justify-between gap-3 group/link">
                         <div className="min-w-0">
-                          <h3 className="font-medium leading-tight text-[#2D4A22] text-[16px] sm:text-[17px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{p.title}</h3>
+                          <h3 className="font-medium leading-tight text-[#2D4A22] text-[16px] sm:text-[17px] group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">{getLocalizedText(locale, p.title, p.titleId, p.titleEn, p.titleZn)}</h3>
                           <p className="mt-1 text-[14px] text-[#8B6F47]">{p.note}</p>
                         </div>
                         {p.tag && <span className="shrink-0 rounded-full bg-[#2D4A22] px-2.5 sm:px-3 py-1 text-[12px] sm:text-[13px] font-medium text-white">{p.tag}</span>}
