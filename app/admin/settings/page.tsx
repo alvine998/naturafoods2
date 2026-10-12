@@ -110,7 +110,14 @@ export default function CompanySettingsAdminPage() {
       misiPersonPhoto: form.misi_person_photo,
       misiPersonName: form.misi_person_name,
       misiPersonPosition: form.misi_person_position,
-      careerBanner: form.career_banner,
+      careerBanner: form.career_banner_en?.trim() ? form.career_banner_en : form.career_banner_id?.trim() ? form.career_banner_id : form.career_banner_zn?.trim() ? form.career_banner_zn : form.career_banner,
+      career_banner: form.career_banner_en?.trim() ? form.career_banner_en : form.career_banner_id?.trim() ? form.career_banner_id : form.career_banner_zn?.trim() ? form.career_banner_zn : form.career_banner,
+      careerBannerId: form.career_banner_id,
+      careerBannerEn: form.career_banner_en,
+      careerBannerZn: form.career_banner_zn,
+      career_banner_id: form.career_banner_id,
+      career_banner_en: form.career_banner_en,
+      career_banner_zn: form.career_banner_zn,
       careerUrl: form.career_url,
       mapsUrl: form.maps_url,
     };
@@ -303,9 +310,24 @@ export default function CompanySettingsAdminPage() {
           </div>
         </Section>
 
-        <Section title="Careers" desc="The full-width banner image displayed at the top of the Careers page.">
-          <div className="sm:col-span-2">
-            <Field label="Careers banner image">
+        <Section title="Careers" desc="Full-width banner images displayed at the top of the Careers page — one per language (ID / EN / ZN).">
+          <div>
+            <Field label="Careers banner — ID">
+              <FileUpload value={form.career_banner_id} onChange={(v) => set("career_banner_id", v)} folder="settings" />
+            </Field>
+          </div>
+          <div>
+            <Field label="Careers banner — EN">
+              <FileUpload value={form.career_banner_en} onChange={(v) => set("career_banner_en", v)} folder="settings" />
+            </Field>
+          </div>
+          <div>
+            <Field label="Careers banner — ZN">
+              <FileUpload value={form.career_banner_zn} onChange={(v) => set("career_banner_zn", v)} folder="settings" />
+            </Field>
+          </div>
+          <div>
+            <Field label="Careers banner — legacy fallback">
               <FileUpload value={form.career_banner} onChange={(v) => set("career_banner", v)} folder="settings" />
             </Field>
           </div>

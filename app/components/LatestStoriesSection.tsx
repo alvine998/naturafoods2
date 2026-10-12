@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { useLang } from "../i18n";
 import { useStore } from "../lib/store";
 import type { Article } from "../lib/data";
+import { getArticleTitle, getArticleExcerpt } from "../lib/data";
 import EduInnoSliderBanner from "./EduInnoSliderBanner";
 
 function sortByDateDesc(list: Article[]): Article[] {
@@ -36,7 +37,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 export default function LatestStoriesSection() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const { articles, edu, innovation, promoBanners, ready } = useStore();
 
   const list: Article[] = sortByDateDesc(
@@ -84,6 +85,8 @@ export default function LatestStoriesSection() {
             const src = a.img?.trim() ? a.img : null;
             const isVideo =
               !!src && (src.startsWith("data:video") || /\.(mp4|webm|mov)(\?|$)/i.test(src));
+            const localizedTitle = getArticleTitle(a, locale);
+            const localizedExcerpt = getArticleExcerpt(a, locale);
             return (
               <motion.div
                 key={a.slug}
@@ -101,7 +104,7 @@ export default function LatestStoriesSection() {
                     ) : (
                       <Image
                         src={src}
-                        alt={a.title}
+                        alt={localizedTitle}
                         width={640}
                         height={400}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]"
@@ -120,10 +123,10 @@ export default function LatestStoriesSection() {
                   </div>
                   <Link href={`/articles/${a.slug}`} className="group/link">
                     <h3 className="mt-3 font-medium leading-tight text-[#2D4A22] text-[16px] sm:text-[17px] break-words group-hover/link:underline decoration-[#2D4A22]/20 underline-offset-4">
-                      {a.title}
+                      {localizedTitle}
                     </h3>
                   </Link>
-                  <p className="mt-2 text-[15px] leading-7 text-[#1a1a16]/60 line-clamp-2">{a.excerpt}</p>
+                  <p className="mt-2 text-[15px] leading-7 text-[#1a1a16]/60 line-clamp-2">{localizedExcerpt}</p>
                   <Link
                     href={`/articles/${a.slug}`}
                     className="mt-4 inline-flex items-center gap-1 text-[13px] tracking-[0.1em] text-[#2D4A22] underline decoration-[#2D4A22]/20 underline-offset-4"

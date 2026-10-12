@@ -4,17 +4,18 @@ import Image from "../components/SafeImage";
 import Link from "next/link";
 import SiteNav from "../components/SiteNav";
 import SiteFooter from "../components/SiteFooter";
-import { useCompanySettings } from "../lib/companySettings";
+import { useCompanySettings, getCareerBanner } from "../lib/companySettings";
 import { useLang } from "../i18n";
 
 const DEFAULT_CAREER_BANNER =
   "https://cdn-naturafoods.alvineitsolutions.com/Screenshot%202026-09-15%20at%2007.03.34.png";
 
 export default function CareersPage() {
-  const { t } = useLang();
+  const { t, locale } = useLang();
   const copy = t.careersLanding;
   const companySettings = useCompanySettings();
   const careerUrl = companySettings.career_url || "https://glints.com";
+  const careerBanner = getCareerBanner(companySettings, locale) || DEFAULT_CAREER_BANNER;
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <SiteNav />
@@ -26,9 +27,9 @@ export default function CareersPage() {
         aria-label={copy.cta}
         className="group relative block min-h-[100svh] overflow-hidden"
       >
-        {/* Full-bleed background image */}
+        {/* Full-bleed background image (localized ID / EN / ZN) */}
         <Image
-          src={companySettings.career_banner || DEFAULT_CAREER_BANNER}
+          src={careerBanner}
           alt={copy.imageAlt}
           fill
           priority

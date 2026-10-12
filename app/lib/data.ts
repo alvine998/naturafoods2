@@ -1,7 +1,7 @@
 export type ProductType = "home-brand" | "small-pack" | "general";
 export type ProductCategory = { id: string; slug: string; name: string; description?: string; isActive: boolean; isHighlight?: boolean; sortIndex?: number };
 export type Product = { slug: string; cat: string; categoryId?: string; category?: ProductCategory; brandId?: string | null; brand?: { id: string; slug: string; name: string }; title: string; titleId?: string; titleEn?: string; titleZn?: string; note: string; tag: string; img: string; desc: string; descId?: string; descEn?: string; descZh?: string; type?: ProductType; isHighlight?: boolean; file?: string | null; sortIndex?: number };
-export type Article = { slug: string; title: string; excerpt: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string; keywords?: string[]; sortIndex?: number };
+export type Article = { slug: string; title: string; titleId?: string; titleEn?: string; titleZn?: string; excerpt: string; excerptId?: string; excerptEn?: string; excerptZn?: string; content: string; contentId?: string; contentEn?: string; contentZh?: string; date: string; category: string; img: string; keywords?: string[]; sortIndex?: number };
 export type Edu = { id: string; title: string; desc: string; duration?: string; level?: string; img: string; imgId?: string; imgEn?: string; imgZn?: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
 export type Innovation = { id: string; title: string; desc: string; tag: string; img: string; imgId?: string; imgEn?: string; imgZn?: string; link?: string; cta?: string; eyebrow?: string; sortIndex?: number };
 export type Job = { id: string; title: string; dept: string; loc: string; type: string; desc: string; sortIndex?: number };
@@ -91,4 +91,29 @@ export function getLocalizedImage(
   zh?: string,
 ): string {
   return getLocalizedText(locale, undefined, id, en, zh) || base || "";
+}
+
+export function getArticleTitle(
+  article: { title?: string; titleId?: string; titleEn?: string; titleZn?: string } & Record<string, unknown>,
+  locale: string,
+): string {
+  const a = article as { title?: string; titleId?: string; titleEn?: string; titleZn?: string; title_zh?: string; titleZh?: string };
+  const zn = a.titleZn ?? a.titleZh ?? (article as Record<string, unknown>).title_zn as string | undefined ?? (article as Record<string, unknown>).title_zh as string | undefined;
+  return getLocalizedText(locale, a.title, a.titleId, a.titleEn, zn);
+}
+
+export function getArticleExcerpt(
+  article: { excerpt?: string; excerptId?: string; excerptEn?: string; excerptZn?: string } & Record<string, unknown>,
+  locale: string,
+): string {
+  const a = article as { excerpt?: string; excerptId?: string; excerptEn?: string; excerptZn?: string; excerptZh?: string };
+  const raw = article as Record<string, unknown>;
+  const zn = a.excerptZn ?? a.excerptZh ?? (raw.excerpt_zn as string | undefined) ?? (raw.excerpt_zh as string | undefined) ?? (raw.excerptZN as string | undefined) ?? (raw.excerptZH as string | undefined);
+  return getLocalizedText(
+    locale,
+    a.excerpt,
+    (a.excerptId ?? (raw.excerpt_id as string | undefined) ?? (raw.excerptID as string | undefined)),
+    (a.excerptEn ?? (raw.excerpt_en as string | undefined) ?? (raw.excerptEN as string | undefined)),
+    zn,
+  );
 }

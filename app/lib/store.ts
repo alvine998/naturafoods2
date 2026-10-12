@@ -73,20 +73,36 @@ function normalizeProducts(raw: unknown): Product[] {
 
 function normalizeArticles(raw: unknown): Article[] {
   if (!Array.isArray(raw)) return SEED_ARTICLES;
-  return raw.map((a: Record<string, unknown>) => ({
-    slug: String(a.slug ?? ""),
-    title: String(a.title ?? ""),
-    excerpt: String(a.excerpt ?? ""),
-    content: String(a.content ?? a.contentEn ?? a.contentEN ?? ""),
-    contentId: String(a.contentId ?? a.contentID ?? a.content ?? ""),
-    contentEn: String(a.contentEn ?? a.contentEN ?? a.content ?? ""),
-    contentZh: String(a.contentZh ?? a.contentZN ?? a.contentZh ?? a.content ?? ""),
-    date: String(a.date ?? a.published_date ?? new Date().toISOString().slice(0, 10)),
-    category: String(a.category ?? "General"),
-    img: String(a.img ?? a.thumbnail ?? ""),
-    keywords: Array.isArray(a.keywords) ? a.keywords.map((keyword) => String(keyword).trim()).filter(Boolean) : typeof a.keywords === "string" ? a.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean) : [],
-    sortIndex: toSortIndex(a.sortIndex ?? a.sort_index),
-  })).filter((a) => a.slug && a.title);
+  return raw.map((a: Record<string, unknown>) => {
+    const titleId = String(a.titleId ?? a.title_id ?? a.titleID ?? "");
+    const titleEn = String(a.titleEn ?? a.title_en ?? a.titleEN ?? "");
+    const titleZn = String(a.titleZn ?? a.title_zn ?? a.titleZN ?? a.titleZh ?? a.title_zh ?? a.titleZH ?? "");
+    const title = String(a.title ?? titleEn ?? titleId ?? titleZn ?? "");
+    const excerptId = String(a.excerptId ?? a.excerpt_id ?? a.excerptID ?? "");
+    const excerptEn = String(a.excerptEn ?? a.excerpt_en ?? a.excerptEN ?? "");
+    const excerptZn = String(a.excerptZn ?? a.excerpt_zn ?? a.excerptZN ?? a.excerptZh ?? a.excerpt_zh ?? a.excerptZH ?? "");
+    const excerpt = String(a.excerpt ?? excerptEn ?? excerptId ?? excerptZn ?? "");
+    return {
+      slug: String(a.slug ?? ""),
+      title,
+      titleId: titleId || title,
+      titleEn: titleEn || title,
+      titleZn: titleZn || title,
+      excerpt,
+      excerptId: excerptId || excerpt,
+      excerptEn: excerptEn || excerpt,
+      excerptZn: excerptZn || excerpt,
+      content: String(a.content ?? a.contentEn ?? a.contentEN ?? ""),
+      contentId: String(a.contentId ?? a.contentID ?? a.content ?? ""),
+      contentEn: String(a.contentEn ?? a.contentEN ?? a.content ?? ""),
+      contentZh: String(a.contentZh ?? a.contentZN ?? a.contentZh ?? a.content ?? ""),
+      date: String(a.date ?? a.published_date ?? new Date().toISOString().slice(0, 10)),
+      category: String(a.category ?? "General"),
+      img: String(a.img ?? a.thumbnail ?? ""),
+      keywords: Array.isArray(a.keywords) ? a.keywords.map((keyword) => String(keyword).trim()).filter(Boolean) : typeof a.keywords === "string" ? a.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean) : [],
+      sortIndex: toSortIndex(a.sortIndex ?? a.sort_index),
+    };
+  }).filter((a) => a.slug && a.title);
 }
 
 function toSortIndex(v: unknown): number {
@@ -676,9 +692,15 @@ export function getSeedArticles(): Article[] {
     const v = localStorage.getItem(KEYS.articles);
     if (v) {
       const parsed = JSON.parse(v) as Article[];
-      // migrate old single-content articles → fill locale variants
+      // migrate old single-title/excerpt/content articles → fill locale variants
       return parsed.map((a) => ({
         ...a,
+        titleId: a.titleId ?? a.title ?? "",
+        titleEn: a.titleEn ?? a.title ?? "",
+        titleZn: a.titleZn ?? a.title ?? "",
+        excerptId: (a as Article).excerptId ?? a.excerpt ?? "",
+        excerptEn: (a as Article).excerptEn ?? a.excerpt ?? "",
+        excerptZn: (a as Article).excerptZn ?? a.excerpt ?? "",
         contentId: a.contentId ?? a.content ?? "",
         contentEn: a.contentEn ?? a.content ?? "",
         contentZh: a.contentZh ?? a.content ?? "",

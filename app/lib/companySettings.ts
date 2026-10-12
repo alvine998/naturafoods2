@@ -29,6 +29,9 @@ export type CompanySettings = {
   misi_person_name: string;
   misi_person_position: string;
   career_banner: string;
+  career_banner_id: string;
+  career_banner_en: string;
+  career_banner_zn: string;
   career_url: string;
   tagline: string;
   email: string;
@@ -70,6 +73,9 @@ export const DEFAULT_COMPANY_SETTINGS: CompanySettings = {
   misi_person_name: "",
   misi_person_position: "",
   career_banner: "",
+  career_banner_id: "",
+  career_banner_en: "",
+  career_banner_zn: "",
   career_url: "",
   tagline: "Food & Beverage Ingredients · Baking Ingredients",
   email: "info@naturafoods.co.id",
@@ -111,7 +117,14 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     misi_person_photo: str(r.misi_person_photo ?? r.misiPersonPhoto ?? ""),
     misi_person_name: str(r.misi_person_name ?? r.misiPersonName ?? ""),
     misi_person_position: str(r.misi_person_position ?? r.misiPersonPosition ?? ""),
-    career_banner: str(r.career_banner ?? r.careerBanner ?? ""),
+    career_banner: str(
+      r.career_banner ?? r.careerBanner ?? r.career_banner_en ?? r.careerBannerEn ?? r.career_banner_id ?? r.careerBannerId ?? r.career_banner_zn ?? r.careerBannerZn ?? "",
+    ),
+    career_banner_id: str(r.career_banner_id ?? r.careerBannerId ?? r.careerBannerID ?? r.career_banner ?? r.careerBanner ?? ""),
+    career_banner_en: str(r.career_banner_en ?? r.careerBannerEn ?? r.careerBannerEN ?? r.career_banner ?? r.careerBanner ?? ""),
+    career_banner_zn: str(
+      r.career_banner_zn ?? r.careerBannerZn ?? r.careerBannerZN ?? r.career_banner_zh ?? r.careerBannerZh ?? r.career_banner ?? r.careerBanner ?? "",
+    ),
     career_url: str(r.career_url ?? r.careerUrl ?? r.url_career ?? r.urlCareer ?? ""),
     tagline: str(r.tagline ?? DEFAULT_COMPANY_SETTINGS.tagline),
     email: str(r.email ?? DEFAULT_COMPANY_SETTINGS.email),
@@ -127,6 +140,24 @@ export function normalizeCompanySettings(raw: unknown): CompanySettings {
     created_at: str(r.created_at ?? r.createdAt ?? ""),
     updated_at: str(r.updated_at ?? r.updatedAt ?? ""),
   };
+}
+
+/**
+ * Localized career banner — ID / EN / ZN variants with fallback to the
+ * legacy single `career_banner`. Mirrors getLocalizedImage() in lib/data.ts
+ * without creating an import cycle.
+ */
+export function getCareerBanner(
+  settings: Pick<CompanySettings, "career_banner" | "career_banner_id" | "career_banner_en" | "career_banner_zn">,
+  locale: string,
+): string {
+  const id = settings.career_banner_id?.trim() ?? "";
+  const en = settings.career_banner_en?.trim() ?? "";
+  const zn = settings.career_banner_zn?.trim() ?? "";
+  const base = settings.career_banner?.trim() ?? "";
+  if (locale === "id") return id || base || en || zn;
+  if (locale === "zh") return zn || base || en || id;
+  return en || base || id || zn;
 }
 
 function loadCached(): CompanySettings {

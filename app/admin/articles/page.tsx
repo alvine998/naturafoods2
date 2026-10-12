@@ -54,7 +54,7 @@ export default function ArticlesPage() {
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
     if (!n) return sortedAll;
-    return sortedAll.filter((x) => `${x.title} ${x.slug} ${x.category}`.toLowerCase().includes(n));
+    return sortedAll.filter((x) => `${x.title} ${x.titleId ?? ""} ${x.titleEn ?? ""} ${x.titleZn ?? ""} ${x.slug} ${x.category}`.toLowerCase().includes(n));
   }, [sortedAll, q]);
   useEffect(() => setPage(1), [q]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -78,7 +78,19 @@ export default function ArticlesPage() {
   };
   const { rowProps, rowClass } = useDragSort({ disabled: isFiltering, onReorder: reorder });
   const openAdd = () => { setF({}); setKeywordDraft(""); setEditIdx(null); setFormOpen(true); setErr(null); setSlugTouched(false); };
-  const openEdit = (i: number) => { setF(s.articles[i]); setKeywordDraft(""); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true); };
+  const openEdit = (i: number) => {
+    const article = s.articles[i];
+    setF({
+      ...article,
+      titleId: article.titleId || article.title,
+      titleEn: article.titleEn || article.title,
+      titleZn: article.titleZn || article.title,
+      excerptId: article.excerptId || article.excerpt,
+      excerptEn: article.excerptEn || article.excerpt,
+      excerptZn: article.excerptZn || article.excerpt,
+    });
+    setKeywordDraft(""); setEditIdx(i); setFormOpen(true); setErr(null); setSlugTouched(true);
+  };
   const closeForm = () => { setF({}); setKeywordDraft(""); setEditIdx(null); setFormOpen(false); setErr(null); setSlugTouched(false); };
   const addKeywords = (value: string) => {
     const additions = value.split(",").map((keyword) => keyword.trim()).filter(Boolean);
@@ -93,31 +105,67 @@ export default function ArticlesPage() {
     setKeywordDraft("");
   };
   const removeKeyword = (index: number) => setF((prev) => ({ ...prev, keywords: (prev.keywords ?? []).filter((_, i) => i !== index) }));
-  const handleTitleChange = (title: string) => {
-    setF((prev) => ({
-      ...prev,
-      title,
-      // auto-create slug from title until the user edits slug manually
-      ...(!slugTouched ? { slug: slugify(title) } : {}),
-    }));
+  const handleLocalizedTitle = (field: "titleId" | "titleEn" | "titleZn", value: string) => {
+    setF((prev) => {
+      const next = { ...prev, [field]: value };
+      const titleId = String(field === "titleId" ? value : (next.titleId ?? ""));
+      const titleEn = String(field === "titleEn" ? value : (next.titleEn ?? ""));
+      const titleZn = String(field === "titleZn" ? value : (next.titleZn ?? ""));
+      // base title stays EN-first for backward compat (list, SEO, old API)
+      const title = titleEn || titleId || titleZn || "";
+      return {
+        ...next,
+        title,
+        // auto-create slug from ID title (fallback EN) until the user edits slug manually
+        ...(!slugTouched ? { slug: slugify(titleId || titleEn || title) } : {}),
+      };
+    });
   };
   const handleSlugChange = (raw: string) => {
     setSlugTouched(true);
     setF((prev) => ({ ...prev, slug: slugify(raw) }));
   };
   const save = async () => {
-    if (!f.title) return;
-    const baseSlug = f.slug?.trim() ? slugify(String(f.slug)) : slugify(String(f.title));
+    if (!f.titleId || !f.titleEn || !f.titleZn) return;
+    const fallbackTitle = String(f.titleEn || f.titleId || f.titleZn || f.title || "");
+    const baseSlug = f.slug?.trim() ? slugify(String(f.slug)) : slugify(String(f.titleId || fallbackTitle));
     if (!baseSlug) { setErr("Title must contain at least 3 letters/numbers to generate a slug."); return; }
     const isEdit = editIdx !== null;
     const originalSlug = isEdit ? s.articles[editIdx!].slug : null;
     const slug = ensureUniqueSlug(baseSlug, (s.articles as Article[]).map((x) => x.slug), originalSlug);
-    const item: Article = { slug, title: String(f.title), excerpt: String(f.excerpt ?? ""), content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? ""), keywords: (f.keywords ?? []).map((keyword) => keyword.trim()).filter(Boolean), sortIndex: toSortIndex(f.sortIndex) };
+    const title = fallbackTitle;
+    const titleId = String(f.titleId ?? "");
+    const titleEn = String(f.titleEn ?? "");
+    const titleZn = String(f.titleZn ?? "");
+    const excerptFallback = String(f.excerptEn || f.excerptId || f.excerptZn || f.excerpt || "");
+    const excerpt = excerptFallback;
+    const excerptId = String(f.excerptId ?? f.excerpt ?? "");
+    const excerptEn = String(f.excerptEn ?? f.excerpt ?? "");
+    const excerptZn = String(f.excerptZn ?? f.excerpt ?? "");
+    const item: Article = { slug, title, titleId, titleEn, titleZn, excerpt, excerptId, excerptEn, excerptZn, content: String(f.contentEn ?? f.content ?? ""), contentId: String(f.contentId ?? ""), contentEn: String(f.contentEn ?? f.content ?? ""), contentZh: String(f.contentZh ?? ""), date: String(f.date ?? new Date().toISOString().slice(0, 10)), category: String(f.category ?? "General"), img: String(f.img ?? ""), keywords: (f.keywords ?? []).map((keyword) => keyword.trim()).filter(Boolean), sortIndex: toSortIndex(f.sortIndex) };
     // API expects also contentID/contentEN/contentZN aliases + isPublished etc — send both shapes for compat
     const payload: Record<string, unknown> = {
       slug: item.slug,
       title: item.title,
+      titleId: item.titleId,
+      titleEn: item.titleEn,
+      titleZn: item.titleZn,
+      title_id: item.titleId,
+      title_en: item.titleEn,
+      title_zn: item.titleZn,
+      titleID: item.titleId,
+      titleEN: item.titleEn,
+      titleZN: item.titleZn,
       excerpt: item.excerpt,
+      excerptId: item.excerptId,
+      excerptEn: item.excerptEn,
+      excerptZn: item.excerptZn,
+      excerpt_id: item.excerptId,
+      excerpt_en: item.excerptEn,
+      excerpt_zn: item.excerptZn,
+      excerptID: item.excerptId,
+      excerptEN: item.excerptEn,
+      excerptZN: item.excerptZn,
       content: item.content,
       contentId: item.contentId,
       contentID: item.contentId,
@@ -183,8 +231,12 @@ export default function ArticlesPage() {
         <Card className="mt-4 p-4 sm:p-6">
           <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[4]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="title"><Input value={f.title ?? ""} onChange={(e) => handleTitleChange(e.target.value)} placeholder="How to temper couverture" /></Field>
-            <Field label="slug (auto from title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Title (Indonesian)"><Input value={f.titleId ?? ""} onChange={(e) => handleLocalizedTitle("titleId", e.target.value)} placeholder="Cara temper couverture" /></Field>
+              <Field label="Title (English)"><Input value={f.titleEn ?? ""} onChange={(e) => handleLocalizedTitle("titleEn", e.target.value)} placeholder="How to temper couverture" /></Field>
+              <Field label="Title (Chinese)"><Input value={f.titleZn ?? ""} onChange={(e) => handleLocalizedTitle("titleZn", e.target.value)} placeholder="调温巧克力指南" /></Field>
+            </div>
+            <Field label="slug (auto from ID title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
             <Field label="category"><Input value={f.category ?? ""} onChange={(e) => setF({ ...f, category: e.target.value })} placeholder="Guide" /></Field>
             <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
             <div className="sm:col-span-2">
@@ -210,7 +262,11 @@ export default function ArticlesPage() {
             </div>
             <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="articles" /></Field></div>
-            <div className="sm:col-span-2"><Field label="excerpt"><TextArea value={f.excerpt ?? ""} onChange={(e) => setF({ ...f, excerpt: e.target.value })} rows={2} placeholder="Short summary" /></Field></div>
+            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
+              <Field label="Excerpt (Indonesian)"><TextArea value={f.excerptId ?? ""} onChange={(e) => setF({ ...f, excerptId: e.target.value, excerpt: e.target.value || f.excerptEn || f.excerptZn || "" })} rows={2} placeholder="Ringkasan singkat" /></Field>
+              <Field label="Excerpt (English)"><TextArea value={f.excerptEn ?? ""} onChange={(e) => setF({ ...f, excerptEn: e.target.value, excerpt: e.target.value || f.excerptId || f.excerptZn || "" })} rows={2} placeholder="Short summary" /></Field>
+              <Field label="Excerpt (Chinese)"><TextArea value={f.excerptZn ?? ""} onChange={(e) => setF({ ...f, excerptZn: e.target.value, excerpt: e.target.value || f.excerptEn || f.excerptId || "" })} rows={2} placeholder="简短摘要" /></Field>
+            </div>
             <div className="sm:col-span-2 grid gap-2">
               <div className="flex items-center justify-between"><span className="text-[10px] tracking-[0.14em] text-[#8B6F47]">Content — WYSIWYG</span><span className="text-[11px] text-[#8B6F47]">Quill</span></div>
               <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1 w-fit">
@@ -223,8 +279,8 @@ export default function ArticlesPage() {
               {localeTab === "zh" && <QuillEditor value={f.contentZh ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentZh: v }))} placeholder="撰写内容（中文）…" />}
             </div>
           </div>
-          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.title || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
-          {!f.title && <p className="mt-2 text-[11px] text-[#8B6F47]">Title required — slug is generated automatically.</p>}
+          <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.titleId || !f.titleEn || !f.titleZn || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
+          {(!f.titleId || !f.titleEn || !f.titleZn) && <p className="mt-2 text-[11px] text-[#8B6F47]">Title ID, EN & ZN required — slug is generated automatically from the ID title.</p>}
         </Card>
       ) : !s.apiReady ? (
         <div className="mt-4 grid gap-3">
@@ -264,7 +320,7 @@ export default function ArticlesPage() {
                            />
                          </td>
                          <td className="px-3 py-2">{img ? (isVideo ? <video src={img} className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" muted /> : <Image src={img} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#F5EFE0]" width={40} height={40} />) : <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5EFE0] text-[10px] text-[#8B6F47]">—</span>}</td>
-                        <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1">{ar.title}</td>
+                        <td className="px-3 py-2 font-medium text-[#2D4A22] line-clamp-1" title={`ID: ${ar.titleId || ar.title} | EN: ${ar.titleEn || ar.title} | ZN: ${ar.titleZn || ar.title}`}>{ar.titleEn || ar.title}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.slug}</td>
                         <td className="px-3 py-2">{ar.category}</td>
                         <td className="px-3 py-2 text-[#8B6F47]">{ar.date}</td>

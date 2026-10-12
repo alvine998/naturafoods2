@@ -130,13 +130,18 @@ await apiFetch(`/admin/official-partners/${id}`, { method:"DELETE" });
 ```ts
 const { data, meta } = await apiFetch<Article[]>(`/articles?q=&category=&page=1&limit=10&sort=date:desc`);
 const { data: article } = await apiFetch<Article>(`/articles/${slug}`);
-await apiFetch("/admin/articles", { method:"POST", body: JSON.stringify({slug,title: "Tempering Guide", category, excerpt, thumbnail: img, contentID:"<p>ID</p>", contentEN:"<p>EN</p>", contentZN:"<p>ZH</p>", status:"published"}) });
+await apiFetch("/admin/articles", { method:"POST", body: JSON.stringify({slug,title: "Tempering Guide", titleId:"Panduan Tempering", titleEn:"Tempering Guide", titleZn:"调温指南", category, excerpt, excerptId, excerptEn, excerptZn, thumbnail: img, contentID:"<p>ID</p>", contentEN:"<p>EN</p>", contentZN:"<p>ZH</p>", status:"published"}) });
 await apiFetch(`/admin/articles/${slug}`, { method:"PUT", body: JSON.stringify({...}) });
 await apiFetch(`/admin/articles/${slug}`, { method:"DELETE" });
+
+// localized display (app/lib/data.ts)
+import { getArticleTitle, getArticleExcerpt } from "@/app/lib/data";
+const localizedTitle = getArticleTitle(article, locale); // id → titleId, en → titleEn, zh → titleZn
+const localizedExcerpt = getArticleExcerpt(article, locale); // id → excerptId, en → excerptEn, zh → excerptZn
 ```
 
 The API returns both legacy and contract shapes for compatibility:
-`{ slug, title, titleEN, titleID, titleZN, contentEN/contentEn, img/thumbnail, date/published_date, isPublished/status, ... }`
+`{ slug, title, titleEN/titleEn/title_en, titleID/titleId/title_id, titleZN/titleZn/title_zn (+titleZh alias), excerpt, excerptEN/excerptEn/excerpt_en, excerptID/excerptId/excerpt_id, excerptZN/excerptZn/excerpt_zn (+excerptZh alias), contentEN/contentEn, img/thumbnail, date/published_date, isPublished/status, ... }`
 
 ## 6. Education / Innovation / Jobs
 
@@ -303,7 +308,11 @@ const { data: byId } = await apiFetch<CompanySettings>(`/company-settings/${id}`
 
 // admin (Authorization: Bearer <token> via apiFetch /admin/*)
 const { data: current } = await apiFetch<CompanySettings>("/admin/company-settings"); // 404 when no row
-await apiFetch("/admin/company-settings", { method: "POST", body: JSON.stringify({ id: "default", name, logo, description, visi_id, visi_en, visi_zn, misi_id, misi_en, misi_zn, visi_background, misi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position }) }); // 409 if exists
+await apiFetch("/admin/company-settings", { method: "POST", body: JSON.stringify({ id: "default", name, logo, description, visi_id, visi_en, visi_zn, misi_id, misi_en, misi_zn, visi_background, misi_background, visi_person_photo, visi_person_name, visi_person_position, misi_person_photo, misi_person_name, misi_person_position, career_banner, career_banner_id, career_banner_en, career_banner_zn, career_url }) }); // 409 if exists
+
+// localized career banner (app/lib/companySettings.ts)
+import { getCareerBanner } from "@/app/lib/companySettings";
+const banner = getCareerBanner(settings, locale); // id → career_banner_id, en → career_banner_en, zh → career_banner_zn
 await apiFetch("/admin/company-settings", { method: "PUT", body: JSON.stringify({ ...settings }) }); // full replace
 await apiFetch("/admin/company-settings", { method: "PATCH", body: JSON.stringify({ misi_id: "…", misi_en: "…", misi_zn: "…", visi_background: "https://cdn.example/vision-bg.webp", misi_background: "https://cdn.example/mission-bg.webp" }) }); // partial
 await apiFetch("/admin/company-settings", { method: "DELETE" }); // next public GET recreates default

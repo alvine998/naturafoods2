@@ -30,10 +30,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const result = await response.json() as { success?: boolean; data?: Record<string, unknown> };
       const data = result.data;
       if (result.success && data && data.isPublished !== false && data.is_published !== false) {
+        const titleEn = String(data.titleEn ?? data.title_en ?? data.titleEN ?? "");
+        const titleId = String(data.titleId ?? data.title_id ?? data.titleID ?? "");
+        const titleZn = String(data.titleZn ?? data.title_zn ?? data.titleZN ?? data.titleZh ?? data.title_zh ?? "");
+        const excerptEn = String(data.excerptEn ?? data.excerpt_en ?? data.excerptEN ?? "");
+        const excerptId = String(data.excerptId ?? data.excerpt_id ?? data.excerptID ?? "");
+        const excerptZn = String(data.excerptZn ?? data.excerpt_zn ?? data.excerptZN ?? data.excerptZh ?? data.excerpt_zh ?? "");
         article = {
           slug: String(data.slug ?? slug),
-          title: String(data.title ?? "Article"),
-          excerpt: String(data.excerpt ?? ""),
+          title: String(data.title ?? titleEn ?? titleId ?? titleZn ?? "Article"),
+          titleId,
+          titleEn,
+          titleZn,
+          excerpt: String(data.excerpt ?? excerptEn ?? excerptId ?? excerptZn ?? ""),
+          excerptId,
+          excerptEn,
+          excerptZn,
           content: "",
           date: String(data.date ?? data.published_date ?? ""),
           category: String(data.category ?? ""),

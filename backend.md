@@ -222,8 +222,14 @@ Resp 200: { "data": { "slug":"...", "isHighlight": true } }
 type Article = {
   id: string;        // uuid backend, frontend uses slug as id
   slug: string;      // unique, e.g. "tempering-guide"
-  title: string;     // required
-  excerpt: string;   // 0-300
+  title: string;     // required, EN-first fallback (titleEn || titleId || titleZn)
+  titleId: string;   // ID locale title (required)
+  titleEn: string;   // EN locale title (required)
+  titleZn: string;   // ZN locale title (required, `titleZh`/`title_zh` accepted as alias)
+  excerpt: string;   // 0-300, EN-first fallback (excerptEn || excerptId || excerptZn)
+  excerptId: string; // ID locale excerpt
+  excerptEn: string; // EN locale excerpt
+  excerptZn: string; // ZN locale excerpt (`excerptZh`/`excerpt_zh` accepted as alias)
   content: string;   // deprecated fallback (EN)
   contentId: string; // ID locale HTML
   contentEn: string; // EN locale HTML
@@ -238,6 +244,14 @@ type Article = {
 }
 ```
 
+Write aliases accepted for every localized field (same pattern as products):
+`titleId/title_id/titleID`, `titleEn/title_en/titleEN`, `titleZn/title_zn/titleZN`
+(+ `titleZh/title_zh` alias), `excerptId/excerpt_id/excerptID`,
+`excerptEn/excerpt_en/excerptEN`, `excerptZn/excerpt_zn/excerptZN`
+(+ `excerptZh/excerpt_zh` alias). Public displays use
+`getArticleTitle(article, locale)` / `getArticleExcerpt(article, locale)`
+(`app/lib/data.ts`) with EN-first fallback for missing locales.
+
 ### 4.2 Endpoints
 - `GET /articles?q=&category=&page=&limit=&sort=date:desc`
 - `GET /articles/:slug`
@@ -248,6 +262,26 @@ type Article = {
 - `PATCH /admin/articles/:slug/publish` `{isPublished}` (if needed).
 
 Frontend `app/admin/articles/page.tsx` uses `QuillEditor` with locale tabs `id|en|zh`. Backend stores HTML as-is (sanitize on write).
+
+### 4.3 DB migration (MySQL) — localized title + excerpt
+
+```sql
+ALTER TABLE `articles`
+  ADD COLUMN `title_id` mediumtext NULL,
+  ADD COLUMN `title_en` mediumtext NULL,
+  ADD COLUMN `title_zn` mediumtext NULL,
+  ADD COLUMN `excerpt_id` mediumtext NULL,
+  ADD COLUMN `excerpt_en` mediumtext NULL,
+  ADD COLUMN `excerpt_zn` mediumtext NULL;
+
+UPDATE `articles` SET `title_en` = `title` WHERE `title_en` IS NULL AND `title` IS NOT NULL;
+UPDATE `articles` SET `excerpt_en` = `excerpt` WHERE `excerpt_en` IS NULL AND `excerpt` IS NOT NULL;
+```
+
+Backfill `_id` / `_zn` from the base column the same way when the legacy
+row holds the best available copy. Reads must fall back EN-first
+(`title_en || title_id || title_zn`, `excerpt_en || excerpt_id || excerpt_zn`)
+when a locale column is NULL/empty — same rule as the frontend helpers.
 
 ---
 
@@ -583,7 +617,13 @@ model Article {
   id        String @id @default(uuid())
   slug      String @unique
   title     String
+  titleId   String? @db.Text
+  titleEn   String? @db.Text
+  titleZn   String? @db.Text
   excerpt   String? @db.Text
+  excerptId String? @db.Text
+  excerptEn String? @db.Text
+  excerptZn String? @db.Text
   content   String? @db.Text
   contentId String? @db.Text
   contentEn String? @db.Text
@@ -652,6 +692,11 @@ model CompanySetting {
   misiPersonPhoto String? @map("misi_person_photo")
   misiPersonName String? @map("misi_person_name")
   misiPersonPosition String? @map("misi_person_position")
+  careerBanner String? @map("career_banner")
+  careerBannerId String? @map("career_banner_id")
+  careerBannerEn String? @map("career_banner_en")
+  careerBannerZn String? @map("career_banner_zn")
+  careerUrl String? @map("career_url")
   tagline     String?
   email       String?
   phone       String?
@@ -771,6 +816,10 @@ CREATE TABLE IF NOT EXISTS `company_settings` (
   `misi_person_photo` varchar(500) DEFAULT NULL,
   `misi_person_name` varchar(200) DEFAULT NULL,
   `misi_person_position` varchar(200) DEFAULT NULL,
+  `career_banner` varchar(500) DEFAULT NULL,
+  `career_banner_id` varchar(500) DEFAULT NULL,
+  `career_banner_en` varchar(500) DEFAULT NULL,
+  `career_banner_zn` varchar(500) DEFAULT NULL,
   `tagline` varchar(300) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
@@ -789,6 +838,21 @@ CREATE TABLE IF NOT EXISTS `company_settings` (
 ```
 
 Singleton id is `"default"`. Timestamps use `created_at`/`updated_at` (`YYYY-MM-DD HH:mm:ss`, UTC); API serializes ISO8601 `created_at`/`updated_at` (camelCase `createdAt`/`updatedAt` also accepted on write).
+
+Migration for existing tables (localized career banner):
+
+```sql
+ALTER TABLE `company_settings`
+  ADD COLUMN `career_banner_id` varchar(500) NULL DEFAULT NULL,
+  ADD COLUMN `career_banner_en` varchar(500) NULL DEFAULT NULL,
+  ADD COLUMN `career_banner_zn` varchar(500) NULL DEFAULT NULL;
+
+UPDATE `company_settings` SET `career_banner_en` = `career_banner` WHERE `career_banner_en` IS NULL AND `career_banner` IS NOT NULL;
+```
+
+Backfill `_id` / `_zn` from `career_banner` the same way when needed.
+Reads fall back EN-first via `getCareerBanner()` semantics
+(`en || base || id || zn` for EN, per-locale first otherwise).
 
 Default row (created on first public GET when table is empty):
 
@@ -812,6 +876,10 @@ Default row (created on first public GET when table is empty):
   "misi_person_photo": "",
   "misi_person_name": "",
   "misi_person_position": "",
+  "career_banner": "",
+  "career_banner_id": "",
+  "career_banner_en": "",
+  "career_banner_zn": "",
   "tagline": "Food & Beverage Ingredients · Baking Ingredients",
   "email": "info@naturafoods.co.id",
   "phone": "0812 9507 1397",
@@ -848,6 +916,10 @@ type CompanySettings = {
   misi_person_photo: string;    // optional image URL
   misi_person_name: string;     // optional, profile appears when photo and name are set
   misi_person_position: string;
+  career_banner: string;    // legacy fallback (EN-first); kept for backward compat
+  career_banner_id: string; // ID locale banner for /careers
+  career_banner_en: string; // EN locale banner for /careers
+  career_banner_zn: string; // ZN locale banner for /careers
   tagline: string;   // 0-300
   email: string;     // 0-150, email format when non-empty
   phone: string;     // 0-50
