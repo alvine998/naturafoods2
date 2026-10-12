@@ -125,6 +125,20 @@ export default function ArticlesPage() {
     setSlugTouched(true);
     setF((prev) => ({ ...prev, slug: slugify(raw) }));
   };
+  const handleLocalizedExcerpt = (field: "excerptId" | "excerptEn" | "excerptZn", value: string) => {
+    setF((prev) => {
+      const next = { ...prev, [field]: value };
+      const excerptId = String(field === "excerptId" ? value : (next.excerptId ?? ""));
+      const excerptEn = String(field === "excerptEn" ? value : (next.excerptEn ?? ""));
+      const excerptZn = String(field === "excerptZn" ? value : (next.excerptZn ?? ""));
+      // base excerpt stays EN-first for backward compat (list, SEO, old API)
+      return { ...next, excerpt: excerptEn || excerptId || excerptZn || "" };
+    });
+  };
+  // Active locale tab drives title + excerpt + content together (one toggle).
+  const titleField = localeTab === "id" ? "titleId" : localeTab === "en" ? "titleEn" : "titleZn";
+  const excerptField = localeTab === "id" ? "excerptId" : localeTab === "en" ? "excerptEn" : "excerptZn";
+  const titleFilled = { id: !!f.titleId?.trim(), en: !!f.titleEn?.trim(), zh: !!f.titleZn?.trim() };
   const save = async () => {
     if (!f.titleId || !f.titleEn || !f.titleZn) return;
     const fallbackTitle = String(f.titleEn || f.titleId || f.titleZn || f.title || "");
@@ -231,12 +245,16 @@ export default function ArticlesPage() {
         <Card className="mt-4 p-4 sm:p-6">
           <div className="flex items-center justify-between"><h3 className="text-[11px] tracking-[0.14em] text-[#2D4A22]">{editIdx !== null ? a.edit : a.add} — {a.tabs[4]}</h3><button onClick={closeForm} className="rounded-full border px-3 py-1 text-[11px]">✕ Close</button></div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
-              <Field label="Title (Indonesian)"><Input value={f.titleId ?? ""} onChange={(e) => handleLocalizedTitle("titleId", e.target.value)} placeholder="Cara temper couverture" /></Field>
-              <Field label="Title (English)"><Input value={f.titleEn ?? ""} onChange={(e) => handleLocalizedTitle("titleEn", e.target.value)} placeholder="How to temper couverture" /></Field>
-              <Field label="Title (Chinese)"><Input value={f.titleZn ?? ""} onChange={(e) => handleLocalizedTitle("titleZn", e.target.value)} placeholder="调温巧克力指南" /></Field>
+            <div className="sm:col-span-2 grid gap-2">
+              <div className="flex items-center justify-between"><span className="text-[10px] tracking-[0.14em] text-[#8B6F47]">Language — title, excerpt & content follow this tab</span></div>
+              <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1 w-fit">
+                {(["id", "en", "zh"] as const).map((loc) => (
+                  <button key={loc} type="button" onClick={() => setLocaleTab(loc)} className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium ${localeTab === loc ? "bg-[#2D4A22] text-white" : "text-[#8B6F47]"}`}>{loc === "id" ? "ID" : loc === "en" ? "EN" : "中文"}{titleFilled[loc] && <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />}</button>
+                ))}
+              </div>
             </div>
-            <Field label="slug (auto from ID title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
+            <div className="sm:col-span-2"><Field label={`Title (${localeTab === "id" ? "Indonesian" : localeTab === "en" ? "English" : "Chinese"})`}><Input value={f[titleField] ?? ""} onChange={(e) => handleLocalizedTitle(titleField, e.target.value)} placeholder={localeTab === "id" ? "Cara temper couverture" : localeTab === "en" ? "How to temper couverture" : "调温巧克力指南"} /></Field></div>
+            <Field label="slug (auto from title — editable)"><Input value={f.slug ?? ""} onChange={(e) => handleSlugChange(e.target.value)} placeholder="how-to-temper-couverture" /></Field>
             <Field label="category"><Input value={f.category ?? ""} onChange={(e) => setF({ ...f, category: e.target.value })} placeholder="Guide" /></Field>
             <Field label="date"><Input type="date" value={f.date ?? ""} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
             <div className="sm:col-span-2">
@@ -262,25 +280,16 @@ export default function ArticlesPage() {
             </div>
             <SortIndexField value={f.sortIndex} onChange={(v) => setF({ ...f, sortIndex: v })} />
             <div className="sm:col-span-2"><Field label="image / video"><FileUpload value={f.img ?? ""} onChange={(v) => setF({ ...f, img: v })} accept="image/*,video/*" folder="articles" /></Field></div>
-            <div className="sm:col-span-2 grid gap-3 sm:grid-cols-3">
-              <Field label="Excerpt (Indonesian)"><TextArea value={f.excerptId ?? ""} onChange={(e) => setF({ ...f, excerptId: e.target.value, excerpt: e.target.value || f.excerptEn || f.excerptZn || "" })} rows={2} placeholder="Ringkasan singkat" /></Field>
-              <Field label="Excerpt (English)"><TextArea value={f.excerptEn ?? ""} onChange={(e) => setF({ ...f, excerptEn: e.target.value, excerpt: e.target.value || f.excerptId || f.excerptZn || "" })} rows={2} placeholder="Short summary" /></Field>
-              <Field label="Excerpt (Chinese)"><TextArea value={f.excerptZn ?? ""} onChange={(e) => setF({ ...f, excerptZn: e.target.value, excerpt: e.target.value || f.excerptEn || f.excerptId || "" })} rows={2} placeholder="简短摘要" /></Field>
-            </div>
+            <div className="sm:col-span-2"><Field label={`Excerpt (${localeTab === "id" ? "Indonesian" : localeTab === "en" ? "English" : "Chinese"})`}><TextArea value={f[excerptField] ?? ""} onChange={(e) => handleLocalizedExcerpt(excerptField, e.target.value)} rows={2} placeholder={localeTab === "id" ? "Ringkasan singkat" : localeTab === "en" ? "Short summary" : "简短摘要"} /></Field></div>
             <div className="sm:col-span-2 grid gap-2">
-              <div className="flex items-center justify-between"><span className="text-[10px] tracking-[0.14em] text-[#8B6F47]">Content — WYSIWYG</span><span className="text-[11px] text-[#8B6F47]">Quill</span></div>
-              <div className="flex gap-1 rounded-full border border-[#2D4A22]/10 bg-white p-1 w-fit">
-                {(["id", "en", "zh"] as const).map((loc) => (
-                  <button key={loc} type="button" onClick={() => setLocaleTab(loc)} className={`rounded-full px-3 py-1.5 text-[11px] font-medium ${localeTab === loc ? "bg-[#2D4A22] text-white" : "text-[#8B6F47]"}`}>{loc === "id" ? "ID" : loc === "en" ? "EN" : "中文"}</button>
-                ))}
-              </div>
+              <div className="flex items-center justify-between"><span className="text-[10px] tracking-[0.14em] text-[#8B6F47]">Content — WYSIWYG ({localeTab === "id" ? "Indonesian" : localeTab === "en" ? "English" : "Chinese"})</span><span className="text-[11px] text-[#8B6F47]">Quill</span></div>
               {localeTab === "id" && <QuillEditor value={f.contentId ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentId: v }))} placeholder="Tulis konten (ID)…" />}
               {localeTab === "en" && <QuillEditor value={f.contentEn ?? (f.content ?? "")} onChange={(v) => setF((prev) => ({ ...prev, contentEn: v, content: v }))} placeholder="Write content (EN)…" />}
               {localeTab === "zh" && <QuillEditor value={f.contentZh ?? ""} onChange={(v) => setF((prev) => ({ ...prev, contentZh: v }))} placeholder="撰写内容（中文）…" />}
             </div>
           </div>
           <div className="mt-4 flex gap-2"><button onClick={save} disabled={!f.titleId || !f.titleEn || !f.titleZn || saving} className="rounded-full bg-[#2D4A22] px-6 py-2.5 text-[11px] text-white disabled:opacity-50">{saving ? "Saving…" : a.save}</button><button onClick={closeForm} disabled={saving} className="rounded-full border px-6 py-2.5 text-[11px]">{a.cancel}</button></div>
-          {(!f.titleId || !f.titleEn || !f.titleZn) && <p className="mt-2 text-[11px] text-[#8B6F47]">Title ID, EN & ZN required — slug is generated automatically from the ID title.</p>}
+          {(!f.titleId || !f.titleEn || !f.titleZn) && <p className="mt-2 text-[11px] text-[#8B6F47]">Title required in all 3 languages — missing: {[!f.titleId && "ID", !f.titleEn && "EN", !f.titleZn && "ZN"].filter(Boolean).join(", ")}. Switch tabs to fill each one.</p>}
         </Card>
       ) : !s.apiReady ? (
         <div className="mt-4 grid gap-3">
