@@ -11,7 +11,7 @@ concurrency:
 
 env:
   NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'https://api-naturafoods.alvineitsolutions.com/api/v1' }}
-  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://naturafoods.alvineitsolutions.com' }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://naturaintisukses.com' }}
 
 jobs:
   verify:

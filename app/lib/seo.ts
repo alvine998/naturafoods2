@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 // ponytail: set NEXT_PUBLIC_SITE_URL in env for correct canonical/og urls in production
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://naturafoods.id").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://naturaintisukses.com").replace(/\/$/, "");
 export const SITE_NAME = "NaturaFoods";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/logo.png`;
 
